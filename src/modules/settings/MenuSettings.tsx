@@ -18,6 +18,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Button, Col, List, Row, Spin } from 'antd';
 import { useEffect, useState } from 'react';
+import { defaultMenus } from '../../config/menus';
 import MenuService from '../../services/MenuService';
 import MenuModalForm from './components/MenuModalForm';
 
@@ -263,8 +264,28 @@ export default function MenuSettings() {
 
   const saveMenuWeights = async (itemsWithWeights: any[]) => {
     try {
-      // You can implement this method in MenuService
-      await MenuService.updateMenuWeights(itemsWithWeights);
+      // Fix
+      const fixedItems: any[] = [];
+      itemsWithWeights.forEach((item) => {
+        const fixedItem = defaultMenus[item.collection] || {
+          children: [
+            {
+              key: `/collections/${item.collection}`,
+              label: `${item.label} List`,
+            },
+            {
+              key: `/collections/${item.collection}/create`,
+              label: `Create ${item.label}`,
+            },
+          ],
+        };
+        fixedItems.push({
+          ...fixedItem,
+          ...item,
+        });
+      });
+      // console.log('Saving menu weights:', fixedItems);
+      await MenuService.updateMenuWeights(fixedItems);
     } catch (error) {
       console.error('Failed to save menu weights:', error);
       // Optionally show an error message to the user

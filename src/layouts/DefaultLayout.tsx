@@ -23,8 +23,6 @@ export default function DefaultLayout() {
     return MenuService.getMenuItems();
   });
 
-  console.log(mainMenus);
-
   useEffect(() => {
     if (mainMenus && mainMenus.length > 0) {
       const items: any[] = [
@@ -69,7 +67,7 @@ export default function DefaultLayout() {
           defaultSelectedKeys={['1']}
           mode='inline'
           items={menuItems}
-          onClick={(item) => navigate(item.key)}
+          onClick={(item: any) => navigate(item.key)}
         />
       </Sider>
 

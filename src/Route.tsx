@@ -14,8 +14,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
-console.log({ routes });
-
 export default function AppRoutes() {
   return (
     <Routes>
