@@ -1,11 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+import routes from './config/routes';
 import { useAuth } from './hooks/useAuth';
 import DefaultLayout from './layouts/DefaultLayout';
 import Login from './modules/authenticates/Login';
-import CollectionRoutes from './modules/collections/CollectionRoutes';
-import IndexRoutes from './modules/index/IndexRoutes';
-import SettingRoutes from './modules/settings/SettingRoutes';
-import UserRoutes from './modules/users/UserRoutes';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -29,10 +26,9 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        {IndexRoutes()}
-        {CollectionRoutes()}
-        {UserRoutes()}
-        {SettingRoutes()}
+        {routes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.element} />
+        ))}
       </Route>
       {/* <Route path='*' element={<Navigate to='/' replace />} /> */}
     </Routes>

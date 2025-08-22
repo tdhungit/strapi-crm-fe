@@ -1,4 +1,4 @@
-import { UnorderedListOutlined } from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
 import {
   closestCenter,
   DndContext,
@@ -16,11 +16,20 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Col, List, Row, Spin } from 'antd';
+import { Button, Col, List, Row, Spin } from 'antd';
 import { useEffect, useState } from 'react';
 import MenuService from '../../services/MenuService';
+import MenuModalForm from './components/MenuModalForm';
 
-function SortableItem({ menu, listType }: { menu: any; listType: 'available' | 'hidden' }) {
+function SortableItem({
+  menu,
+  listType,
+  onEdit,
+}: {
+  menu: any;
+  listType: 'available' | 'hidden';
+  onEdit: (menu: any) => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: menu.key,
     data: {
@@ -34,13 +43,21 @@ function SortableItem({ menu, listType }: { menu: any; listType: 'available' | '
     transition,
   };
 
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onEdit(menu);
+  };
+
   return (
     <div ref={setNodeRef} style={style} {...attributes}>
-      <List.Item {...listeners}>
-        <List.Item.Meta title={<strong>{menu.label}</strong>} description={menu.key} />
-        <div>
-          <UnorderedListOutlined />
+      <List.Item>
+        <div {...listeners} style={{ flex: 1, cursor: 'grab' }}>
+          <List.Item.Meta title={<strong>{menu.label}</strong>} description={menu.key} />
         </div>
+        <Button type='link' onClick={handleEditClick} style={{ cursor: 'pointer' }}>
+          <EditOutlined />
+        </Button>
       </List.Item>
     </div>
   );
@@ -76,6 +93,10 @@ export default function MenuSettings() {
   const [loading, setLoading] = useState(true);
   const [shouldSave, setShouldSave] = useState(false);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null);
+  const [modalLoading, setModalLoading] = useState(false);
+
   useEffect(() => {
     MenuService.getAvailableMenuItems().then((menus) => {
       // Add weight property if it doesn't exist, based on current order
@@ -106,6 +127,49 @@ export default function MenuSettings() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const handleEditMenu = (menu: any) => {
+    setEditingItem(menu);
+    setModalVisible(true);
+  };
+
+  const handleModalCancel = () => {
+    setModalVisible(false);
+    setEditingItem(null);
+  };
+
+  const handleModalSave = async (values: any) => {
+    setModalLoading(true);
+    try {
+      // Update the item in the appropriate list
+      if (editingItem) {
+        const updatedItem = { ...editingItem, ...values };
+
+        // Check if item is in available or hidden list
+        const isInAvailable = items.some((item) => item.key === editingItem.key);
+        const isInHidden = hiddenItems.some((item) => item.key === editingItem.key);
+
+        if (isInAvailable) {
+          setItems((prevItems) =>
+            prevItems.map((item) => (item.key === editingItem.key ? updatedItem : item))
+          );
+          setShouldSave(true);
+        } else if (isInHidden) {
+          setHiddenItems((prevItems) =>
+            prevItems.map((item) => (item.key === editingItem.key ? updatedItem : item))
+          );
+        }
+
+        console.log('Menu item updated:', updatedItem);
+      }
+    } catch (error) {
+      console.error('Failed to update menu item:', error);
+    } finally {
+      setModalLoading(false);
+      setModalVisible(false);
+      setEditingItem(null);
+    }
+  };
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -226,7 +290,9 @@ export default function MenuSettings() {
               >
                 <List
                   dataSource={items || []}
-                  renderItem={(menu) => <SortableItem menu={menu} listType='available' />}
+                  renderItem={(menu) => (
+                    <SortableItem menu={menu} listType='available' onEdit={handleEditMenu} />
+                  )}
                   locale={{ emptyText: 'No available menu items.' }}
                   bordered
                   size='small'
@@ -244,7 +310,9 @@ export default function MenuSettings() {
               >
                 <List
                   dataSource={hiddenItems || []}
-                  renderItem={(menu) => <SortableItem menu={menu} listType='hidden' />}
+                  renderItem={(menu) => (
+                    <SortableItem menu={menu} listType='hidden' onEdit={handleEditMenu} />
+                  )}
                   locale={{ emptyText: 'No hidden menu items.' }}
                   bordered
                   size='small'
@@ -256,6 +324,14 @@ export default function MenuSettings() {
           </Col>
         </Row>
       </DndContext>
+
+      <MenuModalForm
+        visible={modalVisible}
+        menuItem={editingItem}
+        onCancel={handleModalCancel}
+        onSave={handleModalSave}
+        loading={modalLoading}
+      />
     </div>
   );
 }
