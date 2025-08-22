@@ -19,12 +19,14 @@ export default function DefaultLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [menuItems, setMenuItems] = useState<any[]>([]);
 
-  const { data: contentTypes } = useRequest(() => {
+  const { data: mainMenus } = useRequest(() => {
     return MenuService.getMenuItems();
   });
 
+  console.log(mainMenus);
+
   useEffect(() => {
-    if (contentTypes && contentTypes.length > 0) {
+    if (mainMenus && mainMenus.length > 0) {
       const items: any[] = [
         {
           key: 'home',
@@ -32,7 +34,7 @@ export default function DefaultLayout() {
           label: 'Home',
         },
       ];
-      contentTypes.forEach((item: any) => {
+      mainMenus.forEach((item: any) => {
         const IconComponent = iconMap[item.icon] || FileTextOutlined;
         let children: any;
         if (item.children && item.children.length > 0) {
@@ -49,7 +51,7 @@ export default function DefaultLayout() {
       // Set the menu items state
       setMenuItems(items);
     }
-  }, [contentTypes]);
+  }, [mainMenus]);
 
   return (
     <Layout style={{ minHeight: '100vh', width: '100%' }}>
