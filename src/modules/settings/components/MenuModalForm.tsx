@@ -2,13 +2,14 @@ import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Form, Input, Modal, Row, Select, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { iconMap } from '../../../config/icons';
+import routes from '../../../config/routes';
 
 interface MenuItem {
   key: string;
   label: string;
   icon?: string;
   weight?: number;
-  children?: { route: string; label: string }[];
+  children?: { key: string; label: string }[];
 }
 
 interface MenuModalFormProps {
@@ -27,7 +28,7 @@ export default function MenuModalForm({
   loading = false,
 }: MenuModalFormProps) {
   const [form] = Form.useForm();
-  const [childrenItems, setChildrenItems] = useState<{ route: string; label: string }[]>([]);
+  const [childrenItems, setChildrenItems] = useState<{ key: string; label: string }[]>([]);
 
   // Reset form and children state when modal opens/closes or menuItem changes
   useEffect(() => {
@@ -71,7 +72,7 @@ export default function MenuModalForm({
   };
 
   const addChildItem = () => {
-    setChildrenItems([...childrenItems, { route: '', label: '' }]);
+    setChildrenItems([...childrenItems, { key: '', label: '' }]);
   };
 
   const removeChildItem = (index: number) => {
@@ -79,7 +80,7 @@ export default function MenuModalForm({
     setChildrenItems(newChildren);
   };
 
-  const updateChildItem = (index: number, field: 'route' | 'label', value: string) => {
+  const updateChildItem = (index: number, field: 'key' | 'label', value: string) => {
     const newChildren = [...childrenItems];
     newChildren[index] = { ...newChildren[index], [field]: value };
     setChildrenItems(newChildren);
@@ -97,14 +98,10 @@ export default function MenuModalForm({
   }));
 
   // Sample route options - you can replace this with actual routes from your app
-  const routeOptions = [
-    { label: 'Dashboard', value: '/dashboard' },
-    { label: 'Users', value: '/users' },
-    { label: 'Settings', value: '/settings' },
-    { label: 'Profile', value: '/profile' },
-    { label: 'Reports', value: '/reports' },
-    { label: 'Analytics', value: '/analytics' },
-  ];
+  const routeOptions = routes.map((route) => ({
+    label: route.name,
+    value: route.path,
+  }));
 
   return (
     <Modal
@@ -182,8 +179,8 @@ export default function MenuModalForm({
                     <Form.Item label='Route' required style={{ marginBottom: 8 }}>
                       <Select
                         placeholder='Select route'
-                        value={child.route}
-                        onChange={(value) => updateChildItem(index, 'route', value)}
+                        value={child.key}
+                        onChange={(value) => updateChildItem(index, 'key', value)}
                         options={routeOptions}
                         showSearch
                         filterOption={(input: string, option: any) =>
@@ -207,7 +204,7 @@ export default function MenuModalForm({
                       danger
                       icon={<DeleteOutlined />}
                       onClick={() => removeChildItem(index)}
-                      className='mb-2'
+                      className='mt-5'
                     />
                   </Col>
                 </Row>
