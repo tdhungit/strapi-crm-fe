@@ -38,21 +38,31 @@ export default function CollectionForm() {
               className='mb-4'
               style={{ width: '100%' }}
             >
-              {line.map((item: any) => (
-                <Col key={item.name} xs={24} sm={12} md={12} lg={12}>
-                  <Form.Item
-                    name={item.name}
-                    label={item.label || item.name}
-                    rules={
-                      item.required
-                        ? [{ required: true, message: `${item.label || item.name} is required` }]
-                        : []
-                    }
-                  >
-                    <Input placeholder={`Enter ${item.label || item.name}`} size='large' />
-                  </Form.Item>
-                </Col>
-              ))}
+              {line.map((item: any) => {
+                item = {
+                  ...item,
+                  ...(config.metadatas?.[item.name]?.edit || {}),
+                };
+                console.log('item', item);
+                return (
+                  <Col key={item.name} xs={24} sm={12} md={12} lg={12}>
+                    <Form.Item
+                      name={item.name}
+                      label={item.label || item.name}
+                      rules={
+                        item.required
+                          ? [{ required: true, message: `${item.label || item.name} is required` }]
+                          : []
+                      }
+                    >
+                      <Input
+                        placeholder={item.placeholder || `Enter ${item.label || item.name}`}
+                        size='large'
+                      />
+                    </Form.Item>
+                  </Col>
+                );
+              })}
             </Row>
           ))}
         </Form>
