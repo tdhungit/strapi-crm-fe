@@ -5,6 +5,8 @@ class MenuService {
   async getMenuItems() {
     const res = await ApiService.request('get', '/settings/menus');
     if (!res.init && res.menus) {
+      // save to local storage
+      localStorage.setItem('menus', JSON.stringify(res.menus));
       return res.menus;
     }
 
@@ -30,6 +32,7 @@ class MenuService {
       });
     }
 
+    localStorage.setItem('menus', JSON.stringify(menus));
     return menus;
   }
 
