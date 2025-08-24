@@ -3,10 +3,11 @@ import ApiService from './ApiService';
 
 class MenuService {
   async getMenuItems() {
-    const res = await ApiService.request('get', '/settings/menus');
+    const res = await ApiService.request('get', '/settings/app');
+    // save to local storage
+    localStorage.setItem('strapi-crm', JSON.stringify(res));
+
     if (!res.init && res.menus) {
-      // save to local storage
-      localStorage.setItem('menus', JSON.stringify(res.menus));
       return res.menus;
     }
 
@@ -32,7 +33,6 @@ class MenuService {
       });
     }
 
-    localStorage.setItem('menus', JSON.stringify(menus));
     return menus;
   }
 

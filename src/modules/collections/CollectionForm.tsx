@@ -1,4 +1,4 @@
-import { Col, Form, Input, Row } from 'antd';
+import { Button, Col, Form, Input, Row } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
@@ -39,11 +39,14 @@ export default function CollectionForm() {
               style={{ width: '100%' }}
             >
               {line.map((item: any) => {
+                const metadatas = config.metadatas?.[item.name]?.edit || {};
+                const field = config.fields?.[item.name] || {};
+                metadatas.type = field.type || 'string';
                 item = {
                   ...item,
-                  ...(config.metadatas?.[item.name]?.edit || {}),
+                  ...metadatas,
+                  options: field,
                 };
-                console.log('item', item);
                 return (
                   <Col key={item.name} xs={24} sm={12} md={12} lg={12}>
                     <Form.Item
@@ -65,6 +68,14 @@ export default function CollectionForm() {
               })}
             </Row>
           ))}
+          <div className='flex gap-2'>
+            <Button type='primary' htmlType='submit'>
+              Save
+            </Button>
+            <Button type='default' htmlType='button'>
+              Cancel
+            </Button>
+          </div>
         </Form>
       </div>
     </div>

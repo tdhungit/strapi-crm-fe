@@ -14,15 +14,30 @@ class MetadataService {
     return MetadataService.instance;
   }
 
+  getSavedContentTypes() {
+    const appSettingStr = localStorage.getItem('strapi-crm');
+    const appSetting = appSettingStr ? JSON.parse(appSettingStr) : {};
+    return appSetting['content-types'];
+  }
+
   async getContentTypes() {
     return ApiService.request('get', '/metadata/content-types');
   }
 
+  getContentTypeByModule(module: string) {
+    const contentTypes = this.getSavedContentTypes();
+    return contentTypes.find((item: any) => item.pluralName === module);
+  }
+
+  getContentTypeByUid(uid: string) {
+    const contentTypes = this.getSavedContentTypes();
+    return contentTypes.find((item: any) => item.uid === uid);
+  }
+
   async getCollectionConfigurations(module: string) {
-    const menusJson = localStorage.getItem('menus');
-    const menus = menusJson ? JSON.parse(menusJson) : [];
-    const menu = menus.find((item: any) => item.pluralName === module);
-    const collectionUid = menu.uid;
+    const contentType = this.getContentTypeByModule(module);
+    const collectionUid = contentType.uid;
+
     return ApiService.request('get', `/metadata/content-types/${collectionUid}/configuration`);
   }
 }
