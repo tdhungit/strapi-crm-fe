@@ -1,4 +1,5 @@
-import { Table } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
+import { ProTable } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
@@ -10,8 +11,6 @@ export default function CollectionList() {
   const { name: module } = useParams();
 
   const [config, setConfig] = useState<any>({});
-  const [collections, setCollections] = useState<any>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [columns, setColumns] = useState<any>([]);
 
   useEffect(() => {
@@ -19,8 +18,6 @@ export default function CollectionList() {
       MetadataService.getCollectionConfigurations(module).then((res) => {
         setConfig(res);
       });
-
-      fetchCollections(module);
     }
   }, [module]);
 
@@ -33,6 +30,8 @@ export default function CollectionList() {
           title: metadatas.label || field,
           dataIndex: field,
           key: field,
+          search: true, // Enable search for all columns
+          ellipsis: true, // Handle long text with ellipsis
         });
       });
 
@@ -40,9 +39,12 @@ export default function CollectionList() {
       cols.push({
         title: 'Actions',
         key: 'actions',
+        search: false,
         render: (record: any) => (
           <div>
-            <a href={`/collections/${module}/${record.documentId}`}>Edit</a>
+            <a href={`/collections/${module}/${record.documentId}`}>
+              <EditOutlined />
+            </a>
           </div>
         ),
       });
@@ -51,22 +53,54 @@ export default function CollectionList() {
     }
   }, [config, module]);
 
-  const fetchCollections = async (module: string) => {
-    const collections = await ApiService.getClient().collection(module).find();
-    setCollections(collections.data || []);
-    setLoading(false);
-  };
-
-  if (loading || !config?.layouts) return <PageLoading />;
+  if (!config?.layouts) return <PageLoading />;
 
   return (
     <div>
       <h1 className='text-2xl mb-4 uppercase'>{module}</h1>
-      <Table
-        dataSource={collections}
+      <ProTable
         columns={columns}
+        request={async (params) => {
+          if (!module) {
+            return {
+              data: [],
+              total: 0,
+            };
+          }
+
+          // Handle search parameters
+          const searchParams: any = { filters: {} };
+          // Handle individual field filters
+          Object.keys(params).forEach((key) => {
+            if (key !== 'search' && key !== 'current' && key !== 'pageSize' && params[key]) {
+              searchParams.filters[key] = {
+                $contains: params[key],
+              };
+            }
+          });
+
+          const collections = await ApiService.getClient()
+            .collection(module)
+            .find({
+              ...searchParams,
+              pagination: {
+                page: params.current || 1,
+                pageSize: params.pageSize || 10,
+              },
+            });
+
+          return {
+            data: collections.data || [],
+            total: collections.meta.pagination?.total || 0,
+          };
+        }}
         rowKey={(record: any) => record.id || record.key || JSON.stringify(record)}
-        pagination={false}
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) => `Showing ${range[0]}-${range[1]} of ${total} items`,
+        }}
       />
     </div>
   );
