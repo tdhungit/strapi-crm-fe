@@ -3,6 +3,7 @@ import { ProTable } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
+import { getListLayoutColumns } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 
@@ -23,18 +24,7 @@ export default function CollectionList() {
 
   useEffect(() => {
     if (config?.layouts?.list) {
-      const cols: any = [];
-      config.layouts.list.forEach((field: string) => {
-        const metadatas = config.metadatas?.[field]?.list || {};
-        cols.push({
-          title: metadatas.label || field,
-          dataIndex: field,
-          key: field,
-          search: true, // Enable search for all columns
-          ellipsis: true, // Handle long text with ellipsis
-        });
-      });
-
+      const cols: any = getListLayoutColumns(config);
       // add actions column
       cols.push({
         title: 'Actions',

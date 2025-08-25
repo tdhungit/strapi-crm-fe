@@ -1,5 +1,24 @@
+import { Col, Row, type FormInstance } from 'antd';
 import DetailView from '../components/fields/DetailView';
+import FormInput from '../components/fields/FormInput';
 import MetadataService from '../services/MetadataService';
+
+export function getListLayoutColumns(config: any) {
+  const cols: any = [];
+
+  config.layouts.list.forEach((field: string) => {
+    const metadatas = config.metadatas?.[field]?.list || {};
+    cols.push({
+      title: metadatas.label || field,
+      dataIndex: field,
+      key: field,
+      search: true, // Enable search for all columns
+      ellipsis: true, // Handle long text with ellipsis
+    });
+  });
+
+  return cols;
+}
 
 export function getEditLayoutColumns(config: any) {
   const cols: any = [];
@@ -27,4 +46,23 @@ export function getEditLayoutColumns(config: any) {
   });
 
   return cols;
+}
+
+export function renderEditLayoutRows(config: any, record: any, form: FormInstance) {
+  return config.layouts.edit.map((line: any[], lineIndex: number) => (
+    <Row key={`line-${lineIndex}`} gutter={[16, 16]} className='mb-4' style={{ width: '100%' }}>
+      {line.map((item: any) => {
+        const fieldOptions = MetadataService.getCollectionFieldLayoutConfig(
+          config,
+          'edit',
+          item.name
+        );
+        return (
+          <Col key={item.name} xs={24} sm={12} md={12} lg={12}>
+            <FormInput form={form} item={fieldOptions} data={record} />
+          </Col>
+        );
+      })}
+    </Row>
+  ));
 }

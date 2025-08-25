@@ -1,8 +1,8 @@
-import { Button, Col, Form, message, Row } from 'antd';
+import { Button, Form, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import FormInput from '../../components/fields/FormInput';
 import PageLoading from '../../components/PageLoading';
+import { renderEditLayoutRows } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 
@@ -72,31 +72,7 @@ export default function CollectionForm() {
 
       <div className='w-full bg-white mt-4 p-4 rounded-lg'>
         <Form form={form} layout='vertical' onFinish={onFinish}>
-          {config?.layouts?.edit?.map((line: any[], lineIndex: number) => (
-            <Row
-              key={`line-${lineIndex}`}
-              gutter={[16, 16]}
-              className='mb-4'
-              style={{ width: '100%' }}
-            >
-              {line.map((item: any) => {
-                const metadatas = MetadataService.getCollectionFieldLayoutConfig(
-                  config,
-                  'edit',
-                  item.name
-                );
-                item = {
-                  ...metadatas,
-                  ...item,
-                };
-                return (
-                  <Col key={item.name} xs={24} sm={12} md={12} lg={12}>
-                    <FormInput form={form} item={item} data={data} />
-                  </Col>
-                );
-              })}
-            </Row>
-          ))}
+          {renderEditLayoutRows(config, data, form)}
           <div className='flex gap-2'>
             <Button type='primary' htmlType='submit'>
               Save

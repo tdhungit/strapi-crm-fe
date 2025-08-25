@@ -2,6 +2,7 @@ import { EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
 import PageLoading from '../../components/PageLoading';
+import { getListLayoutColumns } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 
@@ -12,19 +13,7 @@ const UserList: React.FC = () => {
   useEffect(() => {
     MetadataService.getCollectionConfigurations('users').then((res) => {
       setConfig(res);
-
-      const cols: any = [];
-      res.layouts.list.forEach((field: string) => {
-        const metadatas = res.metadatas?.[field]?.list || {};
-        cols.push({
-          title: metadatas.label || field,
-          dataIndex: field,
-          key: field,
-          search: true, // Enable search for all columns
-          ellipsis: true, // Handle long text with ellipsis
-        });
-      });
-
+      const cols: any = getListLayoutColumns(res);
       // add actions column
       cols.push({
         title: 'Actions',
