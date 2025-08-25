@@ -1,7 +1,8 @@
-import { Button, Col, Form, Input, Row } from 'antd';
+import { Button, Col, Form, Row } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
+import FormInput from '../../form-types/FormInput';
 import MetadataService from '../../services/MetadataService';
 
 export default function CollectionForm() {
@@ -49,20 +50,7 @@ export default function CollectionForm() {
                 };
                 return (
                   <Col key={item.name} xs={24} sm={12} md={12} lg={12}>
-                    <Form.Item
-                      name={item.name}
-                      label={item.label || item.name}
-                      rules={
-                        item.required
-                          ? [{ required: true, message: `${item.label || item.name} is required` }]
-                          : []
-                      }
-                    >
-                      <Input
-                        placeholder={item.placeholder || `Enter ${item.label || item.name}`}
-                        size='large'
-                      />
-                    </Form.Item>
+                    <FormInput item={item} />
                   </Col>
                 );
               })}

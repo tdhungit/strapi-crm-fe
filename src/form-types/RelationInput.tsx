@@ -1,12 +1,10 @@
-import { Select } from 'antd';
 import { useEffect, useState } from 'react';
+import DebounceSelect from '../components/DebounceSelect';
 import ApiService from '../services/ApiService';
 import MetadataService from '../services/MetadataService';
 
 export default function RelationInput({ item }: { item: any }) {
   const [contentType, setContentType] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [options, setOptions] = useState<any[]>([]);
 
   useEffect(() => {
     if (item?.options?.target) {
@@ -14,14 +12,16 @@ export default function RelationInput({ item }: { item: any }) {
     }
   }, [item]);
 
-  useEffect(() => {
-    if (contentType) {
-      ApiService.request('get', `/${contentType.pluralName}`).then((res) => {
-        setOptions(res);
-        setLoading(false);
-      });
-    }
-  }, [contentType]);
+  const fetchOptions = async (search: string): Promise<any[]> => {
+    return ApiService.request('get', `/${contentType.pluralName}?_q=${search}`).then((res) => {
+      const results = Array.isArray(res) ? res : res.data ? res.data : [];
+      const keyLabel = contentType.settings?.mainField || 'name';
+      return results.map((item: any) => ({
+        label: item[keyLabel],
+        value: item.id,
+      }));
+    });
+  };
 
-  return <Select loading={loading} options={options} />;
+  return <DebounceSelect fetchOptions={fetchOptions} />;
 }
