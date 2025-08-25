@@ -46,7 +46,11 @@ export default function CollectionForm() {
 
     try {
       message.loading('Saving...');
-      await ApiService.getClient().collection(module).create(values);
+      if (id) {
+        await ApiService.getClient().collection(module).update(id, values);
+      } else {
+        await ApiService.getClient().collection(module).create(values);
+      }
       message.destroy();
       message.success('Saved successfully');
 
