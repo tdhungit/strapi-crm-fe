@@ -1,14 +1,16 @@
-import { Button, Col, Form, Row } from 'antd';
+import { Button, Col, Form, message, Row } from 'antd';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
 import FormInput from '../../form-types/FormInput';
+import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 
 export default function CollectionForm() {
   const { name: module, id } = useParams();
 
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const [config, setConfig] = useState<any>({});
 
@@ -19,6 +21,26 @@ export default function CollectionForm() {
       });
     }
   }, [module]);
+
+  const onFinish = async (values: any) => {
+    console.log('Form values:', values);
+    if (!module) {
+      return;
+    }
+
+    try {
+      message.loading('Saving...');
+      await ApiService.getClient().collection(module).create(values);
+      message.destroy();
+      message.success('Saved successfully');
+
+      navigate(`/collections/${module}`);
+    } catch (error: any) {
+      console.error(error);
+      message.destroy();
+      message.error('Failed to save');
+    }
+  };
 
   if (!config) {
     return <PageLoading />;
@@ -31,7 +53,7 @@ export default function CollectionForm() {
       </h1>
 
       <div className='w-full bg-white mt-4 p-4 rounded-lg'>
-        <Form form={form} layout='vertical'>
+        <Form form={form} layout='vertical' onFinish={onFinish}>
           {config?.layouts?.edit?.map((line: any[], lineIndex: number) => (
             <Row
               key={`line-${lineIndex}`}
@@ -50,7 +72,7 @@ export default function CollectionForm() {
                 };
                 return (
                   <Col key={item.name} xs={24} sm={12} md={12} lg={12}>
-                    <FormInput item={item} />
+                    <FormInput form={form} item={item} />
                   </Col>
                 );
               })}

@@ -1,9 +1,10 @@
+import type { FormInstance } from 'antd';
 import { useEffect, useState } from 'react';
 import DebounceSelect from '../components/DebounceSelect';
 import ApiService from '../services/ApiService';
 import MetadataService from '../services/MetadataService';
 
-export default function RelationInput({ item }: { item: any }) {
+export default function RelationInput({ item, form }: { item: any; form: FormInstance }) {
   const [contentType, setContentType] = useState<any>(null);
 
   useEffect(() => {
@@ -23,5 +24,12 @@ export default function RelationInput({ item }: { item: any }) {
     });
   };
 
-  return <DebounceSelect fetchOptions={fetchOptions} />;
+  return (
+    <DebounceSelect
+      fetchOptions={fetchOptions}
+      onChange={(selected: any) => {
+        form.setFieldValue(item.name, selected.value);
+      }}
+    />
+  );
 }
