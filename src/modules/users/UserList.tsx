@@ -1,14 +1,17 @@
-import { EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { EditOutlined, EyeOutlined, KeyOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
 import PageLoading from '../../components/PageLoading';
 import { getListLayoutColumns } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
+import ChangePasswordModal from './components/ChangePasswordModal';
 
 const UserList: React.FC = () => {
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [changePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
 
   useEffect(() => {
     MetadataService.getCollectionConfigurations('users').then((res) => {
@@ -26,6 +29,16 @@ const UserList: React.FC = () => {
             </a>
             <a href={`/users/detail/${record.id}`} className='inline-block ml-2'>
               <EyeOutlined />
+            </a>
+            <a
+              href='javascript:void(0);'
+              className='inline-block ml-2'
+              onClick={() => {
+                setSelectedUserId(record.id);
+                setChangePasswordModalVisible(true);
+              }}
+            >
+              <KeyOutlined />
             </a>
           </div>
         ),
@@ -72,6 +85,12 @@ const UserList: React.FC = () => {
           showQuickJumper: true,
           showTotal: (total, range) => `Showing ${range[0]}-${range[1]} of ${total} items`,
         }}
+      />
+
+      <ChangePasswordModal
+        userId={selectedUserId || 0}
+        open={changePasswordModalVisible}
+        onOpenChange={setChangePasswordModalVisible}
       />
     </div>
   );
