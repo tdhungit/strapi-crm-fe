@@ -35,9 +35,21 @@ export default function CollectionList() {
           key: field,
         });
       });
+
+      // add actions column
+      cols.push({
+        title: 'Actions',
+        key: 'actions',
+        render: (record: any) => (
+          <div>
+            <a href={`/collections/${module}/${record.documentId}`}>Edit</a>
+          </div>
+        ),
+      });
+
       setColumns(cols);
     }
-  }, [config]);
+  }, [config, module]);
 
   const fetchCollections = async (module: string) => {
     const collections = await ApiService.getClient().collection(module).find();

@@ -1,7 +1,15 @@
 import { DatePicker, Form, Input, InputNumber, type FormInstance } from 'antd';
 import RelationInput from './RelationInput';
 
-export default function FormInput({ item, form }: { item: any; form: FormInstance }) {
+export default function FormInput({
+  item,
+  form,
+  data,
+}: {
+  item: any;
+  form: FormInstance;
+  data: any;
+}) {
   const label = item.label || item.name;
   const placeholder = item.placeholder || `Enter ${item.label || item.name}`;
   const rules = item.required
@@ -18,7 +26,7 @@ export default function FormInput({ item, form }: { item: any; form: FormInstanc
       input = <InputNumber />;
       break;
     case 'relation':
-      input = <RelationInput form={form} item={item} />;
+      input = <RelationInput form={form} item={item} data={data} />;
       break;
     case 'string':
     default:

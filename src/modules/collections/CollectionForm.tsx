@@ -13,6 +13,7 @@ export default function CollectionForm() {
   const navigate = useNavigate();
 
   const [config, setConfig] = useState<any>({});
+  const [data, setData] = useState<any>({});
 
   useEffect(() => {
     if (module) {
@@ -21,6 +22,22 @@ export default function CollectionForm() {
       });
     }
   }, [module]);
+
+  useEffect(() => {
+    if (form && module && id) {
+      // Fetch user data for editing
+      ApiService.getClient()
+        .collection(module)
+        .findOne(id, { populate: '*' })
+        .then((res) => {
+          form.setFieldsValue(res?.data);
+          setData(res?.data);
+        })
+        .catch(() => {
+          message.error('Failed to fetch data');
+        });
+    }
+  }, [id, form, module]);
 
   const onFinish = async (values: any) => {
     if (!module) {
@@ -69,7 +86,7 @@ export default function CollectionForm() {
                 };
                 return (
                   <Col key={item.name} xs={24} sm={12} md={12} lg={12}>
-                    <FormInput form={form} item={item} />
+                    <FormInput form={form} item={item} data={data} />
                   </Col>
                 );
               })}
