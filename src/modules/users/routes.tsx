@@ -1,3 +1,4 @@
+import UserDetail from './UserDetail';
 import UserForm from './UserForm';
 import UserList from './UserList';
 
@@ -13,9 +14,14 @@ const routes = [
     name: 'Create User',
   },
   {
-    path: '/users/:id',
+    path: '/users/edit/:id',
     element: <UserForm />,
     name: 'Edit User',
+  },
+  {
+    path: '/users/detail/:id',
+    element: <UserDetail />,
+    name: 'User Detail',
   },
 ];
 

@@ -1,4 +1,4 @@
-import { EditOutlined } from '@ant-design/icons';
+import { EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
 import PageLoading from '../../components/PageLoading';
@@ -32,8 +32,11 @@ const UserList: React.FC = () => {
         search: false,
         render: (record: any) => (
           <div>
-            <a href={`/users/${record.documentId}`}>
+            <a href={`/users/edit/${record.id}`} className='inline-block'>
               <EditOutlined />
+            </a>
+            <a href={`/users/detail/${record.id}`} className='inline-block ml-2'>
+              <EyeOutlined />
             </a>
           </div>
         ),

@@ -40,6 +40,18 @@ class MetadataService {
 
     return ApiService.request('get', `/metadata/content-types/${collectionUid}/configuration`);
   }
+
+  getCollectionFieldLayoutConfig(config: any, layout: string, fieldName: string) {
+    const fieldOptions = config.fields?.[fieldName] || {};
+    const metadatas = config.metadatas?.[fieldName]?.[layout] || {};
+    metadatas.type = fieldOptions.type || 'string';
+    metadatas.name = fieldName;
+    return {
+      ...fieldOptions,
+      ...metadatas,
+      options: fieldOptions,
+    };
+  }
 }
 
 export default MetadataService.getInstance();

@@ -80,13 +80,14 @@ export default function CollectionForm() {
               style={{ width: '100%' }}
             >
               {line.map((item: any) => {
-                const metadatas = config.metadatas?.[item.name]?.edit || {};
-                const field = config.fields?.[item.name] || {};
-                metadatas.type = field.type || 'string';
+                const metadatas = MetadataService.getCollectionFieldLayoutConfig(
+                  config,
+                  'edit',
+                  item.name
+                );
                 item = {
-                  ...item,
                   ...metadatas,
-                  options: field,
+                  ...item,
                 };
                 return (
                   <Col key={item.name} xs={24} sm={12} md={12} lg={12}>
