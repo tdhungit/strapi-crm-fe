@@ -1,4 +1,4 @@
-import { EditOutlined } from '@ant-design/icons';
+import { EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -42,7 +42,13 @@ export default function CollectionList() {
         search: false,
         render: (record: any) => (
           <div>
-            <a href={`/collections/${module}/${record.documentId}`}>
+            <a href={`/collections/${module}/detail/${record.documentId}`} className='inline-block'>
+              <EyeOutlined />
+            </a>
+            <a
+              href={`/collections/${module}/edit/${record.documentId}`}
+              className='inline-block ml-2'
+            >
               <EditOutlined />
             </a>
           </div>

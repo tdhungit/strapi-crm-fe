@@ -1,8 +1,8 @@
 import type { FormInstance } from 'antd';
 import { useEffect, useState } from 'react';
-import DebounceSelect from '../components/DebounceSelect';
-import ApiService from '../services/ApiService';
-import MetadataService from '../services/MetadataService';
+import ApiService from '../../../services/ApiService';
+import MetadataService from '../../../services/MetadataService';
+import DebounceSelect from '../../DebounceSelect';
 
 export default function RelationInput({
   item,

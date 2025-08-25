@@ -1,5 +1,5 @@
 import { DatePicker, Form, Input, InputNumber, type FormInstance } from 'antd';
-import RelationInput from './RelationInput';
+import RelationInput from './relation/RelationInput';
 
 export default function FormInput({
   item,

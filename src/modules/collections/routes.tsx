@@ -1,3 +1,4 @@
+import CollectionDetail from './CollectionDetail';
 import CollectionForm from './CollectionForm';
 import CollectionList from './CollectionList';
 
@@ -13,9 +14,14 @@ const routes = [
     name: 'Collection Form',
   },
   {
-    path: '/collections/:name/:id',
+    path: '/collections/:name/detail/:id',
+    element: <CollectionDetail />,
+    name: 'Collection Detail',
+  },
+  {
+    path: '/collections/:name/edit/:id',
     element: <CollectionForm />,
-    name: 'Collection Form',
+    name: 'Collection Edit',
   },
 ];
 

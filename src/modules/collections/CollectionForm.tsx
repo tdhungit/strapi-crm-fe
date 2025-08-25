@@ -1,8 +1,8 @@
 import { Button, Col, Form, message, Row } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import FormInput from '../../components/fields/FormInput';
 import PageLoading from '../../components/PageLoading';
-import FormInput from '../../form-types/FormInput';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 
