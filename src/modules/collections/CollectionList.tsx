@@ -83,10 +83,6 @@ export default function CollectionList() {
             .collection(module)
             .find({
               ...searchParams,
-              pagination: {
-                page: params.current || 1,
-                pageSize: params.pageSize || 10,
-              },
             });
 
           return {
@@ -96,7 +92,7 @@ export default function CollectionList() {
         }}
         rowKey={(record: any) => record.id || record.key || JSON.stringify(record)}
         pagination={{
-          defaultPageSize: 10,
+          defaultPageSize: config.settings?.pageSize || 10,
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: (total, range) => `Showing ${range[0]}-${range[1]} of ${total} items`,

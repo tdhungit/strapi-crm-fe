@@ -1,48 +1,86 @@
-import { Table } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import { EditOutlined } from '@ant-design/icons';
+import { ProTable } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
+import PageLoading from '../../components/PageLoading';
 import ApiService from '../../services/ApiService';
+import MetadataService from '../../services/MetadataService';
 
 const UserList: React.FC = () => {
-  const [users, setUsers] = useState<any>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const columns: ColumnsType<any> = [
-    {
-      title: 'Username',
-      dataIndex: 'username',
-      key: 'username',
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-  ];
+  const [config, setConfig] = useState<any>({});
+  const [columns, setColumns] = useState<any>([]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const users = await ApiService.getClient().collection('users').find();
-        setUsers(users);
-      } catch (err: any) {
-        console.error(err);
-        setError('Failed to fetch users');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUsers();
+    MetadataService.getCollectionConfigurations('users').then((res) => {
+      setConfig(res);
+
+      const cols: any = [];
+      res.layouts.list.forEach((field: string) => {
+        const metadatas = res.metadatas?.[field]?.list || {};
+        cols.push({
+          title: metadatas.label || field,
+          dataIndex: field,
+          key: field,
+          search: true, // Enable search for all columns
+          ellipsis: true, // Handle long text with ellipsis
+        });
+      });
+
+      // add actions column
+      cols.push({
+        title: 'Actions',
+        key: 'actions',
+        search: false,
+        render: (record: any) => (
+          <div>
+            <a href={`/users/${record.documentId}`}>
+              <EditOutlined />
+            </a>
+          </div>
+        ),
+      });
+
+      setColumns(cols);
+    });
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  if (!config?.layouts) return <PageLoading />;
 
   return (
     <div>
-      <h1>User List</h1>
-      <Table dataSource={users} columns={columns} rowKey='id' pagination={false} />
+      <h1 className='text-2xl mb-4'>User List</h1>
+
+      <ProTable
+        columns={columns}
+        request={async (params) => {
+          // Handle search parameters
+          const searchParams: any = { filters: {} };
+          // Handle individual field filters
+          Object.keys(params).forEach((key) => {
+            if (key !== 'search' && key !== 'current' && key !== 'pageSize' && params[key]) {
+              searchParams.filters[key] = {
+                $contains: params[key],
+              };
+            }
+          });
+
+          const users = await ApiService.getClient()
+            .collection('users')
+            .find({
+              ...searchParams,
+            });
+          return {
+            data: users.data || [],
+            total: users.meta.pagination?.total || 0,
+          };
+        }}
+        rowKey='id'
+        pagination={{
+          defaultPageSize: config.settings?.pageSize || 10,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) => `Showing ${range[0]}-${range[1]} of ${total} items`,
+        }}
+      />
     </div>
   );
 };
