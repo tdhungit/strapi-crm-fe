@@ -10,6 +10,7 @@ import MetadataService from '../../services/MetadataService';
 export default function CollectionDetail() {
   const { name: module, id } = useParams();
 
+  const [title, setTitle] = useState<string>('');
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
 
@@ -51,12 +52,14 @@ export default function CollectionDetail() {
 
   return (
     <div>
-      <h1 className='text-2xl mb-4 uppercase'>{`Detail ${module}`}</h1>
+      <h1 className='text-2xl mb-4 uppercase'>{title ? title : `Detail ${module}`}</h1>
 
-      <div>
+      <div className='w-full bg-white mt-4 p-4 rounded-lg'>
         {columns.length > 0 && (
           <ProDescriptions
             title={null}
+            column={2}
+            bordered
             request={async () => {
               if (!module || !id) {
                 return {
@@ -68,6 +71,10 @@ export default function CollectionDetail() {
               const res = await ApiService.getClient()
                 .collection(module)
                 .findOne(id, { populate: '*' });
+
+              if (res?.data[config.settings?.mainField]) {
+                setTitle(res?.data[config.settings?.mainField]);
+              }
 
               return Promise.resolve({
                 success: true,
