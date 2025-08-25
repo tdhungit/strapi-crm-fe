@@ -23,7 +23,6 @@ export default function CollectionForm() {
   }, [module]);
 
   const onFinish = async (values: any) => {
-    console.log('Form values:', values);
     if (!module) {
       return;
     }
@@ -42,15 +41,13 @@ export default function CollectionForm() {
     }
   };
 
-  if (!config) {
+  if (!config?.layouts) {
     return <PageLoading />;
   }
 
   return (
     <div>
-      <h1 className='text-2xl'>
-        CollectionForm {module} {id}
-      </h1>
+      <h1 className='text-2xl mb-4 uppercase'>{id ? `Edit ${module}` : `Create ${module}`}</h1>
 
       <div className='w-full bg-white mt-4 p-4 rounded-lg'>
         <Form form={form} layout='vertical' onFinish={onFinish}>
