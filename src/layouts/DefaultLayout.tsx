@@ -1,20 +1,28 @@
 import {
   FileTextOutlined,
   HomeOutlined,
+  LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  SettingOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
-import { Button, Layout, Menu } from 'antd';
+import { Button, Dropdown, Layout, Menu, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { iconMap } from '../config/icons';
+import { useAuth } from '../hooks/useAuth';
+import ApiService from '../services/ApiService';
 import MenuService from '../services/MenuService';
 
 const { Header, Content, Footer, Sider } = Layout;
 
 export default function DefaultLayout() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const { data: user } = useRequest(() => ApiService.request('get', '/users/me'));
 
   const [collapsed, setCollapsed] = useState(false);
   const [menuItems, setMenuItems] = useState<any[]>([]);
@@ -72,7 +80,15 @@ export default function DefaultLayout() {
       </Sider>
 
       <Layout>
-        <Header style={{ padding: 0, background: 'rgb(255, 255, 255)' }}>
+        <Header
+          style={{
+            padding: 0,
+            background: 'rgb(255, 255, 255)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
           <Button
             type='text'
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -83,6 +99,59 @@ export default function DefaultLayout() {
               height: 64,
             }}
           />
+          <div style={{ marginRight: 16 }}>
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: 'profile',
+                    icon: <UserOutlined />,
+                    label: 'Profile',
+                    onClick: () => navigate('/users/profile'),
+                  },
+                  {
+                    key: 'settings',
+                    icon: <SettingOutlined />,
+                    label: 'Settings',
+                    onClick: () => navigate('/settings'),
+                  },
+                  {
+                    key: 'menu-settings',
+                    icon: <SettingOutlined />,
+                    label: 'Menu Settings',
+                    onClick: () => navigate('/settings/menus'),
+                  },
+                  {
+                    type: 'divider',
+                  },
+                  {
+                    key: 'logout',
+                    icon: <LogoutOutlined />,
+                    label: 'Logout',
+                    onClick: () => {
+                      logout();
+                      navigate('/login');
+                    },
+                  },
+                ],
+              }}
+              placement='bottomRight'
+              trigger={['click']}
+            >
+              <Button
+                type='text'
+                icon={<UserOutlined />}
+                style={{
+                  fontSize: '16px',
+                  height: 64,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <Space>{user?.username || '...'}</Space>
+              </Button>
+            </Dropdown>
+          </div>
         </Header>
         <Content style={{ margin: 16 }}>
           <Outlet />

@@ -1,6 +1,7 @@
 import UserDetail from './UserDetail';
 import UserForm from './UserForm';
 import UserList from './UserList';
+import UserProfile from './UserProfile';
 
 const routes = [
   {
@@ -22,6 +23,11 @@ const routes = [
     path: '/users/detail/:id',
     element: <UserDetail />,
     name: 'User Detail',
+  },
+  {
+    path: '/users/profile',
+    element: <UserProfile />,
+    name: 'Profile',
   },
 ];
 
