@@ -1,10 +1,13 @@
+import { App as AntdApp } from 'antd';
 import AppRoutes from './Route';
 
 function App() {
   return (
-    <div className='App'>
-      <AppRoutes />
-    </div>
+    <AntdApp>
+      <div className='StrapiCrmContainer'>
+        <AppRoutes />
+      </div>
+    </AntdApp>
   );
 }
 

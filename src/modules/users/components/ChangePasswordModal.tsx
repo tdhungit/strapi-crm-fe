@@ -1,5 +1,5 @@
 import { ModalForm, ProFormText } from '@ant-design/pro-components';
-import { Form, message } from 'antd';
+import { App, Form } from 'antd';
 import { useEffect } from 'react';
 import ApiService from '../../../services/ApiService';
 
@@ -12,6 +12,7 @@ export default function ChangePasswordModal({
   onOpenChange: (open: boolean) => void;
   userId: number;
 }) {
+  const { message, notification } = App.useApp();
   const [form] = Form.useForm();
 
   // Reset form when modal opens/closes
@@ -28,16 +29,24 @@ export default function ChangePasswordModal({
       onOpenChange={onOpenChange}
       form={form}
       onFinish={async (values) => {
-        const hide = message.loading('Saving...', 0);
+        message.open({
+          type: 'loading',
+          content: 'Saving...',
+          duration: 0,
+        });
         try {
           await ApiService.request('post', `/users/change-password/${userId}`, values);
-          hide();
-          message.success('Password changed successfully');
+          message.destroy();
+          notification.success({
+            message: 'Password changed successfully',
+          });
           onOpenChange(false);
         } catch (error: any) {
-          hide();
           const errorMessage = error?.response?.data?.error?.message || 'Failed to change password';
-          message.error(errorMessage);
+          message.destroy();
+          notification.error({
+            message: errorMessage,
+          });
           console.error('Password change error:', error);
         }
       }}
