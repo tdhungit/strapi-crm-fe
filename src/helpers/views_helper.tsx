@@ -66,3 +66,21 @@ export function renderEditLayoutRows(config: any, record: any, form: FormInstanc
     </Row>
   ));
 }
+
+export function getEditLayoutPanels(config: any) {
+  const panelFields: any[] = [];
+  config.layouts.edit.forEach((line: any[]) => {
+    line.forEach((item: any) => {
+      const fieldOptions = MetadataService.getCollectionFieldLayoutConfig(
+        config,
+        'edit',
+        item.name
+      );
+      if (fieldOptions.type === 'relation' && fieldOptions.relation === 'oneToMany') {
+        panelFields.push(item.name);
+      }
+    });
+  });
+
+  return panelFields;
+}

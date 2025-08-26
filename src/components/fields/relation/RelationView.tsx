@@ -6,7 +6,6 @@ export default function RelationView({ item, data }: { item: any; data: any }) {
   const [documentId, setDocumentId] = useState<string>('');
 
   useEffect(() => {
-    console.log('item', item);
     if (item?.options?.target) {
       const contentType = MetadataService.getContentTypeByUid(item.options.target);
       const mainField = contentType.settings?.mainField || 'name';

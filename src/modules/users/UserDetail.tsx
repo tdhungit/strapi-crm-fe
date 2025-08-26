@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageError from '../../components/PageError';
 import PageLoading from '../../components/PageLoading';
+import OneToManyPanel from '../../components/panels/OneToManyPanel';
 import { getEditLayoutColumns } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
@@ -10,9 +11,9 @@ import MetadataService from '../../services/MetadataService';
 export default function UserDetail() {
   const { id } = useParams<{ id?: string }>();
 
-  const [title, setTitle] = useState<string>('');
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
+  const [record, setRecord] = useState<any>({});
 
   useEffect(() => {
     MetadataService.getCollectionConfigurations('users').then((res) => {
@@ -28,7 +29,7 @@ export default function UserDetail() {
 
   return (
     <div>
-      <h1 className='text-2xl mb-4'>{title ? title : 'User Detail'}</h1>
+      <h1 className='text-2xl mb-4'>{record?.username || 'User Detail'}</h1>
 
       <div className='w-full bg-white mt-4 p-4 rounded-lg'>
         {columns.length > 0 && (
@@ -49,7 +50,7 @@ export default function UserDetail() {
                 .findOne(id, { populate: '*' });
 
               if (res?.username) {
-                setTitle(res?.username);
+                setRecord(res);
               }
 
               return Promise.resolve({
@@ -61,6 +62,10 @@ export default function UserDetail() {
             columns={columns}
           />
         )}
+      </div>
+
+      <div className='w-full bg-white mt-4 p-4 rounded-lg'>
+        <OneToManyPanel record={record} relateModule='accounts' field={config.fields.accounts} />
       </div>
     </div>
   );
