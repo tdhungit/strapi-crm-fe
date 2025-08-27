@@ -1,6 +1,6 @@
 import { EditOutlined, EyeOutlined, FileExcelOutlined, PlusCircleFilled } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
@@ -14,6 +14,7 @@ export default function CollectionList() {
 
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
+  const [params, setParams] = useState<any>({});
 
   useEffect(() => {
     if (module) {
@@ -50,6 +51,27 @@ export default function CollectionList() {
     }
   }, [config, module]);
 
+  const handleExport = () => {
+    if (!module) {
+      return;
+    }
+
+    ApiService.request('get', `/exports/csv/${module}`, {
+      filters: params.filters || {},
+      sort: params.sort || {},
+    }).then((res) => {
+      // download file with res is csv
+      const url = window.URL.createObjectURL(new Blob([res]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${module}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      message.success('Export completed');
+    });
+  };
+
   if (!config?.layouts) return <PageLoading />;
 
   return (
@@ -58,6 +80,8 @@ export default function CollectionList() {
       <ProTable
         columns={columns}
         request={async (params) => {
+          setParams(params);
+
           if (!module) {
             return {
               data: [],
@@ -110,6 +134,9 @@ export default function CollectionList() {
             href={`/imports/${module}?returnUrl=/collections/${module}`}
           >
             <FileExcelOutlined /> Import
+          </Button>,
+          <Button key='export' variant='solid' color='volcano' onClick={handleExport}>
+            <FileExcelOutlined /> Export
           </Button>,
         ]}
       />
