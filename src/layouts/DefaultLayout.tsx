@@ -27,12 +27,12 @@ export default function DefaultLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [menuItems, setMenuItems] = useState<any[]>([]);
 
-  const { data: mainMenus } = useRequest(() => {
-    return MenuService.getMenuItems();
+  const { data: appSettings } = useRequest(() => {
+    return MenuService.getAppSettings();
   });
 
   useEffect(() => {
-    if (mainMenus && mainMenus.length > 0) {
+    if (appSettings?.menus && appSettings?.menus.length > 0) {
       const items: any[] = [
         {
           key: 'home',
@@ -40,7 +40,7 @@ export default function DefaultLayout() {
           label: 'Home',
         },
       ];
-      mainMenus.forEach((item: any) => {
+      appSettings.menus.forEach((item: any) => {
         const IconComponent = iconMap[item.icon] || FileTextOutlined;
         let children: any;
         if (item.children && item.children.length > 0) {
@@ -57,7 +57,7 @@ export default function DefaultLayout() {
       // Set the menu items state
       setMenuItems(items);
     }
-  }, [mainMenus]);
+  }, [appSettings]);
 
   return (
     <Layout style={{ minHeight: '100vh', width: '100%' }}>
@@ -69,7 +69,17 @@ export default function DefaultLayout() {
         collapsedWidth={60}
         theme='light'
       >
-        <div className='demo-logo-vertical' />
+        <div className='demo-logo-vertical'>
+          <a href='/home'>
+            {(appSettings?.logo?.menuLogo?.url && (
+              <img
+                src={import.meta.env.VITE_STRAPI_URL + appSettings.logo.menuLogo.url}
+                alt='StrapiCRM'
+                className='max-h-[32px]'
+              />
+            )) || <strong className='text-xl font-bold'>StrapiCRM</strong>}
+          </a>
+        </div>
         <Menu
           theme='light'
           defaultSelectedKeys={['1']}

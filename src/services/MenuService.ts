@@ -2,13 +2,13 @@ import { defaultMenus } from '../config/menus';
 import ApiService from './ApiService';
 
 class MenuService {
-  async getMenuItems() {
+  async getAppSettings() {
     const res = await ApiService.request('get', '/settings/app');
     // save to local storage
     localStorage.setItem('strapi-crm', JSON.stringify(res));
 
     if (!res.init && res.menus) {
-      return res.menus;
+      return res;
     }
 
     const menus: any[] = [];
@@ -33,7 +33,10 @@ class MenuService {
       });
     }
 
-    return menus;
+    return {
+      ...res,
+      menus,
+    };
   }
 
   async getAvailableMenuItems() {
