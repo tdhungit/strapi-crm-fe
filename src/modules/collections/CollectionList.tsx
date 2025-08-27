@@ -1,5 +1,6 @@
-import { EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { EditOutlined, EyeOutlined, FileExcelOutlined, PlusCircleFilled } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
+import { Button } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
@@ -93,6 +94,24 @@ export default function CollectionList() {
           showQuickJumper: true,
           showTotal: (total, range) => `Showing ${range[0]}-${range[1]} of ${total} items`,
         }}
+        toolBarRender={() => [
+          <Button
+            key='create'
+            variant='solid'
+            color='primary'
+            href={`/collections/${module}/create`}
+          >
+            <PlusCircleFilled /> Create
+          </Button>,
+          <Button
+            key='import'
+            variant='solid'
+            color='orange'
+            href={`/imports/${module}?returnUrl=/collections/${module}`}
+          >
+            <FileExcelOutlined /> Import
+          </Button>,
+        ]}
       />
     </div>
   );

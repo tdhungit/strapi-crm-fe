@@ -37,14 +37,16 @@ class ApiService {
     return this.client;
   }
 
-  async request(method: string, url: string, data?: any) {
+  async request(method: string, url: string, data?: any, headers: any = {}) {
     data = data || {};
+    headers = headers || {};
     const config: AxiosRequestConfig = {
       method,
       url: `${this.baseUrl}/api${url}`,
       headers: {
         Authorization: `Bearer ${this.getToken()}`,
         'Content-Type': 'application/json',
+        ...headers,
       },
     };
 
