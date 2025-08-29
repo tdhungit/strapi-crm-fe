@@ -16,7 +16,7 @@ export default function FormInput({
     ? [{ required: true, message: `${item.label || item.name} is required` }]
     : [];
 
-  let input = <Input placeholder={placeholder} size='large' />;
+  let input = <Input placeholder={placeholder} size='middle' />;
 
   switch (item.type) {
     case 'date':

@@ -1,4 +1,9 @@
-import { EditOutlined, EyeOutlined, FileExcelOutlined, PlusCircleFilled } from '@ant-design/icons';
+import {
+  EditOutlined,
+  EyeOutlined,
+  FileExcelOutlined,
+  PlusCircleFilled,
+} from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import { Button, message } from 'antd';
 import { useEffect, useState } from 'react';
@@ -34,7 +39,10 @@ export default function CollectionList() {
         search: false,
         render: (record: any) => (
           <div>
-            <a href={`/collections/${module}/detail/${record.documentId}`} className='inline-block'>
+            <a
+              href={`/collections/${module}/detail/${record.documentId}`}
+              className='inline-block'
+            >
               <EyeOutlined />
             </a>
             <a
@@ -79,6 +87,10 @@ export default function CollectionList() {
       <h1 className='text-2xl mb-4 uppercase'>{module}</h1>
       <ProTable
         columns={columns}
+        rowKey='documentId'
+        search={{
+          searchText: 'Search',
+        }}
         request={async (params) => {
           setParams(params);
 
@@ -93,7 +105,12 @@ export default function CollectionList() {
           const searchParams: any = { filters: {} };
           // Handle individual field filters
           Object.keys(params).forEach((key) => {
-            if (key !== 'search' && key !== 'current' && key !== 'pageSize' && params[key]) {
+            if (
+              key !== 'search' &&
+              key !== 'current' &&
+              key !== 'pageSize' &&
+              params[key]
+            ) {
               searchParams.filters[key] = {
                 $contains: params[key],
               };
@@ -111,12 +128,12 @@ export default function CollectionList() {
             total: collections.meta.pagination?.total || 0,
           };
         }}
-        rowKey={(record: any) => record.id || record.key || JSON.stringify(record)}
         pagination={{
           defaultPageSize: config.settings?.pageSize || 10,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => `Showing ${range[0]}-${range[1]} of ${total} items`,
+          showTotal: (total, range) =>
+            `Showing ${range[0]}-${range[1]} of ${total} items`,
         }}
         toolBarRender={() => [
           <Button
@@ -135,7 +152,12 @@ export default function CollectionList() {
           >
             <FileExcelOutlined /> Import
           </Button>,
-          <Button key='export' variant='solid' color='volcano' onClick={handleExport}>
+          <Button
+            key='export'
+            variant='solid'
+            color='volcano'
+            onClick={handleExport}
+          >
             <FileExcelOutlined /> Export
           </Button>,
         ]}

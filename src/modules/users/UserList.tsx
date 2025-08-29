@@ -11,7 +11,8 @@ const UserList: React.FC = () => {
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [changePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
+  const [changePasswordModalVisible, setChangePasswordModalVisible] =
+    useState(false);
 
   useEffect(() => {
     MetadataService.getCollectionConfigurations('users').then((res) => {
@@ -27,7 +28,10 @@ const UserList: React.FC = () => {
             <a href={`/users/edit/${record.id}`} className='inline-block'>
               <EditOutlined />
             </a>
-            <a href={`/users/detail/${record.id}`} className='inline-block ml-2'>
+            <a
+              href={`/users/detail/${record.id}`}
+              className='inline-block ml-2'
+            >
               <EyeOutlined />
             </a>
             <a
@@ -56,12 +60,21 @@ const UserList: React.FC = () => {
 
       <ProTable
         columns={columns}
+        rowKey='id'
+        search={{
+          searchText: 'Search',
+        }}
         request={async (params) => {
           // Handle search parameters
           const searchParams: any = { filters: {} };
           // Handle individual field filters
           Object.keys(params).forEach((key) => {
-            if (key !== 'search' && key !== 'current' && key !== 'pageSize' && params[key]) {
+            if (
+              key !== 'search' &&
+              key !== 'current' &&
+              key !== 'pageSize' &&
+              params[key]
+            ) {
               searchParams.filters[key] = {
                 $contains: params[key],
               };
@@ -78,12 +91,12 @@ const UserList: React.FC = () => {
             total: users.meta.pagination?.total || 0,
           };
         }}
-        rowKey='id'
         pagination={{
           defaultPageSize: config.settings?.pageSize || 10,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => `Showing ${range[0]}-${range[1]} of ${total} items`,
+          showTotal: (total, range) =>
+            `Showing ${range[0]}-${range[1]} of ${total} items`,
         }}
       />
 

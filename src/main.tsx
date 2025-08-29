@@ -8,7 +8,15 @@ import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ConfigProvider locale={enUS}>
+    <ConfigProvider
+      locale={enUS}
+      theme={{
+        token: {
+          borderRadius: 4,
+          colorPrimary: '#004d00',
+        },
+      }}
+    >
       <BrowserRouter>
         <App />
       </BrowserRouter>
