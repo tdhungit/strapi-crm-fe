@@ -96,7 +96,7 @@ export default function DefaultLayout() {
           defaultSelectedKeys={['1']}
           mode='inline'
           items={menuItems}
-          onClick={(item: any) => navigate(item.key)}
+          onClick={(item: any) => navigate(item.key, { replace: true })}
           style={{
             background: '#003300',
             color: '#ffffff',
@@ -180,7 +180,7 @@ export default function DefaultLayout() {
             </Dropdown>
           </div>
         </Header>
-        <Content style={{ margin: 16 }}>
+        <Content>
           <Outlet />
         </Content>
         <Footer style={{ textAlign: 'center' }}>

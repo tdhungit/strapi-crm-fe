@@ -1,5 +1,5 @@
 import { EditOutlined, EyeOutlined, KeyOutlined } from '@ant-design/icons';
-import { ProTable } from '@ant-design/pro-components';
+import { PageContainer, ProTable } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
 import PageLoading from '../../components/PageLoading';
 import { getListLayoutColumns } from '../../helpers/views_helper';
@@ -55,10 +55,25 @@ const UserList: React.FC = () => {
   if (!config?.layouts) return <PageLoading />;
 
   return (
-    <div>
-      <h1 className='text-2xl mb-4'>User List</h1>
-
+    <PageContainer
+      header={{
+        title: 'USER LIST',
+        breadcrumb: {
+          items: [
+            {
+              title: 'Home',
+              href: '/home',
+            },
+            {
+              title: 'Users',
+              href: '/users',
+            },
+          ],
+        },
+      }}
+    >
       <ProTable
+        key='user-list'
         columns={columns}
         rowKey='id'
         search={{
@@ -105,7 +120,7 @@ const UserList: React.FC = () => {
         open={changePasswordModalVisible}
         onOpenChange={setChangePasswordModalVisible}
       />
-    </div>
+    </PageContainer>
   );
 };
 

@@ -1,9 +1,12 @@
-import { ProDescriptions } from '@ant-design/pro-components';
+import { PageContainer, ProDescriptions } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageError from '../../components/PageError';
 import PageLoading from '../../components/PageLoading';
-import { getEditLayoutColumns } from '../../helpers/views_helper';
+import {
+  capitalizeFirstLetter,
+  getEditLayoutColumns,
+} from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 
@@ -29,12 +32,34 @@ export default function CollectionDetail() {
   if (!id) return <PageError message='Invalid ID' />;
 
   return (
-    <div>
-      <h1 className='text-2xl mb-4 uppercase'>{title ? title : `Detail ${module}`}</h1>
-
+    <PageContainer
+      header={{
+        title: title || `${module?.toUpperCase()}`,
+        breadcrumb: {
+          items: [
+            {
+              title: 'Home',
+              href: '/home',
+            },
+            {
+              title: capitalizeFirstLetter(module || ''),
+              href: `/collections/${module}`,
+            },
+            {
+              title: 'Edit',
+              href: `/collections/${module}/edit/${id}`,
+            },
+            {
+              title: 'Detail',
+            },
+          ],
+        },
+      }}
+    >
       <div className='w-full bg-white mt-4 p-4 rounded-lg'>
         {columns.length > 0 && (
           <ProDescriptions
+            key={`${module}-${id || 0}`}
             title={null}
             column={2}
             bordered
@@ -64,6 +89,6 @@ export default function CollectionDetail() {
           />
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

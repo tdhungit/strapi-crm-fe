@@ -1,8 +1,12 @@
+import { PageContainer } from '@ant-design/pro-components';
 import { Button, Form, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
-import { renderEditLayoutRows } from '../../helpers/views_helper';
+import {
+  capitalizeFirstLetter,
+  renderEditLayoutRows,
+} from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 
@@ -67,11 +71,41 @@ export default function CollectionForm() {
   }
 
   return (
-    <div>
-      <h1 className='text-2xl mb-4 uppercase'>{id ? `Edit ${module}` : `Create ${module}`}</h1>
-
+    <PageContainer
+      header={{
+        title: id
+          ? `Edit ${module}`.toLocaleUpperCase()
+          : `Create ${module}`.toLocaleUpperCase(),
+        breadcrumb: {
+          items: [
+            {
+              title: 'Home',
+              href: '/home',
+            },
+            {
+              title: capitalizeFirstLetter(module || ''),
+              href: `/collections/${module}`,
+            },
+            id
+              ? {
+                  title: 'Detail',
+                  href: `/collections/${module}/detail/${id}`,
+                }
+              : {},
+            {
+              title: id ? 'Edit' : 'Create',
+            },
+          ],
+        },
+      }}
+    >
       <div className='w-full bg-white mt-4 p-4 rounded-lg'>
-        <Form form={form} layout='vertical' onFinish={onFinish}>
+        <Form
+          key={`${module}-${id || 0}`}
+          form={form}
+          layout='vertical'
+          onFinish={onFinish}
+        >
           {renderEditLayoutRows(config, data, form)}
           <div className='flex gap-2'>
             <Button type='primary' htmlType='submit'>
@@ -83,6 +117,6 @@ export default function CollectionForm() {
           </div>
         </Form>
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -1,3 +1,4 @@
+import { PageContainer } from '@ant-design/pro-components';
 import { Button, Form, Input, message } from 'antd';
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -40,44 +41,72 @@ const UserForm: React.FC = () => {
   };
 
   return (
-    <Form
-      form={form}
-      layout='vertical'
-      onFinish={onFinish}
-      style={{ maxWidth: 400, margin: '0 auto', marginTop: 32 }}
+    <PageContainer
+      header={{
+        title: id ? 'Edit User' : 'Create User',
+        breadcrumb: {
+          routes: [
+            {
+              href: '/',
+              breadcrumbName: 'Home',
+            },
+            {
+              href: '/users',
+              breadcrumbName: 'Users',
+            },
+            id
+              ? {
+                  href: `/users/detail/${id}`,
+                  breadcrumbName: 'User Detail',
+                }
+              : {},
+            {
+              breadcrumbName: id ? 'Edit User' : 'Create User',
+            },
+          ],
+        },
+      }}
     >
-      <Form.Item
-        label='Username'
-        name='username'
-        rules={[{ required: true, message: 'Please input username!' }]}
+      <Form
+        key={`user-${id || 0}`}
+        form={form}
+        layout='vertical'
+        onFinish={onFinish}
+        style={{ maxWidth: 400, margin: '0 auto', marginTop: 32 }}
       >
-        <Input />
-      </Form.Item>
-      <Form.Item
-        label='Email'
-        name='email'
-        rules={[
-          { required: true, message: 'Please input email!' },
-          { type: 'email', message: 'Please enter a valid email!' },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-      {!id && (
         <Form.Item
-          label='Password'
-          name='password'
-          rules={[{ required: true, message: 'Please input password!' }]}
+          label='Username'
+          name='username'
+          rules={[{ required: true, message: 'Please input username!' }]}
         >
-          <Input.Password />
+          <Input />
         </Form.Item>
-      )}
-      <Form.Item>
-        <Button type='primary' htmlType='submit'>
-          {id ? 'Update User' : 'Create User'}
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item
+          label='Email'
+          name='email'
+          rules={[
+            { required: true, message: 'Please input email!' },
+            { type: 'email', message: 'Please enter a valid email!' },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        {!id && (
+          <Form.Item
+            label='Password'
+            name='password'
+            rules={[{ required: true, message: 'Please input password!' }]}
+          >
+            <Input.Password />
+          </Form.Item>
+        )}
+        <Form.Item>
+          <Button type='primary' htmlType='submit'>
+            {id ? 'Update User' : 'Create User'}
+          </Button>
+        </Form.Item>
+      </Form>
+    </PageContainer>
   );
 };
 

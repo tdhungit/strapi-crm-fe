@@ -1,4 +1,4 @@
-import { ProDescriptions } from '@ant-design/pro-components';
+import { PageContainer, ProDescriptions } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageError from '../../components/PageError';
@@ -28,12 +28,30 @@ export default function UserDetail() {
   if (!config?.layouts) return <PageLoading />;
 
   return (
-    <div>
-      <h1 className='text-2xl mb-4'>{record?.username || 'User Detail'}</h1>
-
+    <PageContainer
+      header={{
+        title: record?.username || 'User Detail',
+        breadcrumb: {
+          routes: [
+            {
+              href: '/users',
+              breadcrumbName: 'Users',
+            },
+            {
+              href: `/users/edit/${id}`,
+              breadcrumbName: 'User Edit',
+            },
+            {
+              breadcrumbName: 'User Detail',
+            },
+          ],
+        },
+      }}
+    >
       <div className='w-full bg-white mt-4 p-4 rounded-lg'>
         {columns.length > 0 && (
           <ProDescriptions
+            key={`user-${id || 0}`}
             title={null}
             column={2}
             bordered
@@ -65,8 +83,12 @@ export default function UserDetail() {
       </div>
 
       <div className='w-full bg-white mt-4 p-4 rounded-lg'>
-        <OneToManyPanel record={record} relateModule='accounts' field={config.fields.accounts} />
+        <OneToManyPanel
+          record={record}
+          relateModule='accounts'
+          field={config.fields.accounts}
+        />
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -32,7 +32,10 @@ export function getEditLayoutColumns(config: any) {
       );
 
       // check relation
-      if (fieldOptions.type === 'relation' && fieldOptions.relation === 'oneToMany') {
+      if (
+        fieldOptions.type === 'relation' &&
+        fieldOptions.relation === 'oneToMany'
+      ) {
         return;
       }
 
@@ -40,7 +43,9 @@ export function getEditLayoutColumns(config: any) {
         title: fieldOptions.label || item.name,
         dataIndex: item.name,
         valueType: undefined,
-        render: (_text: any, record: any) => <DetailView item={fieldOptions} data={record} />,
+        render: (_text: any, record: any) => (
+          <DetailView item={fieldOptions} data={record} />
+        ),
       });
     });
   });
@@ -48,9 +53,18 @@ export function getEditLayoutColumns(config: any) {
   return cols;
 }
 
-export function renderEditLayoutRows(config: any, record: any, form: FormInstance) {
+export function renderEditLayoutRows(
+  config: any,
+  record: any,
+  form: FormInstance
+) {
   return config.layouts.edit.map((line: any[], lineIndex: number) => (
-    <Row key={`line-${lineIndex}`} gutter={[16, 16]} className='mb-4' style={{ width: '100%' }}>
+    <Row
+      key={`line-${lineIndex}`}
+      gutter={[16, 16]}
+      className='mb-4'
+      style={{ width: '100%' }}
+    >
       {line.map((item: any) => {
         const fieldOptions = MetadataService.getCollectionFieldLayoutConfig(
           config,
@@ -76,11 +90,21 @@ export function getEditLayoutPanels(config: any) {
         'edit',
         item.name
       );
-      if (fieldOptions.type === 'relation' && fieldOptions.relation === 'oneToMany') {
+      if (
+        fieldOptions.type === 'relation' &&
+        fieldOptions.relation === 'oneToMany'
+      ) {
         panelFields.push(item.name);
       }
     });
   });
 
   return panelFields;
+}
+
+export function capitalizeFirstLetter(str: string) {
+  if (str.length === 0) {
+    return ''; // Handle empty strings
+  }
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

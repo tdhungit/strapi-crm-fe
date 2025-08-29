@@ -1,4 +1,8 @@
-import { ProForm, ProFormText } from '@ant-design/pro-components';
+import {
+  PageContainer,
+  ProForm,
+  ProFormText,
+} from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
 import { Form } from 'antd';
 import { useEffect } from 'react';
@@ -8,7 +12,9 @@ import ApiService from '../../services/ApiService';
 export default function UserProfile() {
   const [form] = Form.useForm();
 
-  const { data: user } = useRequest(() => ApiService.request('get', '/users/me'));
+  const { data: user } = useRequest(() =>
+    ApiService.request('get', '/users/me')
+  );
 
   useEffect(() => {
     if (form && user) {
@@ -21,17 +27,36 @@ export default function UserProfile() {
   }
 
   return (
-    <div className='w-full'>
-      <h1 className='text-2xl font-bold'>User Profile</h1>
-
+    <PageContainer
+      header={{
+        title: 'Profile',
+        breadcrumb: {
+          routes: [
+            {
+              href: '/',
+              breadcrumbName: 'Home',
+            },
+            {
+              href: '/profile',
+              breadcrumbName: 'Profile',
+            },
+          ],
+        },
+      }}
+    >
       <div className='mt-4 bg-white rounded-lg shadow-md p-4'>
-        <ProForm layout='vertical' form={form}>
+        <ProForm key='user-profile' layout='vertical' form={form}>
           <ProForm.Group>
-            <ProFormText name='username' label='Username' disabled width={'md'} />
+            <ProFormText
+              name='username'
+              label='Username'
+              disabled
+              width={'md'}
+            />
             <ProFormText name='email' label='Email' disabled width={'md'} />
           </ProForm.Group>
         </ProForm>
       </div>
-    </div>
+    </PageContainer>
   );
 }

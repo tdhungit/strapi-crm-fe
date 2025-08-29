@@ -4,18 +4,22 @@ import {
   FileExcelOutlined,
   PlusCircleFilled,
 } from '@ant-design/icons';
-import { ProTable } from '@ant-design/pro-components';
+import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { Button, message } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
-import { getListLayoutColumns } from '../../helpers/views_helper';
+import {
+  capitalizeFirstLetter,
+  getListLayoutColumns,
+} from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 
 export default function CollectionList() {
   // Get the 'name' parameter from the route
   const { name: module } = useParams();
+  const ref = useRef<any>(null);
 
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
@@ -25,6 +29,7 @@ export default function CollectionList() {
     if (module) {
       MetadataService.getCollectionConfigurations(module).then((res) => {
         setConfig(res);
+        ref?.current?.reload();
       });
     }
   }, [module]);
@@ -83,11 +88,28 @@ export default function CollectionList() {
   if (!config?.layouts) return <PageLoading />;
 
   return (
-    <div>
-      <h1 className='text-2xl mb-4 uppercase'>{module}</h1>
+    <PageContainer
+      header={{
+        title: `${module?.toUpperCase()}`,
+        breadcrumb: {
+          items: [
+            {
+              title: 'Home',
+              href: '/home',
+            },
+            {
+              title: capitalizeFirstLetter(module || ''),
+              href: `/collections/${module}`,
+            },
+          ],
+        },
+      }}
+    >
       <ProTable
+        key={`${module}-list`}
         columns={columns}
         rowKey='documentId'
+        actionRef={ref}
         search={{
           searchText: 'Search',
         }}
@@ -162,6 +184,6 @@ export default function CollectionList() {
           </Button>,
         ]}
       />
-    </div>
+    </PageContainer>
   );
 }

@@ -1,7 +1,19 @@
 import { InboxOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { Alert, Button, Card, Col, Row, Select, Table, Upload, message } from 'antd';
+import { PageContainer } from '@ant-design/pro-components';
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Row,
+  Select,
+  Table,
+  Upload,
+  message,
+} from 'antd';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { capitalizeFirstLetter } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 
@@ -26,7 +38,8 @@ export default function ImportModule() {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const returnUrl = searchParams.get('returnUrl') || `/imports/${collectionName}`;
+  const returnUrl =
+    searchParams.get('returnUrl') || `/imports/${collectionName}`;
 
   useEffect(() => {
     if (collectionName) {
@@ -53,7 +66,9 @@ export default function ImportModule() {
       });
 
       // Count auto-mapped fields
-      const autoMappedCount = mappings.filter((m) => m.contentTypeField !== '').length;
+      const autoMappedCount = mappings.filter(
+        (m) => m.contentTypeField !== ''
+      ).length;
 
       setFieldMappings(mappings);
 
@@ -82,10 +97,14 @@ export default function ImportModule() {
           }
 
           // Parse CSV (simple implementation - doesn't handle quoted commas)
-          const headers = lines[0].split(',').map((h) => h.trim().replace(/"/g, ''));
+          const headers = lines[0]
+            .split(',')
+            .map((h) => h.trim().replace(/"/g, ''));
           const rows = lines
             .slice(1)
-            .map((line) => line.split(',').map((cell) => cell.trim().replace(/"/g, '')));
+            .map((line) =>
+              line.split(',').map((cell) => cell.trim().replace(/"/g, ''))
+            );
 
           resolve({ headers, rows });
         } catch (error) {
@@ -112,7 +131,9 @@ export default function ImportModule() {
     } catch (error) {
       message.destroy();
       message.error(
-        `Failed to read CSV file: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to read CSV file: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
       );
     }
   };
@@ -120,7 +141,9 @@ export default function ImportModule() {
   const handleMappingChange = (csvHeader: string, contentTypeField: string) => {
     setFieldMappings((prev) =>
       prev.map((mapping) =>
-        mapping.csvHeader === csvHeader ? { ...mapping, contentTypeField } : mapping
+        mapping.csvHeader === csvHeader
+          ? { ...mapping, contentTypeField }
+          : mapping
       )
     );
   };
@@ -154,7 +177,8 @@ export default function ImportModule() {
           // Check if this is an auto-mapped field
           const isAutoMapped =
             record.contentTypeField &&
-            record.contentTypeField.toLowerCase() === record.csvHeader.toLowerCase().trim();
+            record.contentTypeField.toLowerCase() ===
+              record.csvHeader.toLowerCase().trim();
 
           return (
             <div style={{ position: 'relative' }}>
@@ -162,11 +186,16 @@ export default function ImportModule() {
                 style={{ width: '100%' }}
                 placeholder='Select a field to map'
                 value={record.contentTypeField || undefined}
-                onChange={(value) => handleMappingChange(record.csvHeader, value)}
+                onChange={(value) =>
+                  handleMappingChange(record.csvHeader, value)
+                }
                 allowClear
                 showSearch
                 optionFilterProp='label'
-                options={[{ value: '', label: '-- Skip this column --' }, ...contentTypeFields]}
+                options={[
+                  { value: '', label: '-- Skip this column --' },
+                  ...contentTypeFields,
+                ]}
               />
               {isAutoMapped && (
                 <span
@@ -196,7 +225,9 @@ export default function ImportModule() {
     const mappedFields = fieldMappings.filter((m) => m.contentTypeField !== '');
 
     if (mappedFields.length === 0) {
-      message.warning('Please map at least one CSV column to a content type field.');
+      message.warning(
+        'Please map at least one CSV column to a content type field.'
+      );
       return;
     }
 
@@ -231,9 +262,14 @@ export default function ImportModule() {
       message.loading('Importing data...', 0);
 
       // Post to API endpoint
-      const response = await ApiService.request('post', '/imports/csv', formData, {
-        'Content-Type': 'multipart/form-data',
-      });
+      const response = await ApiService.request(
+        'post',
+        '/imports/csv',
+        formData,
+        {
+          'Content-Type': 'multipart/form-data',
+        }
+      );
 
       message.destroy();
       message.success(response?.message || 'Data imported successfully');
@@ -241,7 +277,11 @@ export default function ImportModule() {
       navigate(returnUrl);
     } catch (error) {
       message.destroy();
-      message.error(`Import failed: ${error instanceof Error ? error.message : 'Network error'}`);
+      message.error(
+        `Import failed: ${
+          error instanceof Error ? error.message : 'Network error'
+        }`
+      );
     }
   };
 
@@ -252,9 +292,26 @@ export default function ImportModule() {
   };
 
   return (
-    <div className='w-full'>
-      <h1 className='text-2xl font-bold'>Import Module: {collectionName}</h1>
-
+    <PageContainer
+      header={{
+        title: `Import Module: ${collectionName}`,
+        breadcrumb: {
+          items: [
+            {
+              title: 'Home',
+              href: '/home',
+            },
+            {
+              title: capitalizeFirstLetter(collectionName || ''),
+              href: `/collections/${collectionName}`,
+            },
+            {
+              title: 'Import',
+            },
+          ],
+        },
+      }}
+    >
       {/* File Upload Section */}
       <Card title='Step 1: Upload CSV File' className='!mt-4'>
         <Upload.Dragger
@@ -272,7 +329,9 @@ export default function ImportModule() {
             <InboxOutlined />
           </p>
           <p className='ant-upload-text'>
-            {csvData ? `File loaded: ${uploadedFile?.name}` : 'Click or drag CSV file to this area'}
+            {csvData
+              ? `File loaded: ${uploadedFile?.name}`
+              : 'Click or drag CSV file to this area'}
           </p>
           <p className='ant-upload-hint'>
             {csvData
@@ -325,7 +384,10 @@ export default function ImportModule() {
 
       {/* Field Mapping Section */}
       {csvData && contentType?.fields && (
-        <Card title='Step 3: Map CSV Headers to Content Type Fields' className='!mt-4'>
+        <Card
+          title='Step 3: Map CSV Headers to Content Type Fields'
+          className='!mt-4'
+        >
           <Alert
             message='Field Mapping'
             description="Map each CSV column to the corresponding field in your content type. Fields with matching names are automatically mapped. You can skip columns that you don't want to import."
@@ -357,7 +419,10 @@ export default function ImportModule() {
                 type='primary'
                 size='large'
                 onClick={handleImport}
-                disabled={fieldMappings.filter((m) => m.contentTypeField !== '').length === 0}
+                disabled={
+                  fieldMappings.filter((m) => m.contentTypeField !== '')
+                    .length === 0
+                }
               >
                 Import Data
               </Button>
@@ -365,6 +430,6 @@ export default function ImportModule() {
           </Row>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

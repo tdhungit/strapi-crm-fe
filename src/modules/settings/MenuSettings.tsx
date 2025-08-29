@@ -1,4 +1,5 @@
 import { EditOutlined } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-components';
 import {
   closestCenter,
   DndContext,
@@ -31,13 +32,14 @@ function SortableItem({
   listType: 'available' | 'hidden';
   onEdit: (menu: any) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: menu.key,
-    data: {
-      type: listType,
-      menu,
-    },
-  });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: menu.key,
+      data: {
+        type: listType,
+        menu,
+      },
+    });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -54,9 +56,16 @@ function SortableItem({
     <div ref={setNodeRef} style={style} {...attributes}>
       <List.Item>
         <div {...listeners} style={{ flex: 1, cursor: 'grab' }}>
-          <List.Item.Meta title={<strong>{menu.label}</strong>} description={menu.key} />
+          <List.Item.Meta
+            title={<strong>{menu.label}</strong>}
+            description={menu.key}
+          />
         </div>
-        <Button type='link' onClick={handleEditClick} style={{ cursor: 'pointer' }}>
+        <Button
+          type='link'
+          onClick={handleEditClick}
+          style={{ cursor: 'pointer' }}
+        >
           <EditOutlined />
         </Button>
       </List.Item>
@@ -81,7 +90,9 @@ function DropZone({
   return (
     <div
       ref={setNodeRef}
-      className={`min-h-[200px] ${isOver ? 'bg-blue-50 border-2 border-blue-300' : ''}`}
+      className={`min-h-[200px] ${
+        isOver ? 'bg-blue-50 border-2 border-blue-300' : ''
+      }`}
     >
       {children}
     </div>
@@ -147,17 +158,25 @@ export default function MenuSettings() {
         const updatedItem = { ...editingItem, ...values };
 
         // Check if item is in available or hidden list
-        const isInAvailable = items.some((item) => item.key === editingItem.key);
-        const isInHidden = hiddenItems.some((item) => item.key === editingItem.key);
+        const isInAvailable = items.some(
+          (item) => item.key === editingItem.key
+        );
+        const isInHidden = hiddenItems.some(
+          (item) => item.key === editingItem.key
+        );
 
         if (isInAvailable) {
           setItems((prevItems) =>
-            prevItems.map((item) => (item.key === editingItem.key ? updatedItem : item))
+            prevItems.map((item) =>
+              item.key === editingItem.key ? updatedItem : item
+            )
           );
           setShouldSave(true);
         } else if (isInHidden) {
           setHiddenItems((prevItems) =>
-            prevItems.map((item) => (item.key === editingItem.key ? updatedItem : item))
+            prevItems.map((item) =>
+              item.key === editingItem.key ? updatedItem : item
+            )
           );
         }
 
@@ -184,7 +203,8 @@ export default function MenuSettings() {
 
     // Handle dropping on drop zones
     if (overId === 'available-dropzone' || overId === 'hidden-dropzone') {
-      const targetListType = overId === 'available-dropzone' ? 'available' : 'hidden';
+      const targetListType =
+        overId === 'available-dropzone' ? 'available' : 'hidden';
 
       if (activeData?.type !== targetListType) {
         if (activeData?.type === 'available' && targetListType === 'hidden') {
@@ -195,13 +215,21 @@ export default function MenuSettings() {
             setHiddenItems((hiddenItems) => [...hiddenItems, itemToMove]);
             setShouldSave(true);
           }
-        } else if (activeData?.type === 'hidden' && targetListType === 'available') {
+        } else if (
+          activeData?.type === 'hidden' &&
+          targetListType === 'available'
+        ) {
           // Move from hidden to available
           const itemToMove = hiddenItems.find((item) => item.key === activeId);
           if (itemToMove) {
-            setHiddenItems((hiddenItems) => hiddenItems.filter((item) => item.key !== activeId));
+            setHiddenItems((hiddenItems) =>
+              hiddenItems.filter((item) => item.key !== activeId)
+            );
             setItems((items) => {
-              const newItems = [...items, { ...itemToMove, weight: items.length + 1 }];
+              const newItems = [
+                ...items,
+                { ...itemToMove, weight: items.length + 1 },
+              ];
               return newItems;
             });
             setShouldSave(true);
@@ -231,8 +259,12 @@ export default function MenuSettings() {
           setShouldSave(true);
         } else {
           setHiddenItems((hiddenItems) => {
-            const oldIndex = hiddenItems.findIndex((item) => item.key === activeId);
-            const newIndex = hiddenItems.findIndex((item) => item.key === overId);
+            const oldIndex = hiddenItems.findIndex(
+              (item) => item.key === activeId
+            );
+            const newIndex = hiddenItems.findIndex(
+              (item) => item.key === overId
+            );
             return arrayMove(hiddenItems, oldIndex, newIndex);
           });
         }
@@ -247,13 +279,21 @@ export default function MenuSettings() {
           setHiddenItems((hiddenItems) => [...hiddenItems, itemToMove]);
           setShouldSave(true);
         }
-      } else if (activeData?.type === 'hidden' && overData?.type === 'available') {
+      } else if (
+        activeData?.type === 'hidden' &&
+        overData?.type === 'available'
+      ) {
         // Move from hidden to available
         const itemToMove = hiddenItems.find((item) => item.key === activeId);
         if (itemToMove) {
-          setHiddenItems((hiddenItems) => hiddenItems.filter((item) => item.key !== activeId));
+          setHiddenItems((hiddenItems) =>
+            hiddenItems.filter((item) => item.key !== activeId)
+          );
           setItems((items) => {
-            const newItems = [...items, { ...itemToMove, weight: items.length + 1 }];
+            const newItems = [
+              ...items,
+              { ...itemToMove, weight: items.length + 1 },
+            ];
             return newItems;
           });
           setShouldSave(true);
@@ -297,11 +337,33 @@ export default function MenuSettings() {
   }
 
   return (
-    <div>
-      <h1 className='text-2xl font-bold mb-2'>Menu Settings</h1>
-      <p className='text-gray-600'>Configure your menu settings here.</p>
-
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <PageContainer
+      header={{
+        title: 'Menu Settings',
+        subTitle: 'Configure your menu settings here.',
+        breadcrumb: {
+          items: [
+            {
+              title: 'Home',
+              href: '/home',
+            },
+            {
+              title: 'Settings',
+              href: '/settings',
+            },
+            {
+              title: 'Menu Settings',
+              href: '/settings/menus',
+            },
+          ],
+        },
+      }}
+    >
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
         <Row gutter={16} className='mt-4'>
           <Col span={12}>
             <DropZone listType='available'>
@@ -312,12 +374,20 @@ export default function MenuSettings() {
                 <List
                   dataSource={items || []}
                   renderItem={(menu) => (
-                    <SortableItem menu={menu} listType='available' onEdit={handleEditMenu} />
+                    <SortableItem
+                      menu={menu}
+                      listType='available'
+                      onEdit={handleEditMenu}
+                    />
                   )}
                   locale={{ emptyText: 'No available menu items.' }}
                   bordered
                   size='small'
-                  header={<div className='text-sm font-bold'>Available Menu Items</div>}
+                  header={
+                    <div className='text-sm font-bold'>
+                      Available Menu Items
+                    </div>
+                  }
                   className='bg-white'
                 />
               </SortableContext>
@@ -332,12 +402,18 @@ export default function MenuSettings() {
                 <List
                   dataSource={hiddenItems || []}
                   renderItem={(menu) => (
-                    <SortableItem menu={menu} listType='hidden' onEdit={handleEditMenu} />
+                    <SortableItem
+                      menu={menu}
+                      listType='hidden'
+                      onEdit={handleEditMenu}
+                    />
                   )}
                   locale={{ emptyText: 'No hidden menu items.' }}
                   bordered
                   size='small'
-                  header={<div className='text-sm font-bold'>Hidden Menu Items</div>}
+                  header={
+                    <div className='text-sm font-bold'>Hidden Menu Items</div>
+                  }
                   className='bg-white'
                 />
               </SortableContext>
@@ -353,6 +429,6 @@ export default function MenuSettings() {
         onSave={handleModalSave}
         loading={modalLoading}
       />
-    </div>
+    </PageContainer>
   );
 }
