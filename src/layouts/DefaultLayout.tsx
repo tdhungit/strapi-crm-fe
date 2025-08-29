@@ -69,7 +69,9 @@ export default function DefaultLayout() {
         onCollapse={(value) => setCollapsed(value)}
         width={260}
         collapsedWidth={60}
-        theme='light'
+        style={{
+          background: '#003300',
+        }}
       >
         <div className='logo-vertical'>
           <a href='/home' className='flex items-start gap-2'>
@@ -91,11 +93,16 @@ export default function DefaultLayout() {
           </a>
         </div>
         <Menu
-          theme='light'
           defaultSelectedKeys={['1']}
           mode='inline'
           items={menuItems}
           onClick={(item: any) => navigate(item.key)}
+          style={{
+            background: '#003300',
+            color: '#ffffff',
+          }}
+          theme='dark'
+          className='custom-menu'
         />
       </Sider>
 

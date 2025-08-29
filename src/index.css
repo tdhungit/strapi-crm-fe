@@ -6,3 +6,45 @@
   background: rgba(255, 255, 255, 0.2);
   border-radius: 6px;
 }
+
+/* Custom menu styles for #003300 background */
+.custom-menu .ant-menu-sub {
+  background: #001a00 !important;
+}
+
+.custom-menu .ant-menu-submenu-title {
+  background: #003300 !important;
+}
+
+.custom-menu .ant-menu-submenu-title:hover {
+  background: #004d00 !important;
+}
+
+.custom-menu .ant-menu-item {
+  background: #003300 !important;
+}
+
+.custom-menu .ant-menu-item:hover {
+  background: #004d00 !important;
+}
+
+.custom-menu .ant-menu-submenu .ant-menu-item {
+  background: #001a00 !important;
+  padding-left: 48px !important;
+}
+
+.custom-menu .ant-menu-submenu .ant-menu-item:hover {
+  background: #003300 !important;
+}
+
+/* Custom sider trigger styles */
+.ant-layout-sider .ant-layout-sider-trigger {
+  background: #003300 !important;
+  color: #ffffff !important;
+  border-top: 1px solid #004d00 !important;
+}
+
+.ant-layout-sider .ant-layout-sider-trigger:hover {
+  background: #004d00 !important;
+  color: #ffffff !important;
+}
