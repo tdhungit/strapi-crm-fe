@@ -22,7 +22,9 @@ export default function DefaultLayout() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const { data: user } = useRequest(() => ApiService.request('get', '/users/me'));
+  const { data: user } = useRequest(() =>
+    ApiService.request('get', '/users/me')
+  );
 
   const [collapsed, setCollapsed] = useState(false);
   const [menuItems, setMenuItems] = useState<any[]>([]);
@@ -69,15 +71,23 @@ export default function DefaultLayout() {
         collapsedWidth={60}
         theme='light'
       >
-        <div className='demo-logo-vertical'>
-          <a href='/home'>
-            {(appSettings?.logo?.menuLogo?.url && (
+        <div className='logo-vertical'>
+          <a href='/home' className='flex items-start gap-2'>
+            {appSettings?.logo?.menuLogo?.url && (
               <img
-                src={import.meta.env.VITE_STRAPI_URL + appSettings.logo.menuLogo.url}
+                src={
+                  import.meta.env.VITE_STRAPI_URL +
+                  appSettings.logo.menuLogo.url
+                }
                 alt='StrapiCRM'
                 className='max-h-[32px]'
               />
-            )) || <strong className='text-xl font-bold'>StrapiCRM</strong>}
+            )}
+            {!collapsed && (
+              <strong className='text-xl font-bold'>
+                {appSettings?.uiConfig?.pageTitle || 'StrapiCRM'}
+              </strong>
+            )}
           </a>
         </div>
         <Menu
@@ -166,7 +176,9 @@ export default function DefaultLayout() {
         <Content style={{ margin: 16 }}>
           <Outlet />
         </Content>
-        <Footer style={{ textAlign: 'center' }}>Strapi CRM ©2025. Power by Jacky</Footer>
+        <Footer style={{ textAlign: 'center' }}>
+          Strapi CRM ©2025. Power by Jacky
+        </Footer>
       </Layout>
     </Layout>
   );
