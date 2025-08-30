@@ -93,11 +93,23 @@ export function getEditLayoutPanels(config: any) {
         'edit',
         item.name
       );
+
+      const contentType = MetadataService.getContentTypeByUid(
+        fieldOptions.target
+      );
+      const module = contentType?.collectionName;
+
       if (
         fieldOptions.type === 'relation' &&
         fieldOptions.relation === 'oneToMany'
       ) {
-        panelFields.push(item.name);
+        panelFields.push({
+          name: item.name,
+          label: fieldOptions.label || item.name,
+          type: fieldOptions.relation,
+          module,
+          field: config.fields?.[item.name] || {},
+        });
       }
     });
   });

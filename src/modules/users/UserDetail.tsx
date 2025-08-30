@@ -48,7 +48,7 @@ export default function UserDetail() {
         },
       }}
     >
-      <div className='w-full bg-white mt-4 p-4 rounded-lg'>
+      <div className='w-full bg-white p-4 rounded-lg'>
         {columns.length > 0 && (
           <ProDescriptions
             key={`user-${id || 0}`}
@@ -84,6 +84,7 @@ export default function UserDetail() {
 
       <div className='w-full bg-white mt-4 p-4 rounded-lg'>
         <OneToManyPanel
+          label='Accounts'
           record={record}
           relateModule='accounts'
           field={config.fields.accounts}

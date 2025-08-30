@@ -6,10 +6,12 @@ import MetadataService from '../../services/MetadataService';
 import PageLoading from '../PageLoading';
 
 export default function OneToManyPanel({
+  label,
   relateModule,
   field,
   record,
 }: {
+  label: string;
   relateModule: string;
   field: any;
   record: any;
@@ -22,7 +24,7 @@ export default function OneToManyPanel({
 
   return (
     <div className='w-full bg-white rounded-lg'>
-      <h2 className='font-bold mb-4 uppercase'>{relateModule}</h2>
+      <h2 className='font-bold mb-4 uppercase'>{label || relateModule}</h2>
 
       <div className='w-full mt-2'>
         {config?.layouts?.list &&
