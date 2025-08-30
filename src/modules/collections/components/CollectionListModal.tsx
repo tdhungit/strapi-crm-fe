@@ -10,16 +10,19 @@ export default function CollectionListModal({
   module,
   open,
   onOpenChange,
+  onFinish,
 }: {
   module: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onFinish?: (values: any) => void;
 }) {
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
 
   const onSelectRecord = (record: any) => {
-    console.log(record);
+    onFinish?.(record);
+    onOpenChange(false);
   };
 
   useEffect(() => {

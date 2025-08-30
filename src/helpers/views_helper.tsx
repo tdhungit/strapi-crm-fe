@@ -61,7 +61,7 @@ export function renderEditLayoutRows(
   record: any,
   form: FormInstance
 ) {
-  return config.layouts.edit.map((line: any[], lineIndex: number) => (
+  return config?.layouts?.edit?.map((line: any[], lineIndex: number) => (
     <Row
       key={`line-${lineIndex}`}
       gutter={[16, 16]}

@@ -10,6 +10,7 @@ import { useRequest } from 'ahooks';
 import { Button } from 'antd';
 import { useState } from 'react';
 import { getListLayoutColumns } from '../../helpers/views_helper';
+import CollectionFormModal from '../../modules/collections/components/CollectionFormModal';
 import CollectionListModal from '../../modules/collections/components/CollectionListModal';
 import CollectionService from '../../services/CollectionService';
 import MetadataService from '../../services/MetadataService';
@@ -25,6 +26,7 @@ export default function OneToManyPanel({
   record: any;
 }) {
   const [openSelectModal, setOpenSelectModal] = useState(false);
+  const [openFormModal, setOpenFormModal] = useState(false);
 
   const { data: config } = useRequest(() => {
     return MetadataService.getCollectionConfigurations(relateModule);
@@ -85,7 +87,14 @@ export default function OneToManyPanel({
               pagination={CollectionService.getTablePagination(config)}
               options={false}
               toolBarRender={() => [
-                <Button key={`panel-${relateModule}-btn-add`} type='primary'>
+                <Button
+                  key={`panel-${relateModule}-btn-add`}
+                  variant='solid'
+                  color='green'
+                  onClick={() => {
+                    setOpenFormModal(true);
+                  }}
+                >
                   <PlusCircleOutlined /> Add
                 </Button>,
                 <Button
@@ -105,6 +114,14 @@ export default function OneToManyPanel({
         module={relateModule}
         open={openSelectModal}
         onOpenChange={setOpenSelectModal}
+        onFinish={() => {}}
+      />
+
+      <CollectionFormModal
+        collectionName={relateModule}
+        open={openFormModal}
+        onOpenChange={setOpenFormModal}
+        onFinish={() => {}}
       />
     </>
   );
