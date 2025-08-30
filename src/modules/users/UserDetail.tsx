@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageError from '../../components/PageError';
 import PageLoading from '../../components/PageLoading';
-import OneToManyPanel from '../../components/panels/OneToManyPanel';
 import { getEditLayoutColumns } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
@@ -80,15 +79,6 @@ export default function UserDetail() {
             columns={columns}
           />
         )}
-      </div>
-
-      <div className='w-full bg-white mt-4 p-4 rounded-lg'>
-        <OneToManyPanel
-          label='Accounts'
-          record={record}
-          relateModule='accounts'
-          field={config.fields.accounts}
-        />
       </div>
     </PageContainer>
   );

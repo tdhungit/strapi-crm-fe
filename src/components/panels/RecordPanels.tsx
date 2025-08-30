@@ -1,3 +1,4 @@
+import { Collapse } from 'antd';
 import OneToManyPanel from './OneToManyPanel';
 
 export default function RecordPanels({
@@ -7,23 +8,28 @@ export default function RecordPanels({
   panels: any[];
   record: any;
 }) {
+  const collapseItems = panels.map((panel) => ({
+    key: `panel-${panel.name}`,
+    label: panel.label ? panel.label.toUpperCase() : panel.name.toUpperCase(),
+    children: (
+      <>
+        {panel.type === 'oneToMany' && (
+          <OneToManyPanel
+            record={record}
+            relateModule={panel.module}
+            field={panel.field}
+          />
+        )}
+      </>
+    ),
+  }));
+
   return (
-    <>
-      {panels.map((panel) => (
-        <div
-          key={`panel-${panel.name}`}
-          className='w-full bg-white mt-4 p-4 rounded-lg'
-        >
-          {panel.type === 'oneToMany' && (
-            <OneToManyPanel
-              label={panel.label}
-              record={record}
-              relateModule={panel.module}
-              field={panel.field}
-            />
-          )}
-        </div>
-      ))}
-    </>
+    <div className='mt-4'>
+      <Collapse
+        items={collapseItems}
+        defaultActiveKey={panels.map((panel) => `panel-${panel.name}`)}
+      />
+    </div>
   );
 }
