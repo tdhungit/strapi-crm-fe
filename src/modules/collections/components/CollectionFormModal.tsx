@@ -1,5 +1,5 @@
 import { ModalForm } from '@ant-design/pro-components';
-import { Form, message } from 'antd';
+import { App, Form } from 'antd';
 import { useEffect, useState } from 'react';
 import {
   capitalizeFirstLetter,
@@ -27,6 +27,7 @@ export default function CollectionFormModal({
   onOpenChange: (open: boolean) => void;
   onFinish: (values: any) => void;
 }) {
+  const { message, notification } = App.useApp();
   const [form] = Form.useForm();
 
   const [config, setConfig] = useState<any>({});
@@ -53,7 +54,9 @@ export default function CollectionFormModal({
           setData(res?.data);
         })
         .catch(() => {
-          message.error('Failed to fetch data');
+          notification.error({
+            message: 'Failed to fetch data',
+          });
         });
     }
   }, [id, form, collectionName]);
@@ -75,7 +78,30 @@ export default function CollectionFormModal({
   }, [parentCollectionName, parentRecord, relateField]);
 
   const onSave = async (values: any) => {
-    onFinish?.(values);
+    try {
+      message.loading('Saving...');
+      let newRecord;
+      if (id) {
+        newRecord = await ApiService.getClient()
+          .collection(collectionName)
+          .update(id, values);
+      } else {
+        newRecord = await ApiService.getClient()
+          .collection(collectionName)
+          .create(values);
+      }
+      message.destroy();
+      notification.success({
+        message: 'Saved successfully',
+      });
+      onFinish?.(newRecord.data);
+    } catch (error: any) {
+      console.error(error);
+      message.destroy();
+      notification.error({
+        message: error?.response?.data?.error?.message || 'Failed to save',
+      });
+    }
   };
 
   return (

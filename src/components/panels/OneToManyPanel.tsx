@@ -94,6 +94,30 @@ export default function OneToManyPanel({
     ],
   });
 
+  const onSelectedRecord = async (selectedRecord: any) => {
+    message.loading('Saving...', 0);
+    try {
+      await CollectionService.addRelationRecord(
+        relateModule,
+        field,
+        selectedRecord,
+        record.id
+      );
+      ref?.current?.reload();
+      message.destroy();
+      setOpenSelectModal(false);
+      setOpenFormModal(false);
+      notification.success({
+        message: 'Record added successfully',
+      });
+    } catch (error: any) {
+      message.destroy();
+      notification.error({
+        message: error?.response?.data?.error?.message || 'Failed to save',
+      });
+    }
+  };
+
   if (!config?.layouts?.list) return <PageLoading />;
 
   return (
@@ -158,29 +182,7 @@ export default function OneToManyPanel({
             parentRecord={record}
             relateField={field}
             onOpenChange={setOpenSelectModal}
-            onFinish={async (selectedRecord: any) => {
-              message.loading('Saving...', 0);
-              try {
-                await CollectionService.addRelationRecord(
-                  relateModule,
-                  field,
-                  selectedRecord,
-                  record.id
-                );
-                ref?.current?.reload();
-                message.destroy();
-                setOpenSelectModal(false);
-                notification.success({
-                  message: 'Record added successfully',
-                });
-              } catch (error: any) {
-                message.destroy();
-                notification.error({
-                  message:
-                    error?.response?.data?.error?.message || 'Failed to save',
-                });
-              }
-            }}
+            onFinish={onSelectedRecord}
           />
 
           <CollectionFormModal
@@ -190,7 +192,7 @@ export default function OneToManyPanel({
             parentRecord={record}
             relateField={field}
             onOpenChange={setOpenFormModal}
-            onFinish={() => {}}
+            onFinish={onSelectedRecord}
           />
         </>
       )}

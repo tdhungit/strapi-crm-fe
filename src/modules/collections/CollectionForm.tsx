@@ -1,5 +1,5 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Form, message } from 'antd';
+import { App, Button, Form } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
@@ -13,6 +13,7 @@ import MetadataService from '../../services/MetadataService';
 export default function CollectionForm() {
   const { name: module, id } = useParams();
 
+  const { message, notification } = App.useApp();
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
@@ -56,13 +57,17 @@ export default function CollectionForm() {
         await ApiService.getClient().collection(module).create(values);
       }
       message.destroy();
-      message.success('Saved successfully');
+      notification.success({
+        message: 'Saved successfully',
+      });
 
       navigate(`/collections/${module}`);
     } catch (error: any) {
       console.error(error);
       message.destroy();
-      message.error('Failed to save');
+      notification.error({
+        message: error?.response?.data?.error?.message || 'Failed to save',
+      });
     }
   };
 
