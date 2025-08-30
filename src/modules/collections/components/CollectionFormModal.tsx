@@ -10,14 +10,20 @@ import MetadataService from '../../../services/MetadataService';
 
 export default function CollectionFormModal({
   collectionName,
-  id,
   open,
+  id,
+  parentCollectionName,
+  parentRecord,
+  relateField,
   onOpenChange,
   onFinish,
 }: {
   collectionName: string;
-  id?: string;
   open: boolean;
+  id?: string;
+  parentCollectionName?: string;
+  parentRecord?: any;
+  relateField?: any;
   onOpenChange: (open: boolean) => void;
   onFinish: (values: any) => void;
 }) {
@@ -51,6 +57,22 @@ export default function CollectionFormModal({
         });
     }
   }, [id, form, collectionName]);
+
+  useEffect(() => {
+    if (parentCollectionName && relateField?.mappedBy && parentRecord?.id) {
+      const parentContentType =
+        MetadataService.getContentTypeByModule(parentCollectionName);
+      const mainField = parentContentType?.settings?.mainField || 'name';
+      const d = {
+        ...data,
+        [relateField.mappedBy]: {
+          id: parentRecord.id,
+          [mainField]: parentRecord[mainField] || '',
+        },
+      };
+      setData(d);
+    }
+  }, [parentCollectionName, parentRecord, relateField]);
 
   const onSave = async (values: any) => {
     onFinish?.(values);

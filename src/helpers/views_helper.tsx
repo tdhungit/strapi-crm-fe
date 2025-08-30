@@ -85,7 +85,7 @@ export function renderEditLayoutRows(
 }
 
 export function getEditLayoutPanels(config: any) {
-  const panelFields: any[] = [];
+  const panels: any[] = [];
   config.layouts.edit.forEach((line: any[]) => {
     line.forEach((item: any) => {
       const fieldOptions = MetadataService.getCollectionFieldLayoutConfig(
@@ -103,18 +103,19 @@ export function getEditLayoutPanels(config: any) {
         fieldOptions.type === 'relation' &&
         fieldOptions.relation === 'oneToMany'
       ) {
-        panelFields.push({
+        panels.push({
           name: item.name,
           label: fieldOptions.label || item.name,
           type: fieldOptions.relation,
           module,
+          parentModule: config.collectionName,
           field: config.fields?.[item.name] || {},
         });
       }
     });
   });
 
-  return panelFields;
+  return panels;
 }
 
 export function capitalizeFirstLetter(str: string) {

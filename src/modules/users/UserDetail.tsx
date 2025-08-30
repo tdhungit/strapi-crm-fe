@@ -1,6 +1,8 @@
+import { EditFilled } from '@ant-design/icons';
 import { PageContainer, ProDescriptions } from '@ant-design/pro-components';
+import { Button } from 'antd';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import PageError from '../../components/PageError';
 import PageLoading from '../../components/PageLoading';
 import { getEditLayoutColumns } from '../../helpers/views_helper';
@@ -46,6 +48,13 @@ export default function UserDetail() {
           ],
         },
       }}
+      extra={[
+        <Link key={`user-edit-${id}`} to={`/users/edit/${id}`}>
+          <Button variant='solid' color='orange'>
+            <EditFilled /> Edit
+          </Button>
+        </Link>,
+      ]}
     >
       <div className='w-full bg-white p-4 rounded-lg'>
         {columns.length > 0 && (

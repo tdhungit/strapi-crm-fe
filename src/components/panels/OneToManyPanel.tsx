@@ -17,10 +17,12 @@ import MetadataService from '../../services/MetadataService';
 import PageLoading from '../PageLoading';
 
 export default function OneToManyPanel({
+  module,
   relateModule,
   field,
   record,
 }: {
+  module: string;
   relateModule: string;
   field: any;
   record: any;
@@ -111,15 +113,21 @@ export default function OneToManyPanel({
       </div>
 
       <CollectionListModal
+        parentCollectionName={module}
         module={relateModule}
         open={openSelectModal}
+        parentRecord={record}
+        relateField={field}
         onOpenChange={setOpenSelectModal}
         onFinish={() => {}}
       />
 
       <CollectionFormModal
+        parentCollectionName={module}
         collectionName={relateModule}
         open={openFormModal}
+        parentRecord={record}
+        relateField={field}
         onOpenChange={setOpenFormModal}
         onFinish={() => {}}
       />

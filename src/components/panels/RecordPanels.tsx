@@ -15,6 +15,7 @@ export default function RecordPanels({
       <>
         {panel.type === 'oneToMany' && (
           <OneToManyPanel
+            module={panel.parentModule}
             record={record}
             relateModule={panel.module}
             field={panel.field}

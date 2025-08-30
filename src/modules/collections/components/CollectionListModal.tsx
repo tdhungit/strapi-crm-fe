@@ -9,11 +9,17 @@ import MetadataService from '../../../services/MetadataService';
 export default function CollectionListModal({
   module,
   open,
+  parentCollectionName,
+  parentRecord,
+  relateField,
   onOpenChange,
   onFinish,
 }: {
   module: string;
   open: boolean;
+  parentCollectionName?: string;
+  parentRecord?: any;
+  relateField?: any;
   onOpenChange: (open: boolean) => void;
   onFinish?: (values: any) => void;
 }) {
@@ -22,6 +28,7 @@ export default function CollectionListModal({
 
   const onSelectRecord = (record: any) => {
     onFinish?.(record);
+    console.log({ parentCollectionName, parentRecord, relateField });
     onOpenChange(false);
   };
 
