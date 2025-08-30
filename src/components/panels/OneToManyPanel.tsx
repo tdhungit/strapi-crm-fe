@@ -3,12 +3,15 @@ import {
   EditFilled,
   EyeFilled,
   PlusCircleOutlined,
+  SelectOutlined,
 } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
 import { Button } from 'antd';
+import { useState } from 'react';
 import { getListLayoutColumns } from '../../helpers/views_helper';
-import ApiService from '../../services/ApiService';
+import CollectionListModal from '../../modules/collections/components/CollectionListModal';
+import CollectionService from '../../services/CollectionService';
 import MetadataService from '../../services/MetadataService';
 import PageLoading from '../PageLoading';
 
@@ -21,6 +24,8 @@ export default function OneToManyPanel({
   field: any;
   record: any;
 }) {
+  const [openSelectModal, setOpenSelectModal] = useState(false);
+
   const { data: config } = useRequest(() => {
     return MetadataService.getCollectionConfigurations(relateModule);
   });
@@ -52,66 +57,55 @@ export default function OneToManyPanel({
   if (!config?.layouts?.list) return <PageLoading />;
 
   return (
-    <div className='w-full'>
-      {config?.layouts?.list &&
-        relateModule &&
-        field?.mappedBy &&
-        record?.id && (
-          <ProTable
-            key={`${relateModule}-panel-list`}
-            columns={columns}
-            search={{
-              searchText: 'Search',
-            }}
-            request={async (params) => {
-              // Handle search parameters
-              const searchParams: any = {
-                filters: {
-                  [field.mappedBy]: { id: record.id },
-                },
-              };
-              // Handle individual field filters
-              Object.keys(params).forEach((key) => {
-                if (
-                  key !== 'search' &&
-                  key !== 'current' &&
-                  key !== 'pageSize' &&
-                  params[key]
-                ) {
-                  searchParams.filters[key] = {
-                    $contains: params[key],
-                  };
-                }
-              });
+    <>
+      <div className='w-full'>
+        {config?.layouts?.list &&
+          relateModule &&
+          field?.mappedBy &&
+          record?.id && (
+            <ProTable
+              key={`${relateModule}-panel-list`}
+              columns={columns}
+              search={{
+                searchText: 'Search',
+              }}
+              request={async (params, sort) => {
+                return await CollectionService.getTableRequest(
+                  relateModule,
+                  params,
+                  sort,
+                  {
+                    filters: {
+                      [field.mappedBy]: record.id,
+                    },
+                  }
+                );
+              }}
+              rowKey='documentId'
+              pagination={CollectionService.getTablePagination(config)}
+              options={false}
+              toolBarRender={() => [
+                <Button key={`panel-${relateModule}-btn-add`} type='primary'>
+                  <PlusCircleOutlined /> Add
+                </Button>,
+                <Button
+                  key={`panel-${relateModule}-btn-select`}
+                  variant='solid'
+                  color='orange'
+                  onClick={() => setOpenSelectModal(true)}
+                >
+                  <SelectOutlined /> Select
+                </Button>,
+              ]}
+            />
+          )}
+      </div>
 
-              const collections = await ApiService.getClient()
-                .collection(relateModule)
-                .find({
-                  ...searchParams,
-                  pagination: { pageSize: config?.settings?.pageSize || 10 },
-                });
-
-              return {
-                data: collections.data || [],
-                total: collections.meta.pagination?.total || 0,
-              };
-            }}
-            rowKey='documentId'
-            pagination={{
-              defaultPageSize: config.settings?.pageSize || 10,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) =>
-                `Showing ${range[0]}-${range[1]} of ${total} items`,
-            }}
-            options={false}
-            toolBarRender={() => [
-              <Button key={`panel-${relateModule}-btn-add`} type='primary'>
-                <PlusCircleOutlined /> Add
-              </Button>,
-            ]}
-          />
-        )}
-    </div>
+      <CollectionListModal
+        module={relateModule}
+        open={openSelectModal}
+        onOpenChange={setOpenSelectModal}
+      />
+    </>
   );
 }

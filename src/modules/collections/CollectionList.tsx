@@ -14,6 +14,7 @@ import {
   getListLayoutColumns,
 } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
+import CollectionService from '../../services/CollectionService';
 import MetadataService from '../../services/MetadataService';
 
 export default function CollectionList() {
@@ -29,40 +30,37 @@ export default function CollectionList() {
     if (module) {
       MetadataService.getCollectionConfigurations(module).then((res) => {
         setConfig(res);
+        // get columns
+        const cols: any = getListLayoutColumns(res);
+        // add actions column
+        cols.push({
+          title: 'Actions',
+          key: 'actions',
+          search: false,
+          render: (record: any) => (
+            <div>
+              <a
+                href={`/collections/${module}/detail/${record.documentId}`}
+                className='inline-block'
+              >
+                <EyeOutlined />
+              </a>
+              <a
+                href={`/collections/${module}/edit/${record.documentId}`}
+                className='inline-block ml-2'
+              >
+                <EditOutlined />
+              </a>
+            </div>
+          ),
+        });
+        // update columns
+        setColumns(cols);
+        // reload table
         ref?.current?.reload();
       });
     }
   }, [module]);
-
-  useEffect(() => {
-    if (config?.layouts?.list) {
-      const cols: any = getListLayoutColumns(config);
-      // add actions column
-      cols.push({
-        title: 'Actions',
-        key: 'actions',
-        search: false,
-        render: (record: any) => (
-          <div>
-            <a
-              href={`/collections/${module}/detail/${record.documentId}`}
-              className='inline-block'
-            >
-              <EyeOutlined />
-            </a>
-            <a
-              href={`/collections/${module}/edit/${record.documentId}`}
-              className='inline-block ml-2'
-            >
-              <EditOutlined />
-            </a>
-          </div>
-        ),
-      });
-
-      setColumns(cols);
-    }
-  }, [config, module]);
 
   const handleExport = () => {
     if (!module) {
@@ -130,66 +128,9 @@ export default function CollectionList() {
         }}
         request={async (params, sort) => {
           setParams(params);
-
-          if (!module) {
-            return {
-              data: [],
-              total: 0,
-            };
-          }
-
-          // Handle search parameters
-          const searchParams: any = { filters: {} };
-
-          // Handle individual field filters
-          Object.keys(params).forEach((key) => {
-            if (
-              key !== 'search' &&
-              key !== 'current' &&
-              key !== 'pageSize' &&
-              params[key]
-            ) {
-              searchParams.filters[key] = {
-                $contains: params[key],
-              };
-            }
-          });
-
-          // Handle sorting
-          if (sort) {
-            const sortConfig: any = {};
-            Object.keys(sort).forEach((field) => {
-              const order = sort[field];
-              if (order === 'ascend') {
-                sortConfig[field] = 'asc';
-              } else if (order === 'descend') {
-                sortConfig[field] = 'desc';
-              }
-            });
-
-            if (Object.keys(sortConfig).length > 0) {
-              searchParams.sort = sortConfig;
-            }
-          }
-
-          const collections = await ApiService.getClient()
-            .collection(module)
-            .find({
-              ...searchParams,
-            });
-
-          return {
-            data: collections.data || [],
-            total: collections.meta.pagination?.total || 0,
-          };
+          return await CollectionService.getTableRequest(module, params, sort);
         }}
-        pagination={{
-          defaultPageSize: config.settings?.pageSize || 10,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `Showing ${range[0]}-${range[1]} of ${total} items`,
-        }}
+        pagination={CollectionService.getTablePagination(config)}
         toolBarRender={() => [
           <Button
             key='create'

@@ -3,7 +3,7 @@ import { PageContainer, ProTable } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
 import PageLoading from '../../components/PageLoading';
 import { getListLayoutColumns } from '../../helpers/views_helper';
-import ApiService from '../../services/ApiService';
+import CollectionService from '../../services/CollectionService';
 import MetadataService from '../../services/MetadataService';
 import ChangePasswordModal from './components/ChangePasswordModal';
 
@@ -80,56 +80,9 @@ const UserList: React.FC = () => {
           searchText: 'Search',
         }}
         request={async (params, sort) => {
-          // Handle search parameters
-          const searchParams: any = { filters: {} };
-          // Handle individual field filters
-          Object.keys(params).forEach((key) => {
-            if (
-              key !== 'search' &&
-              key !== 'current' &&
-              key !== 'pageSize' &&
-              params[key]
-            ) {
-              searchParams.filters[key] = {
-                $contains: params[key],
-              };
-            }
-          });
-
-          // Handle sorting
-          if (sort) {
-            const sortConfig: any = {};
-            Object.keys(sort).forEach((field) => {
-              const order = sort[field];
-              if (order === 'ascend') {
-                sortConfig[field] = 'asc';
-              } else if (order === 'descend') {
-                sortConfig[field] = 'desc';
-              }
-            });
-
-            if (Object.keys(sortConfig).length > 0) {
-              searchParams.sort = sortConfig;
-            }
-          }
-
-          const users = await ApiService.getClient()
-            .collection('users')
-            .find({
-              ...searchParams,
-            });
-          return {
-            data: users.data || [],
-            total: users.meta.pagination?.total || 0,
-          };
+          return await CollectionService.getTableRequest('users', params, sort);
         }}
-        pagination={{
-          defaultPageSize: config.settings?.pageSize || 10,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `Showing ${range[0]}-${range[1]} of ${total} items`,
-        }}
+        pagination={CollectionService.getTablePagination(config)}
       />
 
       <ChangePasswordModal
