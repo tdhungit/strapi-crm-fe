@@ -6,7 +6,7 @@ import MetadataService from '../services/MetadataService';
 export function getListLayoutColumns(config: any) {
   const cols: any = [];
 
-  config.layouts.list.forEach((field: string) => {
+  config?.layouts?.list?.forEach((field: string) => {
     const metadatas = config.metadatas?.[field]?.list || {};
     // const fieldType = config.attributes?.[field]?.type;
 
@@ -26,7 +26,7 @@ export function getListLayoutColumns(config: any) {
 export function getEditLayoutColumns(config: any) {
   const cols: any = [];
 
-  config.layouts.edit.forEach((line: any[]) => {
+  config?.layouts?.edit?.forEach((line: any[]) => {
     line.forEach((item: any) => {
       const fieldOptions = MetadataService.getCollectionFieldLayoutConfig(
         config,

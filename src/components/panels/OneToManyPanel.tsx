@@ -1,5 +1,12 @@
+import {
+  DeleteFilled,
+  EditFilled,
+  EyeFilled,
+  PlusCircleOutlined,
+} from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
+import { Button } from 'antd';
 import { getListLayoutColumns } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
@@ -18,6 +25,30 @@ export default function OneToManyPanel({
     return MetadataService.getCollectionConfigurations(relateModule);
   });
 
+  const columns = getListLayoutColumns(config);
+  columns.push({
+    title: 'Actions',
+    dataIndex: 'actions',
+    valueType: 'option',
+    render: (_text: any, record: any) => [
+      <a
+        key={`panel-${relateModule}-btn-view`}
+        href={`/collections/${relateModule}/detail/${record.id}`}
+      >
+        <EyeFilled />
+      </a>,
+      <a
+        key={`panel-${relateModule}-btn-edit`}
+        href={`/collections/${relateModule}/edit/${record.id}`}
+      >
+        <EditFilled />
+      </a>,
+      <a key={`panel-${relateModule}-btn-delete`} onClick={() => {}}>
+        <DeleteFilled />
+      </a>,
+    ],
+  });
+
   if (!config?.layouts?.list) return <PageLoading />;
 
   return (
@@ -28,7 +59,7 @@ export default function OneToManyPanel({
         record?.id && (
           <ProTable
             key={`${relateModule}-panel-list`}
-            columns={getListLayoutColumns(config)}
+            columns={columns}
             search={{
               searchText: 'Search',
             }}
@@ -74,6 +105,11 @@ export default function OneToManyPanel({
                 `Showing ${range[0]}-${range[1]} of ${total} items`,
             }}
             options={false}
+            toolBarRender={() => [
+              <Button key={`panel-${relateModule}-btn-add`} type='primary'>
+                <PlusCircleOutlined /> Add
+              </Button>,
+            ]}
           />
         )}
     </div>

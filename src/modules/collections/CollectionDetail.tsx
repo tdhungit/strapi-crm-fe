@@ -27,7 +27,6 @@ export default function CollectionDetail() {
         setConfig(res);
         // Get Panels
         const pns: any = getEditLayoutPanels(res);
-        console.log('Panels', pns, res);
         setPanels(pns);
         // Edit Layout
         const cols: any = getEditLayoutColumns(res);
