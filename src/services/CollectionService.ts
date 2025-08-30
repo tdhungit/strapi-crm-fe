@@ -84,6 +84,19 @@ class CollectionService {
         `Showing ${range[0]}-${range[1]} of ${total} items`,
     };
   }
+
+  async addRelationRecord(
+    collectionName: string,
+    field: any,
+    record: any,
+    parentId: number
+  ) {
+    await ApiService.getClient()
+      .collection(collectionName)
+      .update(record.documentId, {
+        [field.mappedBy]: parentId,
+      });
+  }
 }
 
 export default CollectionService.getInstance();

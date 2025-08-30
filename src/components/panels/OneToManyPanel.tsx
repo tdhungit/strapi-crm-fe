@@ -5,10 +5,10 @@ import {
   PlusCircleOutlined,
   SelectOutlined,
 } from '@ant-design/icons';
-import { ProTable } from '@ant-design/pro-components';
+import { ProTable, type ActionType } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
-import { Button } from 'antd';
-import { useState } from 'react';
+import { App, Button } from 'antd';
+import { useRef, useState } from 'react';
 import { getListLayoutColumns } from '../../helpers/views_helper';
 import CollectionFormModal from '../../modules/collections/components/CollectionFormModal';
 import CollectionListModal from '../../modules/collections/components/CollectionListModal';
@@ -27,6 +27,9 @@ export default function OneToManyPanel({
   field: any;
   record: any;
 }) {
+  const { message, notification } = App.useApp();
+  const ref = useRef<ActionType>(null);
+
   const [openSelectModal, setOpenSelectModal] = useState(false);
   const [openFormModal, setOpenFormModal] = useState(false);
 
@@ -69,6 +72,7 @@ export default function OneToManyPanel({
           record?.id && (
             <ProTable
               key={`${relateModule}-panel-list`}
+              actionRef={ref}
               columns={columns}
               search={{
                 searchText: 'Search',
@@ -112,25 +116,48 @@ export default function OneToManyPanel({
           )}
       </div>
 
-      <CollectionListModal
-        parentCollectionName={module}
-        module={relateModule}
-        open={openSelectModal}
-        parentRecord={record}
-        relateField={field}
-        onOpenChange={setOpenSelectModal}
-        onFinish={() => {}}
-      />
+      {record?.id && (
+        <>
+          <CollectionListModal
+            parentCollectionName={module}
+            module={relateModule}
+            open={openSelectModal}
+            parentRecord={record}
+            relateField={field}
+            onOpenChange={setOpenSelectModal}
+            onFinish={async (selectedRecord: any) => {
+              message.loading('Saving...', 0);
+              try {
+                await CollectionService.addRelationRecord(
+                  relateModule,
+                  field,
+                  selectedRecord,
+                  record.id
+                );
+                ref?.current?.reload();
+                message.destroy();
+                setOpenSelectModal(false);
+              } catch (error: any) {
+                message.destroy();
+                notification.error({
+                  message:
+                    error?.response?.data?.error?.message || 'Failed to save',
+                });
+              }
+            }}
+          />
 
-      <CollectionFormModal
-        parentCollectionName={module}
-        collectionName={relateModule}
-        open={openFormModal}
-        parentRecord={record}
-        relateField={field}
-        onOpenChange={setOpenFormModal}
-        onFinish={() => {}}
-      />
+          <CollectionFormModal
+            parentCollectionName={module}
+            collectionName={relateModule}
+            open={openFormModal}
+            parentRecord={record}
+            relateField={field}
+            onOpenChange={setOpenFormModal}
+            onFinish={() => {}}
+          />
+        </>
+      )}
     </>
   );
 }

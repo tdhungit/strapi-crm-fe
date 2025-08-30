@@ -21,15 +21,17 @@ export default function CollectionListModal({
   parentRecord?: any;
   relateField?: any;
   onOpenChange: (open: boolean) => void;
-  onFinish?: (values: any) => void;
+  onFinish?: (values: any, options: any) => void;
 }) {
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
 
   const onSelectRecord = (record: any) => {
-    onFinish?.(record);
-    console.log({ parentCollectionName, parentRecord, relateField });
-    onOpenChange(false);
+    onFinish?.(record, {
+      parentCollectionName: parentCollectionName,
+      parentRecord: parentRecord,
+      relateField: relateField,
+    });
   };
 
   useEffect(() => {
