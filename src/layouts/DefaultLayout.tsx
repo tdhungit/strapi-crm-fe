@@ -10,21 +10,30 @@ import {
 import { useRequest } from 'ahooks';
 import { Button, Dropdown, Layout, Menu, Space } from 'antd';
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { iconMap } from '../config/icons';
 import { useAuth } from '../hooks/useAuth';
 import ApiService from '../services/ApiService';
 import MenuService from '../services/MenuService';
+import { setUserStore } from '../stores/authSlice';
 
 const { Header, Content, Footer, Sider } = Layout;
 
 export default function DefaultLayout() {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const dispatch = useDispatch();
 
   const { data: user } = useRequest(() =>
     ApiService.request('get', '/users/me')
   );
+
+  useEffect(() => {
+    if (user) {
+      dispatch(setUserStore(user));
+    }
+  }, [user, dispatch]);
 
   const [collapsed, setCollapsed] = useState(false);
   const [menuItems, setMenuItems] = useState<any[]>([]);

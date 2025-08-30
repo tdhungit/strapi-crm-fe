@@ -1,4 +1,5 @@
 import { DatePicker, Form, Input, InputNumber, type FormInstance } from 'antd';
+import AssignUserInput from './assign-user/AssignUserInput';
 import RelationInput from './relation/RelationInput';
 
 export default function FormInput({
@@ -26,7 +27,11 @@ export default function FormInput({
       input = <InputNumber />;
       break;
     case 'relation':
-      input = <RelationInput form={form} item={item} data={data} />;
+      if (item.name === 'assigned_user') {
+        input = <AssignUserInput form={form} item={item} data={data} />;
+      } else {
+        input = <RelationInput form={form} item={item} data={data} />;
+      }
       break;
     case 'string':
     default:
