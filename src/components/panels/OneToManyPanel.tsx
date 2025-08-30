@@ -27,7 +27,7 @@ export default function OneToManyPanel({
   field: any;
   record: any;
 }) {
-  const { message, notification } = App.useApp();
+  const { message, notification, modal } = App.useApp();
   const ref = useRef<ActionType>(null);
 
   const [openSelectModal, setOpenSelectModal] = useState(false);
@@ -55,7 +55,40 @@ export default function OneToManyPanel({
       >
         <EditFilled />
       </a>,
-      <a key={`panel-${relateModule}-btn-delete`} onClick={() => {}}>
+      <a
+        key={`panel-${relateModule}-btn-delete`}
+        onClick={() => {
+          modal.confirm({
+            title: 'Confirm Delete',
+            content:
+              'Are you sure you want to delete this record? This action cannot be undone.',
+            okText: 'Delete',
+            okType: 'danger',
+            cancelText: 'Cancel',
+            onOk: async () => {
+              message.loading('Saving...', 0);
+              try {
+                await CollectionService.removeRelationRecord(
+                  relateModule,
+                  field,
+                  record
+                );
+                message.destroy();
+                ref?.current?.reload();
+                notification.success({
+                  message: 'Deleted successfully',
+                });
+              } catch (error: any) {
+                message.destroy();
+                notification.error({
+                  message:
+                    error?.response?.data?.error?.message || 'Failed to delete',
+                });
+              }
+            },
+          });
+        }}
+      >
         <DeleteFilled />
       </a>,
     ],
@@ -137,6 +170,9 @@ export default function OneToManyPanel({
                 ref?.current?.reload();
                 message.destroy();
                 setOpenSelectModal(false);
+                notification.success({
+                  message: 'Record added successfully',
+                });
               } catch (error: any) {
                 message.destroy();
                 notification.error({

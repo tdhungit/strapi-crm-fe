@@ -97,6 +97,14 @@ class CollectionService {
         [field.mappedBy]: parentId,
       });
   }
+
+  async removeRelationRecord(collectionName: string, field: any, record: any) {
+    await ApiService.getClient()
+      .collection(collectionName)
+      .update(record.documentId, {
+        [field.mappedBy]: null,
+      });
+  }
 }
 
 export default CollectionService.getInstance();
