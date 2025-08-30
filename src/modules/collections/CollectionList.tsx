@@ -69,9 +69,24 @@ export default function CollectionList() {
       return;
     }
 
+    // Prepare sort parameters for export
+    let sortParams = {};
+    if (params.sorter) {
+      const sortConfig: any = {};
+      Object.keys(params.sorter).forEach((field) => {
+        const order = params.sorter[field];
+        if (order === 'ascend') {
+          sortConfig[field] = 'asc';
+        } else if (order === 'descend') {
+          sortConfig[field] = 'desc';
+        }
+      });
+      sortParams = sortConfig;
+    }
+
     ApiService.request('get', `/exports/csv/${module}`, {
       filters: params.filters || {},
-      sort: params.sort || {},
+      sort: sortParams,
     }).then((res) => {
       // download file with res is csv
       const url = window.URL.createObjectURL(new Blob([res]));
@@ -113,7 +128,7 @@ export default function CollectionList() {
         search={{
           searchText: 'Search',
         }}
-        request={async (params) => {
+        request={async (params, sort) => {
           setParams(params);
 
           if (!module) {
@@ -125,6 +140,7 @@ export default function CollectionList() {
 
           // Handle search parameters
           const searchParams: any = { filters: {} };
+
           // Handle individual field filters
           Object.keys(params).forEach((key) => {
             if (
@@ -138,6 +154,23 @@ export default function CollectionList() {
               };
             }
           });
+
+          // Handle sorting
+          if (sort) {
+            const sortConfig: any = {};
+            Object.keys(sort).forEach((field) => {
+              const order = sort[field];
+              if (order === 'ascend') {
+                sortConfig[field] = 'asc';
+              } else if (order === 'descend') {
+                sortConfig[field] = 'desc';
+              }
+            });
+
+            if (Object.keys(sortConfig).length > 0) {
+              searchParams.sort = sortConfig;
+            }
+          }
 
           const collections = await ApiService.getClient()
             .collection(module)

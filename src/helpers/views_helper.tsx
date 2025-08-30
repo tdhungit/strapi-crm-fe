@@ -8,12 +8,15 @@ export function getListLayoutColumns(config: any) {
 
   config.layouts.list.forEach((field: string) => {
     const metadatas = config.metadatas?.[field]?.list || {};
+    // const fieldType = config.attributes?.[field]?.type;
+
     cols.push({
       title: metadatas.label || field,
       dataIndex: field,
       key: field,
-      search: true, // Enable search for all columns
-      ellipsis: true, // Handle long text with ellipsis
+      search: metadatas.searchable || false,
+      ellipsis: true,
+      sorter: metadatas.sortable || false,
     });
   });
 

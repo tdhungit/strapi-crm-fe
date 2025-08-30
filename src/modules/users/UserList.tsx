@@ -79,7 +79,7 @@ const UserList: React.FC = () => {
         search={{
           searchText: 'Search',
         }}
-        request={async (params) => {
+        request={async (params, sort) => {
           // Handle search parameters
           const searchParams: any = { filters: {} };
           // Handle individual field filters
@@ -95,6 +95,23 @@ const UserList: React.FC = () => {
               };
             }
           });
+
+          // Handle sorting
+          if (sort) {
+            const sortConfig: any = {};
+            Object.keys(sort).forEach((field) => {
+              const order = sort[field];
+              if (order === 'ascend') {
+                sortConfig[field] = 'asc';
+              } else if (order === 'descend') {
+                sortConfig[field] = 'desc';
+              }
+            });
+
+            if (Object.keys(sortConfig).length > 0) {
+              searchParams.sort = sortConfig;
+            }
+          }
 
           const users = await ApiService.getClient()
             .collection('users')
