@@ -32,6 +32,7 @@ export default function CollectionDetail() {
         setPanels(pns);
         // Edit Layout
         const cols: any = getEditLayoutColumns(res);
+        console.log('COLUMNS', cols);
         setColumns(cols);
       });
     }

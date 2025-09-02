@@ -23,10 +23,12 @@ export function getListLayoutColumns(config: any) {
   return cols;
 }
 
-export function getEditLayoutColumns(config: any) {
-  const cols: any = [];
+export function updateEditLayoutColumns(config: any) {
+  const cols: any[] = [];
 
   config?.layouts?.edit?.forEach((line: any[]) => {
+    const lines: any[] = [];
+
     line.forEach((item: any) => {
       const fieldOptions = MetadataService.getCollectionFieldLayoutConfig(
         config,
@@ -34,7 +36,6 @@ export function getEditLayoutColumns(config: any) {
         item.name
       );
 
-      // check relation
       if (
         fieldOptions.type === 'relation' &&
         fieldOptions.relation === 'oneToMany'
@@ -42,15 +43,54 @@ export function getEditLayoutColumns(config: any) {
         return;
       }
 
-      cols.push({
-        title: fieldOptions.label || item.name,
-        dataIndex: item.name,
-        valueType: undefined,
-        render: (_text: any, record: any) => (
-          <DetailView item={fieldOptions} data={record} />
-        ),
+      lines.push({
+        ...item,
+        options: fieldOptions,
       });
     });
+
+    cols.push(lines);
+  });
+
+  return cols;
+}
+
+export function getEditLayoutColumns(config: any, isLine: boolean = false) {
+  const editLayout = updateEditLayoutColumns(config);
+
+  const cols: any[] = [];
+
+  editLayout.forEach((line: any[]) => {
+    const lineLayouts: any[] = [];
+
+    line.forEach((item: any) => {
+      const fieldOptions = item.options;
+
+      if (isLine) {
+        lineLayouts.push({
+          title: fieldOptions.label || item.name,
+          dataIndex: item.name,
+          valueType: undefined,
+          render: (_text: any, record: any) => (
+            <DetailView item={fieldOptions} data={record} />
+          ),
+        });
+      } else {
+        cols.push({
+          title: fieldOptions.label || item.name,
+          dataIndex: item.name,
+          valueType: undefined,
+          render: (_text: any, record: any) => (
+            <DetailView item={fieldOptions} data={record} />
+          ),
+          span: line.length === 1 ? 2 : 1,
+        });
+      }
+    });
+
+    if (isLine) {
+      cols.push(lineLayouts);
+    }
   });
 
   return cols;
@@ -61,7 +101,8 @@ export function renderEditLayoutRows(
   record: any,
   form: FormInstance
 ) {
-  return config?.layouts?.edit?.map((line: any[], lineIndex: number) => (
+  const editLayout = updateEditLayoutColumns(config);
+  return editLayout.map((line: any[], lineIndex: number) => (
     <Row
       key={`line-${lineIndex}`}
       gutter={[16, 16]}
@@ -69,13 +110,9 @@ export function renderEditLayoutRows(
       style={{ width: '100%' }}
     >
       {line.map((item: any) => {
-        const fieldOptions = MetadataService.getCollectionFieldLayoutConfig(
-          config,
-          'edit',
-          item.name
-        );
+        const fieldOptions = item.options;
         return (
-          <Col key={item.name} xs={24} sm={12} md={12} lg={12}>
+          <Col key={item.name} span={line.length === 1 ? 24 : 12}>
             <FormInput form={form} item={fieldOptions} data={record} />
           </Col>
         );
