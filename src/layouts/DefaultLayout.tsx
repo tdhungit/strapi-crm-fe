@@ -43,6 +43,7 @@ export default function DefaultLayout() {
   });
 
   useEffect(() => {
+    // update menu
     if (appSettings?.menus && appSettings?.menus.length > 0) {
       const items: any[] = [
         {
@@ -67,6 +68,16 @@ export default function DefaultLayout() {
 
       // Set the menu items state
       setMenuItems(items);
+    }
+    // update favicon
+    if (appSettings?.uiConfig?.favicon) {
+      let link: any = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = appSettings.uiConfig.favicon;
     }
   }, [appSettings]);
 
