@@ -1,5 +1,7 @@
 import { DatePicker, Form, Input, InputNumber, type FormInstance } from 'antd';
+import { camelToTitle } from '../../helpers/views_helper';
 import AssignUserInput from './assign-user/AssignUserInput';
+import EnumerationInput from './enumeration/EnumerationInput';
 import RelationInput from './relation/RelationInput';
 import RichtextInput from './richtext/RichtextInput';
 
@@ -27,8 +29,11 @@ export default function FormInput({
     case 'number':
       input = <InputNumber />;
       break;
+    case 'enumeration':
+      input = <EnumerationInput type={item.options} />;
+      break;
     case 'richtext':
-      input = <RichtextInput />;
+      input = <RichtextInput value={data[item.name]} />;
       break;
     case 'relation':
       if (item.name === 'assigned_user') {
@@ -43,7 +48,7 @@ export default function FormInput({
   }
 
   return (
-    <Form.Item name={item.name} label={label} rules={rules}>
+    <Form.Item name={item.name} label={camelToTitle(label)} rules={rules}>
       {input}
     </Form.Item>
   );

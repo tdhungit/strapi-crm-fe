@@ -9,9 +9,11 @@ export function getListLayoutColumns(config: any) {
   config?.layouts?.list?.forEach((field: string) => {
     const metadatas = config.metadatas?.[field]?.list || {};
     // const fieldType = config.attributes?.[field]?.type;
-
+    const title = metadatas.label
+      ? camelToTitle(metadatas.label)
+      : camelToTitle(field);
     cols.push({
-      title: metadatas.label || field,
+      title,
       dataIndex: field,
       key: field,
       search: metadatas.searchable || false,
@@ -65,10 +67,12 @@ export function getEditLayoutColumns(config: any, isLine: boolean = false) {
 
     line.forEach((item: any) => {
       const fieldOptions = item.options;
-
+      const title = fieldOptions.label
+        ? camelToTitle(fieldOptions.label)
+        : camelToTitle(item.name);
       if (isLine) {
         lineLayouts.push({
-          title: fieldOptions.label || item.name,
+          title,
           dataIndex: item.name,
           valueType: undefined,
           render: (_text: any, record: any) => (
@@ -77,7 +81,7 @@ export function getEditLayoutColumns(config: any, isLine: boolean = false) {
         });
       } else {
         cols.push({
-          title: fieldOptions.label || item.name,
+          title,
           dataIndex: item.name,
           valueType: undefined,
           render: (_text: any, record: any) => (
@@ -160,4 +164,16 @@ export function capitalizeFirstLetter(str: string) {
     return ''; // Handle empty strings
   }
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function camelToTitle(str: string): string {
+  return (
+    str
+      // Đổi snake_case và kebab-case thành space
+      .replace(/[_-]/g, ' ')
+      // Chèn space giữa camelCase
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      // Viết hoa chữ cái đầu mỗi từ
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+  );
 }

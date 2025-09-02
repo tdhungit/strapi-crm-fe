@@ -7,7 +7,7 @@ import PageError from '../../components/PageError';
 import PageLoading from '../../components/PageLoading';
 import RecordPanels from '../../components/panels/RecordPanels';
 import {
-  capitalizeFirstLetter,
+  camelToTitle,
   getEditLayoutColumns,
   getEditLayoutPanels,
 } from '../../helpers/views_helper';
@@ -32,7 +32,6 @@ export default function CollectionDetail() {
         setPanels(pns);
         // Edit Layout
         const cols: any = getEditLayoutColumns(res);
-        console.log('COLUMNS', cols);
         setColumns(cols);
       });
     }
@@ -53,7 +52,7 @@ export default function CollectionDetail() {
               href: '/home',
             },
             {
-              title: capitalizeFirstLetter(module || ''),
+              title: camelToTitle(module || ''),
               href: `/collections/${module}`,
             },
             {
@@ -98,7 +97,7 @@ export default function CollectionDetail() {
               setRecord(res?.data || {});
 
               if (res?.data[config.settings?.mainField]) {
-                setTitle(res?.data[config.settings?.mainField]);
+                setTitle(camelToTitle(res?.data[config.settings?.mainField]));
               }
 
               return Promise.resolve({

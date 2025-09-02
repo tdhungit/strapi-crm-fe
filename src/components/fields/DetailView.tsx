@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import EnumerationView from './enumeration/EnumerationView';
 import RelationView from './relation/RelationView';
 import RichTextView from './richtext/RichtextView';
 
@@ -16,6 +17,11 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
           break;
         case 'richtext':
           setDisplayValue(<RichTextView value={value} />);
+          break;
+        case 'enumeration':
+          setDisplayValue(
+            <EnumerationView type={item.options} value={value} />
+          );
           break;
         case 'string':
         default:

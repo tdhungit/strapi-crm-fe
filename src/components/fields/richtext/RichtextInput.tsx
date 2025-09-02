@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
@@ -8,7 +8,13 @@ interface Props {
 }
 
 export default function RichtextInput(props: Props) {
-  const [value, setValue] = useState(props.value);
+  const [value, setValue] = useState('');
+
+  useEffect(() => {
+    if (props.value !== value) {
+      setValue(props.value);
+    }
+  }, [props.value]);
 
   const onChange = (value: string) => {
     setValue(value);
