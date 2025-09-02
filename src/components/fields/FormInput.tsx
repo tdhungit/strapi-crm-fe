@@ -1,6 +1,7 @@
 import { DatePicker, Form, Input, InputNumber, type FormInstance } from 'antd';
 import AssignUserInput from './assign-user/AssignUserInput';
 import RelationInput from './relation/RelationInput';
+import RichtextInput from './richtext/RichtextInput';
 
 export default function FormInput({
   item,
@@ -25,6 +26,9 @@ export default function FormInput({
       break;
     case 'number':
       input = <InputNumber />;
+      break;
+    case 'richtext':
+      input = <RichtextInput />;
       break;
     case 'relation':
       if (item.name === 'assigned_user') {

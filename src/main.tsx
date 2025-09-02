@@ -1,3 +1,4 @@
+import '@ant-design/v5-patch-for-react-19';
 import { ConfigProvider } from 'antd';
 import enUS from 'antd/locale/en_US';
 import { StrictMode } from 'react';

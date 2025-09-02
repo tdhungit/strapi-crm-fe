@@ -48,3 +48,7 @@
   background: #004d00 !important;
   color: #ffffff !important;
 }
+
+.ql-editor {
+  min-height: 200px;
+}
