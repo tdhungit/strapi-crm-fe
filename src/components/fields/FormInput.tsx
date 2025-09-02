@@ -1,4 +1,5 @@
 import { DatePicker, Form, Input, InputNumber, type FormInstance } from 'antd';
+import dayjs from 'dayjs';
 import { camelToTitle } from '../../helpers/views_helper';
 import AssignUserInput from './assign-user/AssignUserInput';
 import EnumerationInput from './enumeration/EnumerationInput';
@@ -24,7 +25,13 @@ export default function FormInput({
 
   switch (item.type) {
     case 'date':
-      input = <DatePicker />;
+      input = (
+        <DatePicker
+          size='middle'
+          style={{ width: '100%' }}
+          format='YYYY-MM-DD'
+        />
+      );
       break;
     case 'number':
       input = <InputNumber />;
@@ -47,8 +54,28 @@ export default function FormInput({
       break;
   }
 
+  const getValueProps = (value: any) => {
+    if (item.type === 'date' && value && typeof value === 'string') {
+      return { value: dayjs(value) };
+    }
+    return { value };
+  };
+
+  const normalize = (value: any) => {
+    if (item.type === 'date' && value && dayjs.isDayjs(value)) {
+      return value.format('YYYY-MM-DD');
+    }
+    return value;
+  };
+
   return (
-    <Form.Item name={item.name} label={camelToTitle(label)} rules={rules}>
+    <Form.Item
+      name={item.name}
+      label={camelToTitle(label)}
+      rules={rules}
+      getValueProps={getValueProps}
+      normalize={normalize}
+    >
       {input}
     </Form.Item>
   );
