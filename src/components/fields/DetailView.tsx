@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import RelationView from './relation/RelationView';
+import RichTextView from './richtext/RichtextView';
 
 export default function DetailView({ item, data }: { item: any; data: any }) {
   const [displayValue, setDisplayValue] = useState<any>('');
@@ -12,6 +13,9 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
       switch (type) {
         case 'relation':
           setDisplayValue(<RelationView item={item} data={data} />);
+          break;
+        case 'richtext':
+          setDisplayValue(<RichTextView value={value} />);
           break;
         case 'string':
         default:
