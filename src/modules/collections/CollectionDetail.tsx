@@ -22,6 +22,7 @@ export default function CollectionDetail() {
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
   const [panels, setPanels] = useState<any>([]);
+  const [errorPage, setErrorPage] = useState<any>(false);
 
   useEffect(() => {
     if (module) {
@@ -40,6 +41,8 @@ export default function CollectionDetail() {
   if (!config?.layouts) return <PageLoading />;
 
   if (!id) return <PageError message='Invalid ID' />;
+
+  if (errorPage) return <PageError message={'Permission denied'} />;
 
   return (
     <PageContainer
@@ -91,19 +94,28 @@ export default function CollectionDetail() {
                 };
               }
 
-              const res = await ApiService.getClient()
-                .collection(module)
-                .findOne(id, { populate: '*' });
-              setRecord(res?.data || {});
+              try {
+                const res = await ApiService.getClient()
+                  .collection(module)
+                  .findOne(id, { populate: '*' });
+                setRecord(res?.data || {});
 
-              if (res?.data[config.settings?.mainField]) {
-                setTitle(camelToTitle(res?.data[config.settings?.mainField]));
+                if (res?.data[config.settings?.mainField]) {
+                  setTitle(camelToTitle(res?.data[config.settings?.mainField]));
+                }
+
+                return Promise.resolve({
+                  success: true,
+                  data: res?.data || {},
+                });
+              } catch (error: any) {
+                setErrorPage(true);
+                console.log(error.message);
+                return {
+                  success: false,
+                  data: {},
+                };
               }
-
-              return Promise.resolve({
-                success: true,
-                data: res?.data || {},
-              });
             }}
             emptyText='No Data'
             columns={columns}
