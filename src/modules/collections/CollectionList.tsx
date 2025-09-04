@@ -16,6 +16,7 @@ import {
 import ApiService from '../../services/ApiService';
 import CollectionService from '../../services/CollectionService';
 import MetadataService from '../../services/MetadataService';
+import CollectionDetailDrawer from './components/CollectionDetailDrawer';
 
 export default function CollectionList() {
   // Get the 'name' parameter from the route
@@ -25,13 +26,25 @@ export default function CollectionList() {
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
   const [params, setParams] = useState<any>({});
+  const [selectRecordId, setSelectRecordId] = useState<string>('');
+  const [isOpenDrawer, setIsOpenDrawer] = useState(false);
+
+  useEffect(() => {
+    if (selectRecordId) {
+      setIsOpenDrawer(true);
+    }
+  }, [selectRecordId]);
 
   useEffect(() => {
     if (module) {
       MetadataService.getCollectionConfigurations(module).then((res) => {
         setConfig(res);
         // get columns
-        const cols: any = getListLayoutColumns(res);
+        const cols: any = getListLayoutColumns(res, {
+          onClickMainField: (record: any) => {
+            setSelectRecordId(record.documentId);
+          },
+        });
         // add actions column
         cols.push({
           title: 'Actions',
@@ -158,6 +171,20 @@ export default function CollectionList() {
           </Button>,
         ]}
       />
+
+      {module && selectRecordId && (
+        <CollectionDetailDrawer
+          open={isOpenDrawer}
+          onOpenChange={(open) => {
+            setIsOpenDrawer(open);
+            if (!open) {
+              setSelectRecordId('');
+            }
+          }}
+          id={selectRecordId}
+          collectionName={module}
+        />
+      )}
     </PageContainer>
   );
 }

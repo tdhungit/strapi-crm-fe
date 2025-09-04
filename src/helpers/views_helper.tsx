@@ -3,7 +3,20 @@ import DetailView from '../components/fields/DetailView';
 import FormInput from '../components/fields/FormInput';
 import MetadataService from '../services/MetadataService';
 
-export function getListLayoutColumns(config: any) {
+export interface ListColumnViewOptions {
+  render?: (text: any, record: any) => React.ReactNode;
+}
+
+export function getListLayoutColumns(
+  config: any,
+  options?: {
+    fields?: {
+      [field: string]: ListColumnViewOptions;
+    };
+    onClickMainField?: (record: any) => void;
+  }
+) {
+  options = options || {};
   const cols: any = [];
 
   config?.layouts?.list?.forEach((field: string) => {
@@ -12,6 +25,29 @@ export function getListLayoutColumns(config: any) {
     const title = metadatas.label
       ? camelToTitle(metadatas.label)
       : camelToTitle(field);
+
+    const option = options.fields?.[field] || {};
+    let render;
+
+    if (options.onClickMainField) {
+      if (config.settings?.mainField) {
+        if (field === config.settings?.mainField) {
+          render = (text: string, record: any) => (
+            <span
+              className='cursor-pointer font-semibold'
+              onClick={() => options.onClickMainField?.(record)}
+            >
+              {text}
+            </span>
+          );
+        }
+      }
+    }
+
+    if (option.render) {
+      render = option.render;
+    }
+
     cols.push({
       title,
       dataIndex: field,
@@ -19,6 +55,7 @@ export function getListLayoutColumns(config: any) {
       search: metadatas.searchable || false,
       ellipsis: true,
       sorter: metadatas.sortable || false,
+      render,
     });
   });
 
