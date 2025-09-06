@@ -7,6 +7,29 @@ export interface ListColumnViewOptions {
   render?: (text: any, record: any) => React.ReactNode;
 }
 
+export interface CollectionConfigType {
+  collectionName: string;
+  attributes: {
+    [field: string]: any;
+  };
+  metadatas: {
+    [field: string]: any;
+  };
+  layouts: {
+    list: string[];
+    edit: string[][];
+  };
+  settings: {
+    bulkable: boolean;
+    defaultSortBy: string;
+    defaultSortOrder: string;
+    filterable: boolean;
+    mainField: string;
+    pageSize: number;
+    searchable: boolean;
+  };
+}
+
 export function getListLayoutColumns(
   config: any,
   options?: {
@@ -21,7 +44,6 @@ export function getListLayoutColumns(
 
   config?.layouts?.list?.forEach((field: string) => {
     const metadatas = config.metadatas?.[field]?.list || {};
-    // const fieldType = config.attributes?.[field]?.type;
     const title = metadatas.label
       ? camelToTitle(metadatas.label)
       : camelToTitle(field);
@@ -48,6 +70,21 @@ export function getListLayoutColumns(
       render = option.render;
     }
 
+    if (!render) {
+      const item = config.attributes?.[field] || {};
+      render = (_text: any, record: any) => (
+        <>
+          <DetailView
+            item={{
+              ...item,
+              name: field,
+            }}
+            data={record}
+          />
+        </>
+      );
+    }
+
     cols.push({
       title,
       dataIndex: field,
@@ -62,7 +99,7 @@ export function getListLayoutColumns(
   return cols;
 }
 
-export function updateEditLayoutColumns(config: any) {
+export function updateEditLayoutColumns(config: CollectionConfigType) {
   const cols: any[] = [];
 
   config?.layouts?.edit?.forEach((line: any[]) => {
@@ -94,7 +131,10 @@ export function updateEditLayoutColumns(config: any) {
   return cols;
 }
 
-export function getEditLayoutColumns(config: any, isLine: boolean = false) {
+export function getEditLayoutColumns(
+  config: CollectionConfigType,
+  isLine: boolean = false
+) {
   const editLayout = updateEditLayoutColumns(config);
 
   const cols: any[] = [];
@@ -162,7 +202,7 @@ export function renderEditLayoutRows(
   ));
 }
 
-export function getEditLayoutPanels(config: any) {
+export function getEditLayoutPanels(config: CollectionConfigType) {
   const panels: any[] = [];
   config.layouts.edit.forEach((line: any[]) => {
     line.forEach((item: any) => {
@@ -213,4 +253,19 @@ export function camelToTitle(str: string): string {
       // Viết hoa chữ cái đầu mỗi từ
       .replace(/\b\w/g, (char) => char.toUpperCase())
   );
+}
+
+export function getCollectionPopulatedList(
+  config: CollectionConfigType
+): string[] {
+  const populate: string[] = [];
+
+  config.layouts.list.forEach((field: string) => {
+    const options = config.attributes[field];
+    if (['relation', 'component'].includes(options.type)) {
+      populate.push(field);
+    }
+  });
+
+  return populate;
 }

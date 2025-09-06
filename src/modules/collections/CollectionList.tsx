@@ -11,6 +11,7 @@ import { useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
 import {
   capitalizeFirstLetter,
+  getCollectionPopulatedList,
   getListLayoutColumns,
 } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
@@ -141,7 +142,9 @@ export default function CollectionList() {
         }}
         request={async (params, sort) => {
           setParams(params);
-          return await CollectionService.getTableRequest(module, params, sort);
+          return await CollectionService.getTableRequest(module, params, sort, {
+            populate: getCollectionPopulatedList(config),
+          });
         }}
         pagination={CollectionService.getTablePagination(config)}
         toolBarRender={() => [

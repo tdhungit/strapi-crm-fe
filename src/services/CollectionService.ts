@@ -1,5 +1,11 @@
 import ApiService from './ApiService';
 
+interface ListRequestType {
+  filters?: any;
+  sort?: any;
+  populate?: any;
+}
+
 class CollectionService {
   private static instance: CollectionService;
 
@@ -14,7 +20,7 @@ class CollectionService {
     collectionName?: string,
     params: any = {},
     sort: any = [],
-    options: any = {}
+    options: ListRequestType = {}
   ) {
     if (!collectionName) {
       return {
@@ -65,6 +71,10 @@ class CollectionService {
       if (Object.keys(sortConfig).length > 0) {
         searchParams.sort = sortConfig;
       }
+    }
+
+    if (options?.populate) {
+      searchParams.populate = options.populate;
     }
 
     return await ApiService.getClient()
