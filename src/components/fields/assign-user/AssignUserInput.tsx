@@ -3,12 +3,14 @@ import type { RootState } from '../../../stores';
 import RelationInput from '../relation/RelationInput';
 
 export default function AssignUserInput({
+  initialValues,
   value,
   item,
   data,
   disable,
   onChange,
 }: {
+  initialValues?: any;
   value?: any;
   item: any;
   data: any;
@@ -28,6 +30,7 @@ export default function AssignUserInput({
 
   return (
     <RelationInput
+      initialValues={initialValues}
       value={value}
       item={item}
       data={newData}

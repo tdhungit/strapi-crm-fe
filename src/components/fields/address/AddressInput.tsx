@@ -14,18 +14,25 @@ interface AddressValue {
 
 interface Props {
   value?: AddressValue;
+  initialValues?: AddressValue;
   onChange?: (value: any) => void;
 }
 
 export default function AddressInput(props: Props): React.ReactElement {
   const [value, setValue] = useState<AddressValue>(props.value || {});
 
-  // Load initial data from props
   useEffect(() => {
-    if (props.value) {
-      setValue(props.value);
+    if (props.initialValues) {
+      setValue(props.initialValues);
+      props.onChange?.({
+        country: props.initialValues.country,
+        state: props.initialValues.state,
+        city: props.initialValues.city,
+        zipcode: props.initialValues.zipcode,
+        address: props.initialValues.address,
+      });
     }
-  }, [props.value]);
+  }, [props.initialValues]);
 
   const { data: countries, loading: countryLoading } = useRequest(
     () => ApiService.request('get', '/address/countries'),

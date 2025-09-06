@@ -4,13 +4,14 @@ import MetadataService from '../../../services/MetadataService';
 import DebounceSelect from '../../DebounceSelect';
 
 export default function RelationInput(props: {
+  initialValues?: any;
   value?: any;
   item: any;
   data: any;
-  onChange?: (value: any) => void;
   disable?: boolean;
+  onChange?: (value: any) => void;
 }) {
-  const { item, data, onChange, disable, value: defaultValue } = props;
+  const { item, onChange, disable, initialValues } = props;
 
   const [contentType, setContentType] = useState<any>(null);
   const [keyLabel, setKeyLabel] = useState<string>('name');
@@ -26,17 +27,15 @@ export default function RelationInput(props: {
   }, [item]);
 
   useEffect(() => {
-    if (data[item.name] && keyLabel) {
+    if (initialValues?.id) {
       const newValue = {
-        label: data[item.name][keyLabel],
-        value: data[item.name].id,
+        label: initialValues[keyLabel],
+        value: initialValues.id,
       };
       setValue(newValue);
-      if (defaultValue !== newValue.value) {
-        onChange?.(newValue);
-      }
+      onChange?.(newValue);
     }
-  }, [item, keyLabel, data]);
+  }, [initialValues]);
 
   const fetchOptions = async (search: string): Promise<any[]> => {
     return ApiService.request(

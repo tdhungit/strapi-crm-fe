@@ -47,6 +47,7 @@ export default function FormInput({
       if (item.name === 'assigned_user') {
         input = (
           <AssignUserInput
+            initialValues={data[item.name]}
             item={item}
             data={data}
             onChange={(value: any) => {
@@ -57,6 +58,7 @@ export default function FormInput({
       } else {
         input = (
           <RelationInput
+            initialValues={data[item.name]}
             item={item}
             data={data}
             onChange={(value: any) => {
@@ -69,15 +71,9 @@ export default function FormInput({
     case 'component':
       switch (item.component) {
         case 'common.address':
-          form.setFieldValue(item.name, {
-            country: data[item.name]?.country,
-            state: data[item.name]?.state,
-            city: data[item.name]?.city,
-            zipcode: data[item.name]?.zipcode,
-            address: data[item.name]?.address,
-          });
           input = (
             <AddressInput
+              initialValues={data[item.name]}
               onChange={(value: any) => {
                 form.setFieldValue(item.name, {
                   country: value?.country,
