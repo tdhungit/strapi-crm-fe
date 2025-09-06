@@ -1,18 +1,17 @@
-import type { FormInstance } from 'antd';
 import { useEffect, useState } from 'react';
 import ApiService from '../../../services/ApiService';
 import MetadataService from '../../../services/MetadataService';
 import DebounceSelect from '../../DebounceSelect';
 
-export default function RelationInput({
-  item,
-  form,
-  data,
-}: {
+export default function RelationInput(props: {
+  value?: any;
   item: any;
-  form: FormInstance;
   data: any;
+  onChange?: (value: any) => void;
+  disable?: boolean;
 }) {
+  const { item, data, onChange, disable, value: defaultValue } = props;
+
   const [contentType, setContentType] = useState<any>(null);
   const [keyLabel, setKeyLabel] = useState<string>('name');
   const [value, setValue] = useState<any>(null);
@@ -28,16 +27,22 @@ export default function RelationInput({
 
   useEffect(() => {
     if (data[item.name] && keyLabel) {
-      setValue({
+      const newValue = {
         label: data[item.name][keyLabel],
         value: data[item.name].id,
-      });
-      form.setFieldValue(item.name, data[item.name].id);
+      };
+      setValue(newValue);
+      if (defaultValue !== newValue.value) {
+        onChange?.(newValue);
+      }
     }
-  }, [form, item, keyLabel, data]);
+  }, [item, keyLabel, data]);
 
   const fetchOptions = async (search: string): Promise<any[]> => {
-    return ApiService.request('get', `/${contentType.pluralName}?_q=${search}`).then((res) => {
+    return ApiService.request(
+      'get',
+      `/${contentType.pluralName}?_q=${search}`
+    ).then((res) => {
       const results = Array.isArray(res) ? res : res.data ? res.data : [];
       return results.map((item: any) => ({
         label: item[keyLabel],
@@ -51,9 +56,10 @@ export default function RelationInput({
       value={value}
       fetchOptions={fetchOptions}
       onChange={(selected: any) => {
-        form.setFieldValue(item.name, selected.value);
         setValue(selected);
+        onChange?.(selected);
       }}
+      disabled={disable}
     />
   );
 }

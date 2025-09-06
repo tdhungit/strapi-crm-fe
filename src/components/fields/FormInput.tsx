@@ -1,6 +1,7 @@
 import { DatePicker, Form, Input, InputNumber, type FormInstance } from 'antd';
 import dayjs from 'dayjs';
 import { camelToTitle } from '../../helpers/views_helper';
+import AddressInput from './address/AddressInput';
 import AssignUserInput from './assign-user/AssignUserInput';
 import EnumerationInput from './enumeration/EnumerationInput';
 import RelationInput from './relation/RelationInput';
@@ -44,9 +45,53 @@ export default function FormInput({
       break;
     case 'relation':
       if (item.name === 'assigned_user') {
-        input = <AssignUserInput form={form} item={item} data={data} />;
+        input = (
+          <AssignUserInput
+            item={item}
+            data={data}
+            onChange={(value: any) => {
+              form.setFieldValue(item.name, value.value);
+            }}
+          />
+        );
       } else {
-        input = <RelationInput form={form} item={item} data={data} />;
+        input = (
+          <RelationInput
+            item={item}
+            data={data}
+            onChange={(value: any) => {
+              form.setFieldValue(item.name, value.value);
+            }}
+          />
+        );
+      }
+      break;
+    case 'component':
+      switch (item.component) {
+        case 'common.address':
+          form.setFieldValue(item.name, {
+            country: data[item.name]?.country,
+            state: data[item.name]?.state,
+            city: data[item.name]?.city,
+            zipcode: data[item.name]?.zipcode,
+            address: data[item.name]?.address,
+          });
+          input = (
+            <AddressInput
+              onChange={(value: any) => {
+                form.setFieldValue(item.name, {
+                  country: value?.country,
+                  state: value?.state,
+                  city: value?.city,
+                  zipcode: value?.zipcode,
+                  address: value?.address,
+                });
+              }}
+            />
+          );
+          break;
+        default:
+          break;
       }
       break;
     case 'string':

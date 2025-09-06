@@ -34,13 +34,17 @@ class MetadataService {
     return contentTypes.find((item: any) => item.uid === uid);
   }
 
-  async getCollectionConfigurations(module: string) {
+  async getCollectionConfigurations(
+    module: string,
+    type: string = 'content_types'
+  ) {
     const contentType = this.getContentTypeByModule(module);
     const collectionUid = contentType.uid;
 
     return ApiService.request(
       'get',
-      `/metadata/content-types/${collectionUid}/configuration`
+      `/metadata/content-types/${collectionUid}/configuration`,
+      { type }
     );
   }
 
