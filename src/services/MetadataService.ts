@@ -38,11 +38,18 @@ class MetadataService {
     const contentType = this.getContentTypeByModule(module);
     const collectionUid = contentType.uid;
 
-    return ApiService.request('get', `/metadata/content-types/${collectionUid}/configuration`);
+    return ApiService.request(
+      'get',
+      `/metadata/content-types/${collectionUid}/configuration`
+    );
   }
 
-  getCollectionFieldLayoutConfig(config: any, layout: string, fieldName: string) {
-    const fieldOptions = config.fields?.[fieldName] || {};
+  getCollectionFieldLayoutConfig(
+    config: any,
+    layout: string,
+    fieldName: string
+  ) {
+    const fieldOptions = config.attributes?.[fieldName] || {};
     const metadatas = config.metadatas?.[fieldName]?.[layout] || {};
     metadatas.type = fieldOptions.type || 'string';
     metadatas.name = fieldName;

@@ -50,8 +50,8 @@ export default function ImportModule() {
 
   // Initialize field mappings when CSV data and content type are available
   useEffect(() => {
-    if (csvData && contentType?.fields) {
-      const availableFields = Object.keys(contentType.fields);
+    if (csvData && contentType?.attributes) {
+      const availableFields = Object.keys(contentType.attributes);
 
       const mappings: FieldMapping[] = csvData.headers.map((header) => {
         // Auto-select if header name matches field name (case-insensitive)
@@ -149,11 +149,11 @@ export default function ImportModule() {
   };
 
   const getContentTypeFields = () => {
-    if (!contentType?.fields) return [];
+    if (!contentType?.attributes) return [];
 
-    return Object.keys(contentType.fields).map((key) => ({
+    return Object.keys(contentType.attributes).map((key) => ({
       value: key,
-      label: `${key} (${contentType.fields[key].type})`,
+      label: `${key} (${contentType.attributes[key].type})`,
     }));
   };
 
@@ -383,7 +383,7 @@ export default function ImportModule() {
       )}
 
       {/* Field Mapping Section */}
-      {csvData && contentType?.fields && (
+      {csvData && contentType?.attributes && (
         <Card
           title='Step 3: Map CSV Headers to Content Type Fields'
           className='!mt-4'

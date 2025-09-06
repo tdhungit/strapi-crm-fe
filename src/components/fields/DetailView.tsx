@@ -23,6 +23,8 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
             <EnumerationView type={item.options} value={value} />
           );
           break;
+        case 'component':
+          break;
         case 'string':
         default:
           setDisplayValue(value);

@@ -10,7 +10,7 @@ export interface ListColumnViewOptions {
 export function getListLayoutColumns(
   config: any,
   options?: {
-    fields?: {
+    attributes?: {
       [field: string]: ListColumnViewOptions;
     };
     onClickMainField?: (record: any) => void;
@@ -26,7 +26,7 @@ export function getListLayoutColumns(
       ? camelToTitle(metadatas.label)
       : camelToTitle(field);
 
-    const option = options.fields?.[field] || {};
+    const option = options.attributes?.[field] || {};
     let render;
 
     if (options.onClickMainField) {
@@ -187,7 +187,7 @@ export function getEditLayoutPanels(config: any) {
           type: fieldOptions.relation,
           module,
           parentModule: config.collectionName,
-          field: config.fields?.[item.name] || {},
+          field: config.attributes?.[item.name] || {},
         });
       }
     });
