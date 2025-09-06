@@ -1,5 +1,68 @@
 import ApiService from './ApiService';
 
+export interface MetadataFieldType {
+  label: string;
+  description?: string;
+  placeholder?: string;
+  visible?: boolean;
+  editable?: boolean;
+  mainField?: string; // relation field
+  searchable?: boolean; // layout list
+  sortable?: boolean; // layout list
+}
+
+export interface MetadataCollectionType {
+  [field: string]: {
+    edit: MetadataFieldType;
+    list: MetadataFieldType;
+  };
+}
+
+export interface CollectionConfigType {
+  collectionName: string;
+  attributes: {
+    [field: string]: {
+      type: string;
+      [key: string]: any;
+    };
+  };
+  metadatas: MetadataCollectionType;
+  layouts: {
+    list: string[];
+    edit: string[][];
+  };
+  settings: {
+    bulkable: boolean;
+    defaultSortBy: string;
+    defaultSortOrder: string;
+    filterable: boolean;
+    mainField: string;
+    pageSize: number;
+    searchable: boolean;
+  };
+}
+
+export interface FieldLayoutConfigType {
+  type: string;
+  name: string;
+  label: string;
+  description?: string;
+  placeholder?: string;
+  visible?: boolean;
+  editable?: boolean;
+  enum?: string[]; // type: enumeration
+  mainField?: string; // type: relation
+  relation?: string; // type: relation
+  target?: string; // type: relation
+  inversedBy?: string; // type: relation
+  component?: string; // type: component
+  repeatable?: boolean; // type: component
+  options?: {
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
 class MetadataService {
   private static instance: MetadataService;
 
@@ -37,7 +100,7 @@ class MetadataService {
   async getCollectionConfigurations(
     module: string,
     type: string = 'content_types'
-  ) {
+  ): Promise<CollectionConfigType> {
     const contentType = this.getContentTypeByModule(module);
     const collectionUid = contentType.uid;
 
@@ -52,7 +115,7 @@ class MetadataService {
     config: any,
     layout: string,
     fieldName: string
-  ) {
+  ): FieldLayoutConfigType {
     const fieldOptions = config.attributes?.[fieldName] || {};
     const metadatas = config.metadatas?.[fieldName]?.[layout] || {};
     metadatas.type = fieldOptions.type || 'string';

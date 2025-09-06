@@ -1,37 +1,16 @@
 import { Col, Row, type FormInstance } from 'antd';
 import DetailView from '../components/fields/DetailView';
 import FormInput from '../components/fields/FormInput';
-import MetadataService from '../services/MetadataService';
+import MetadataService, {
+  type CollectionConfigType,
+} from '../services/MetadataService';
 
 export interface ListColumnViewOptions {
   render?: (text: any, record: any) => React.ReactNode;
 }
 
-export interface CollectionConfigType {
-  collectionName: string;
-  attributes: {
-    [field: string]: any;
-  };
-  metadatas: {
-    [field: string]: any;
-  };
-  layouts: {
-    list: string[];
-    edit: string[][];
-  };
-  settings: {
-    bulkable: boolean;
-    defaultSortBy: string;
-    defaultSortOrder: string;
-    filterable: boolean;
-    mainField: string;
-    pageSize: number;
-    searchable: boolean;
-  };
-}
-
 export function getListLayoutColumns(
-  config: any,
+  config: CollectionConfigType,
   options?: {
     attributes?: {
       [field: string]: ListColumnViewOptions;
@@ -212,15 +191,17 @@ export function getEditLayoutPanels(config: CollectionConfigType) {
         item.name
       );
 
-      const contentType = MetadataService.getContentTypeByUid(
-        fieldOptions.target
-      );
-      const module = contentType?.collectionName;
-
       if (
         fieldOptions.type === 'relation' &&
-        fieldOptions.relation === 'oneToMany'
+        fieldOptions.relation === 'oneToMany' &&
+        fieldOptions.target
       ) {
+        const contentType = MetadataService.getContentTypeByUid(
+          fieldOptions.target
+        );
+
+        const module = contentType?.collectionName;
+
         panels.push({
           name: item.name,
           label: fieldOptions.label || item.name,
