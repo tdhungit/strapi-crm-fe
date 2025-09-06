@@ -37,7 +37,7 @@ export default function CollectionDetailDrawer(props: Props) {
           // get record data
           ApiService.getClient()
             .collection(props.collectionName)
-            .findOne(props.id)
+            .findOne(props.id, { populate: '*' })
             .then((res: any) => {
               setRecord(res.data);
               if (config.settings?.mainField) {

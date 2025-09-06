@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import AddressView from './address/AddressView';
 import EnumerationView from './enumeration/EnumerationView';
 import RelationView from './relation/RelationView';
 import RichTextView from './richtext/RichtextView';
@@ -24,6 +25,13 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
           );
           break;
         case 'component':
+          switch (item.component) {
+            case 'common.address':
+              setDisplayValue(<AddressView value={value} />);
+              break;
+            default:
+              break;
+          }
           break;
         case 'string':
         default:
