@@ -17,23 +17,21 @@ export default function AssignUserInput({
   disable?: boolean;
   onChange?: (value: any) => void;
 }) {
-  const newData = { ...(data ? data : {}) };
+  let newData = initialValues ? { ...initialValues } : { ...data };
   const user = useSelector((state: RootState) => state.auth.user);
   if (user?.id) {
-    if (!newData.assigned_user) {
-      newData.assigned_user = {
-        id: user.id,
-        username: user.username,
-      };
-    }
+    newData = {
+      initValue: user.id,
+      initLabel: user.username,
+    };
   }
 
   return (
     <RelationInput
-      initialValues={initialValues}
+      initialValues={newData}
       value={value}
       item={item}
-      data={newData}
+      data={data}
       disable={disable}
       onChange={(value: any) => {
         onChange?.(value);
