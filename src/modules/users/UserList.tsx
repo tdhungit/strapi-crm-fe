@@ -1,18 +1,14 @@
-import { EditOutlined, EyeOutlined, KeyOutlined } from '@ant-design/icons';
+import { EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
 import PageLoading from '../../components/PageLoading';
 import { getListLayoutColumns } from '../../helpers/views_helper';
 import CollectionService from '../../services/CollectionService';
 import MetadataService from '../../services/MetadataService';
-import ChangePasswordModal from './components/ChangePasswordModal';
 
 const UserList: React.FC = () => {
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [changePasswordModalVisible, setChangePasswordModalVisible] =
-    useState(false);
 
   useEffect(() => {
     MetadataService.getCollectionConfigurations('users').then((res) => {
@@ -33,16 +29,6 @@ const UserList: React.FC = () => {
               className='inline-block ml-2'
             >
               <EyeOutlined />
-            </a>
-            <a
-              href='javascript:void(0);'
-              className='inline-block ml-2'
-              onClick={() => {
-                setSelectedUserId(record.id);
-                setChangePasswordModalVisible(true);
-              }}
-            >
-              <KeyOutlined />
             </a>
           </div>
         ),
@@ -83,12 +69,6 @@ const UserList: React.FC = () => {
           return await CollectionService.getTableRequest('users', params, sort);
         }}
         pagination={CollectionService.getTablePagination(config)}
-      />
-
-      <ChangePasswordModal
-        userId={selectedUserId || 0}
-        open={changePasswordModalVisible}
-        onOpenChange={setChangePasswordModalVisible}
       />
     </PageContainer>
   );
