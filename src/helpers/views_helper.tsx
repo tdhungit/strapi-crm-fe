@@ -101,6 +101,12 @@ export function updateListLayoutFilterRender(
       break;
     }
 
+    case 'date':
+    case 'datetime': {
+      col.valueType = 'dateRange';
+      break;
+    }
+
     default:
       break;
   }
@@ -334,7 +340,6 @@ export function generateCollectionFilters(
       params[key]
     ) {
       const fieldOptions = config?.attributes?.[key] || { type: 'string' };
-      // console.log({ fieldOptions });
       switch (fieldOptions.type) {
         case 'relation':
           if (fieldOptions.relation === 'manyToOne') {
@@ -346,6 +351,13 @@ export function generateCollectionFilters(
         case 'enumeration':
           filters[key] = {
             $eq: params[key],
+          };
+          break;
+        case 'date':
+        case 'datetime':
+          filters[key] = {
+            $gte: params[key][0] + ' 00:00:00',
+            $lte: params[key][1] + ' 23:59:59',
           };
           break;
         default:
