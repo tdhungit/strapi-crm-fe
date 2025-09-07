@@ -1,7 +1,7 @@
 import { DatePicker, Form, Input, InputNumber, type FormInstance } from 'antd';
 import dayjs from 'dayjs';
 import { camelToTitle } from '../../helpers/views_helper';
-import type { FieldLayoutConfigType } from '../../services/MetadataService';
+import type { FieldLayoutConfigType } from '../../types/layouts';
 import AddressInput from './address/AddressInput';
 import AssignUserInput from './assign-user/AssignUserInput';
 import EnumerationInput from './enumeration/EnumerationInput';

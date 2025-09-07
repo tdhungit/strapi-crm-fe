@@ -94,22 +94,33 @@ export default function DefaultLayout() {
         }}
       >
         <div className='logo-vertical'>
-          <a href='/home' className='flex items-start gap-2'>
-            {appSettings?.logo?.menuLogo?.url && (
-              <img
-                src={
-                  import.meta.env.VITE_STRAPI_URL +
-                  appSettings.logo.menuLogo.url
-                }
-                alt='StrapiCRM'
-                className='max-h-[32px]'
-              />
-            )}
-            {!collapsed && (
-              <strong className='text-xl font-bold'>
-                {appSettings?.uiConfig?.pageTitle || 'StrapiCRM'}
-              </strong>
-            )}
+          <a href='/home' className='logo-link'>
+            <div className='logo-container'>
+              <div className='logo-image-wrapper'>
+                <img
+                  src={
+                    (appSettings?.logo?.menuLogo?.url &&
+                      `${import.meta.env.VITE_STRAPI_URL}${
+                        appSettings.logo.menuLogo.url
+                      }`) ||
+                    '/logo.svg'
+                  }
+                  alt='StrapiCRM'
+                  className='logo-image'
+                />
+              </div>
+
+              {!collapsed && (
+                <div className='logo-text-wrapper'>
+                  <strong className='logo-text'>
+                    {appSettings?.uiConfig?.pageTitle || 'StrapiCRM'}
+                  </strong>
+                  <div className='logo-subtitle'>
+                    {appSettings?.uiConfig?.pageSubtitle || 'A Open Source CRM'}
+                  </div>
+                </div>
+              )}
+            </div>
           </a>
         </div>
         <Menu

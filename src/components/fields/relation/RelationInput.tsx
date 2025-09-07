@@ -20,9 +20,11 @@ export default function RelationInput(props: {
   useEffect(() => {
     if (item?.options?.target) {
       const ct = MetadataService.getContentTypeByUid(item.options.target);
-      setContentType(ct);
-      const mainField = ct.settings?.mainField || 'name';
-      setKeyLabel(mainField);
+      if (ct) {
+        setContentType(ct);
+        const mainField = ct.settings?.mainField || 'name';
+        setKeyLabel(mainField);
+      }
     }
   }, [item]);
 
