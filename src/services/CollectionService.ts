@@ -1,14 +1,12 @@
 import type { ParamsType } from '@ant-design/pro-components';
-import type { SortOrder } from 'antd/es/table/interface';
-import { generateCollectionFilters } from '../helpers/views_helper';
+import type { SortOrder } from 'antd/lib/table/interface';
+import {
+  generateCollectionFilters,
+  generateCollectionSort,
+} from '../helpers/views_helper';
+import type { ListRequestType } from '../types/content-types';
+import type { CollectionConfigType } from '../types/layouts';
 import ApiService from './ApiService';
-import type { CollectionConfigType } from './MetadataService';
-
-interface ListRequestType {
-  filters?: any;
-  sort?: any;
-  populate?: any;
-}
 
 class CollectionService {
   private static instance: CollectionService;
@@ -54,16 +52,7 @@ class CollectionService {
 
     // Handle sorting
     if (sort) {
-      const sortConfig: any = {};
-      Object.keys(sort).forEach((field) => {
-        const order = sort[field];
-        if (order === 'ascend') {
-          sortConfig[field] = 'asc';
-        } else if (order === 'descend') {
-          sortConfig[field] = 'desc';
-        }
-      });
-
+      const sortConfig = generateCollectionSort(sort, config);
       if (Object.keys(sortConfig).length > 0) {
         searchParams.sort = sortConfig;
       }

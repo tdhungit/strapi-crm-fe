@@ -1,78 +1,10 @@
+import type { ComponentType } from '../types/components';
+import type { ContentTypeType } from '../types/content-types';
+import type {
+  CollectionConfigType,
+  FieldLayoutConfigType,
+} from '../types/layouts';
 import ApiService from './ApiService';
-
-export interface MetadataFieldType {
-  label: string;
-  description?: string;
-  placeholder?: string;
-  visible?: boolean;
-  editable?: boolean;
-  mainField?: string; // relation field
-  searchable?: boolean; // layout list
-  sortable?: boolean; // layout list
-}
-
-export interface MetadataCollectionType {
-  [field: string]: {
-    edit: MetadataFieldType;
-    list: MetadataFieldType;
-  };
-}
-
-export interface LayoutEditItemType {
-  name: string;
-  size: number;
-}
-
-export interface CollectionConfigType {
-  collectionName: string;
-  attributes: {
-    [field: string]: {
-      type: string;
-      [key: string]: any;
-    };
-  };
-  metadatas: MetadataCollectionType;
-  layouts: {
-    list: string[];
-    edit: LayoutEditItemType[][];
-  };
-  settings: {
-    bulkable: boolean;
-    defaultSortBy: string;
-    defaultSortOrder: string;
-    filterable: boolean;
-    mainField: string;
-    pageSize: number;
-    searchable: boolean;
-  };
-}
-
-export interface FieldLayoutConfigType {
-  type: string;
-  name: string;
-  label: string;
-  description?: string;
-  placeholder?: string;
-  visible?: boolean;
-  editable?: boolean;
-  enum?: string[]; // type: enumeration
-  mainField?: string; // type: relation
-  relation?: string; // type: relation
-  target?: string; // type: relation
-  inversedBy?: string; // type: relation
-  component?: string; // type: component
-  repeatable?: boolean; // type: component
-  options?: {
-    [key: string]: any;
-  };
-  [key: string]: any;
-}
-
-export interface LayoutEditLineType {
-    name: string;
-    size: number;
-    options: FieldLayoutConfigType;
-  }
 
 class MetadataService {
   private static instance: MetadataService;
@@ -88,17 +20,17 @@ class MetadataService {
     return MetadataService.instance;
   }
 
-  getSavedContentTypes() {
+  getSavedContentTypes(): ContentTypeType[] {
     const appSettingStr = localStorage.getItem('strapi-crm');
     const appSetting = appSettingStr ? JSON.parse(appSettingStr) : {};
     return appSetting['content-types'];
   }
 
-  async getContentTypes() {
+  async getContentTypes(): Promise<ContentTypeType[]> {
     return ApiService.request('get', '/metadata/content-types');
   }
 
-  getContentTypeByModule(module: string) {
+  getContentTypeByModule(module: string): ContentTypeType | undefined {
     const contentTypes = this.getSavedContentTypes();
     return contentTypes.find((item: any) => item.pluralName === module);
   }
@@ -110,16 +42,27 @@ class MetadataService {
 
   async getCollectionConfigurations(
     module: string,
-    type: string = 'content_types'
+    type: 'content_types' | 'components' = 'content_types'
   ): Promise<CollectionConfigType> {
     const contentType = this.getContentTypeByModule(module);
-    const collectionUid = contentType.uid;
+    const collectionUid = contentType?.uid;
+
+    if (!collectionUid) {
+      throw new Error(`Content type ${module} not found`);
+    }
 
     return ApiService.request(
       'get',
       `/metadata/content-types/${collectionUid}/configuration`,
       { type }
     );
+  }
+
+  getComponentConfigurations(componentUid: string): ComponentType | undefined {
+    const appSettingStr = localStorage.getItem('strapi-crm');
+    const appSetting = appSettingStr ? JSON.parse(appSettingStr) : {};
+    const components: ComponentType[] = appSetting['components'];
+    return components.find((item: any) => item.uid === componentUid);
   }
 
   getCollectionFieldLayoutConfig(

@@ -1,29 +1,19 @@
 import type { ParamsType, ProColumns } from '@ant-design/pro-components';
 import { Col, Row, type FormInstance } from 'antd';
-import type { ReactNode } from 'react';
+import type { SortOrder } from 'antd/lib/table/interface';
 import DetailView from '../components/fields/DetailView';
 import FormInput from '../components/fields/FormInput';
 import RelationInput from '../components/fields/relation/RelationInput';
-import MetadataService, {
-  type CollectionConfigType,
-  type LayoutEditLineType,
-} from '../services/MetadataService';
-
-export interface ListColumnViewOptions {
-  render?: (text: any, record: any) => React.ReactNode;
-  renderFormItem?: (
-    item: any,
-    { type, defaultRender, formItemProps, fieldProps, ...rest }: any,
-    form: FormInstance
-  ) => ReactNode;
-}
-
-export interface ListLayoutOptions {
-  attributes?: {
-    [field: string]: ListColumnViewOptions;
-  };
-  onClickMainField?: (record: any) => void;
-}
+import MetadataService from '../services/MetadataService';
+import type {
+  ContentTypeFiltersType,
+  ContentTypeSortsType,
+} from '../types/content-types';
+import type {
+  CollectionConfigType,
+  LayoutEditLineType,
+  ListLayoutOptions,
+} from '../types/layouts';
 
 export function updateListLayoutFieldRender(
   field: string,
@@ -99,7 +89,6 @@ export function updateListLayoutFilterRender(
     }
 
     case 'enumeration': {
-      console.log({ fieldTypes });
       col.valueType = 'select';
       const valueEnum: any = {};
       fieldTypes.enum.forEach((item: any) => {
@@ -328,15 +317,14 @@ export function getCollectionPopulatedList(
 
 export function generateCollectionFilters(
   params: ParamsType & {
+    search?: string;
     pageSize?: number;
     current?: number;
     keyword?: string;
   } = {},
   config?: CollectionConfigType
-) {
-  const filters: {
-    [key: string]: any;
-  } = {};
+): ContentTypeFiltersType {
+  const filters: ContentTypeFiltersType = {};
 
   Object.keys(params).forEach((key) => {
     if (
@@ -370,4 +358,49 @@ export function generateCollectionFilters(
   });
 
   return filters;
+}
+
+export function generateCollectionSort(
+  sort: Record<string, SortOrder> = {},
+  config?: CollectionConfigType
+): ContentTypeSortsType {
+  const sortConfig: ContentTypeSortsType = {};
+
+  Object.keys(sort).forEach((field) => {
+    const fieldOptions = config?.attributes?.[field] || { type: 'string' };
+    const order = sort[field] === 'descend' ? 'desc' : 'asc';
+
+    switch (fieldOptions.type) {
+      case 'relation':
+        if (fieldOptions.relation === 'manyToOne') {
+          const contentType = MetadataService.getContentTypeByUid(
+            fieldOptions.target
+          );
+          if (contentType?.settings?.mainField) {
+            sortConfig[field] = {
+              [contentType.settings.mainField]: order,
+            };
+          }
+        }
+        break;
+
+      case 'component': {
+        const component = MetadataService.getComponentConfigurations(
+          fieldOptions.component
+        );
+        if (component?.settings?.mainField) {
+          sortConfig[field] = {
+            [component.settings.mainField]: order,
+          };
+        }
+        break;
+      }
+
+      default:
+        sortConfig[field] = order;
+        break;
+    }
+  });
+
+  return sortConfig;
 }

@@ -41,7 +41,7 @@ export default function CollectionList() {
       MetadataService.getCollectionConfigurations(module).then((res) => {
         setConfig(res);
         // get columns
-        const cols: any = getListLayoutColumns(res, {
+        const cols = getListLayoutColumns(res, {
           onClickMainField: (record: any) => {
             setSelectRecordId(record.documentId);
           },
