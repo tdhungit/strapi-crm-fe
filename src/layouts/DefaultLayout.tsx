@@ -124,7 +124,7 @@ export default function DefaultLayout() {
                       }`) ||
                     '/logo.svg'
                   }
-                  alt='StrapiCRM'
+                  alt={appSettings?.uiConfig?.pageTitle || 'Strapi CRM'}
                   className='w-full h-full object-contain rounded-md brightness-110 contrast-110'
                 />
               </div>
@@ -132,10 +132,10 @@ export default function DefaultLayout() {
               {!collapsed && (
                 <div className='flex flex-col gap-0.5 flex-1 min-w-0'>
                   <strong className='text-lg font-bold bg-gradient-to-r from-white to-green-100 bg-clip-text text-transparent leading-tight tracking-tight m-0 -ml-[0.025em] shadow-[0_2px_4px_rgba(0,0,0,0.1)]'>
-                    {appSettings?.uiConfig?.pageTitle || 'StrapiCRM'}
+                    {appSettings?.uiConfig?.pageTitle || 'Strapi CRM'}
                   </strong>
                   <div className='text-[11px] font-medium text-white/70 leading-none tracking-[0.02em] uppercase opacity-80 transition-opacity duration-300 hover:opacity-100 hover:text-white/90'>
-                    Management System
+                    A Open Source CRM System
                   </div>
                 </div>
               )}
