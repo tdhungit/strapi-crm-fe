@@ -7,7 +7,7 @@ export default function RelationInput(props: {
   initialValues?: any;
   value?: any;
   item: any;
-  data: any;
+  data?: any;
   disable?: boolean;
   onChange?: (value: any) => void;
 }) {

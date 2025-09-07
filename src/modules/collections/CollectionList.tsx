@@ -139,12 +139,20 @@ export default function CollectionList() {
         actionRef={ref}
         search={{
           searchText: 'Search',
+          labelWidth: 'auto',
+          span: 12,
         }}
         request={async (params, sort) => {
           setParams(params);
-          return await CollectionService.getTableRequest(module, params, sort, {
-            populate: getCollectionPopulatedList(config),
-          });
+          return await CollectionService.getTableRequest(
+            module,
+            params,
+            sort,
+            {
+              populate: getCollectionPopulatedList(config),
+            },
+            config
+          );
         }}
         pagination={CollectionService.getTablePagination(config)}
         toolBarRender={() => [

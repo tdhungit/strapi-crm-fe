@@ -1,90 +1,165 @@
+import type { ParamsType, ProColumns } from '@ant-design/pro-components';
 import { Col, Row, type FormInstance } from 'antd';
+import type { ReactNode } from 'react';
 import DetailView from '../components/fields/DetailView';
 import FormInput from '../components/fields/FormInput';
+import RelationInput from '../components/fields/relation/RelationInput';
 import MetadataService, {
   type CollectionConfigType,
+  type LayoutEditLineType,
 } from '../services/MetadataService';
 
 export interface ListColumnViewOptions {
   render?: (text: any, record: any) => React.ReactNode;
+  renderFormItem?: (
+    item: any,
+    { type, defaultRender, formItemProps, fieldProps, ...rest }: any,
+    form: FormInstance
+  ) => ReactNode;
+}
+
+export interface ListLayoutOptions {
+  attributes?: {
+    [field: string]: ListColumnViewOptions;
+  };
+  onClickMainField?: (record: any) => void;
+}
+
+export function updateListLayoutFieldRender(
+  field: string,
+  col: ProColumns<any>,
+  config: CollectionConfigType,
+  options: ListLayoutOptions
+) {
+  const option = options.attributes?.[field] || {};
+  if (option.render) {
+    col.render = option.render;
+    return col;
+  }
+
+  if (options.onClickMainField) {
+    if (config.settings?.mainField) {
+      if (field === config.settings?.mainField) {
+        col.render = (text: any, record: any) => (
+          <span
+            className='cursor-pointer font-semibold'
+            onClick={() => options.onClickMainField?.(record)}
+          >
+            {text}
+          </span>
+        );
+        return col;
+      }
+    }
+  }
+
+  const fieldTypes = config.attributes?.[field] || {};
+  fieldTypes.name = field;
+  col.render = (_text: any, record: any) => (
+    <>
+      <DetailView item={fieldTypes} data={record} />
+    </>
+  );
+
+  return col;
+}
+
+export function updateListLayoutFilterRender(
+  field: string,
+  col: ProColumns<any>,
+  config: CollectionConfigType,
+  options: ListLayoutOptions
+): ProColumns<any> {
+  const option = options.attributes?.[field] || {};
+  if (option.renderFormItem) {
+    col.renderFormItem = option.renderFormItem;
+    return col;
+  }
+
+  const fieldTypes = config.attributes?.[field] || { type: 'string' };
+
+  switch (fieldTypes.type) {
+    case 'relation': {
+      const fieldOptions = MetadataService.getCollectionFieldLayoutConfig(
+        config,
+        'edit',
+        field
+      );
+      col.renderFormItem = (_item: any, _config: any, form: FormInstance) => {
+        return (
+          <RelationInput
+            item={fieldOptions}
+            onChange={(value: any) => {
+              form.setFieldValue(field, value.value);
+            }}
+          />
+        );
+      };
+      break;
+    }
+
+    case 'enumeration': {
+      console.log({ fieldTypes });
+      col.valueType = 'select';
+      const valueEnum: any = {};
+      fieldTypes.enum.forEach((item: any) => {
+        valueEnum[item] = {
+          text: item,
+          [col.dataIndex]: item,
+        };
+      });
+      col.valueEnum = valueEnum;
+      break;
+    }
+
+    default:
+      break;
+  }
+
+  return col;
 }
 
 export function getListLayoutColumns(
   config: CollectionConfigType,
-  options?: {
-    attributes?: {
-      [field: string]: ListColumnViewOptions;
-    };
-    onClickMainField?: (record: any) => void;
-  }
-) {
+  options?: ListLayoutOptions
+): ProColumns<any>[] {
   options = options || {};
-  const cols: any = [];
+  const cols: ProColumns<any>[] = [];
 
   config?.layouts?.list?.forEach((field: string) => {
     const metadatas = config.metadatas?.[field]?.list || {};
+
     const title = metadatas.label
       ? camelToTitle(metadatas.label)
       : camelToTitle(field);
 
-    const option = options.attributes?.[field] || {};
-    let render;
-
-    if (options.onClickMainField) {
-      if (config.settings?.mainField) {
-        if (field === config.settings?.mainField) {
-          render = (text: string, record: any) => (
-            <span
-              className='cursor-pointer font-semibold'
-              onClick={() => options.onClickMainField?.(record)}
-            >
-              {text}
-            </span>
-          );
-        }
-      }
-    }
-
-    if (option.render) {
-      render = option.render;
-    }
-
-    if (!render) {
-      const item = config.attributes?.[field] || {};
-      render = (_text: any, record: any) => (
-        <>
-          <DetailView
-            item={{
-              ...item,
-              name: field,
-            }}
-            data={record}
-          />
-        </>
-      );
-    }
-
-    cols.push({
+    let col: ProColumns<any> = {
       title,
       dataIndex: field,
       key: field,
       search: metadatas.searchable || false,
       ellipsis: true,
       sorter: metadatas.sortable || false,
-      render,
-    });
+    };
+
+    col = updateListLayoutFieldRender(field, col, config, options);
+    col = updateListLayoutFilterRender(field, col, config, options);
+
+    cols.push(col);
   });
 
   return cols;
 }
 
-export function updateEditLayoutColumns(config: CollectionConfigType) {
-  const cols: any[] = [];
+export function updateEditLayoutColumns(
+  config: CollectionConfigType
+): LayoutEditLineType[][] {
+  const cols: LayoutEditLineType[][] = [];
 
-  config?.layouts?.edit?.forEach((line: any[]) => {
-    const lines: any[] = [];
+  config?.layouts?.edit?.forEach((line) => {
+    const lines: LayoutEditLineType[] = [];
 
-    line.forEach((item: any) => {
+    line.forEach((item) => {
       const fieldOptions = MetadataService.getCollectionFieldLayoutConfig(
         config,
         'edit',
@@ -157,19 +232,19 @@ export function getEditLayoutColumns(
 }
 
 export function renderEditLayoutRows(
-  config: any,
+  config: CollectionConfigType,
   record: any,
   form: FormInstance
 ) {
   const editLayout = updateEditLayoutColumns(config);
-  return editLayout.map((line: any[], lineIndex: number) => (
+  return editLayout.map((line, lineIndex: number) => (
     <Row
       key={`line-${lineIndex}`}
       gutter={[16, 16]}
       className='mb-4'
       style={{ width: '100%' }}
     >
-      {line.map((item: any) => {
+      {line.map((item) => {
         const fieldOptions = item.options;
         return (
           <Col key={item.name} span={line.length === 1 ? 24 : 12}>
@@ -249,4 +324,50 @@ export function getCollectionPopulatedList(
   });
 
   return populate;
+}
+
+export function generateCollectionFilters(
+  params: ParamsType & {
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+  } = {},
+  config?: CollectionConfigType
+) {
+  const filters: {
+    [key: string]: any;
+  } = {};
+
+  Object.keys(params).forEach((key) => {
+    if (
+      key !== 'search' &&
+      key !== 'current' &&
+      key !== 'pageSize' &&
+      params[key]
+    ) {
+      const fieldOptions = config?.attributes?.[key] || { type: 'string' };
+      // console.log({ fieldOptions });
+      switch (fieldOptions.type) {
+        case 'relation':
+          if (fieldOptions.relation === 'manyToOne') {
+            filters[key] = {
+              id: params[key],
+            };
+          }
+          break;
+        case 'enumeration':
+          filters[key] = {
+            $eq: params[key],
+          };
+          break;
+        default:
+          filters[key] = {
+            $contains: params[key],
+          };
+          break;
+      }
+    }
+  });
+
+  return filters;
 }

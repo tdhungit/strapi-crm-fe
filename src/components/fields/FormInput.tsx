@@ -1,6 +1,7 @@
 import { DatePicker, Form, Input, InputNumber, type FormInstance } from 'antd';
 import dayjs from 'dayjs';
 import { camelToTitle } from '../../helpers/views_helper';
+import type { FieldLayoutConfigType } from '../../services/MetadataService';
 import AddressInput from './address/AddressInput';
 import AssignUserInput from './assign-user/AssignUserInput';
 import EnumerationInput from './enumeration/EnumerationInput';
@@ -11,10 +12,12 @@ export default function FormInput({
   item,
   form,
   data,
+  noLabel,
 }: {
-  item: any;
+  item: FieldLayoutConfigType;
   form: FormInstance;
   data: any;
+  noLabel?: boolean;
 }) {
   const label = item.label || item.name;
   const placeholder = item.placeholder || `Enter ${item.label || item.name}`;
@@ -108,6 +111,10 @@ export default function FormInput({
     }
     return value;
   };
+
+  if (noLabel) {
+    return input;
+  }
 
   return (
     <Form.Item

@@ -1,4 +1,8 @@
+import type { ParamsType } from '@ant-design/pro-components';
+import type { SortOrder } from 'antd/es/table/interface';
+import { generateCollectionFilters } from '../helpers/views_helper';
 import ApiService from './ApiService';
+import type { CollectionConfigType } from './MetadataService';
 
 interface ListRequestType {
   filters?: any;
@@ -18,9 +22,14 @@ class CollectionService {
 
   async getTableRequest(
     collectionName?: string,
-    params: any = {},
-    sort: any = [],
-    options: ListRequestType = {}
+    params: ParamsType & {
+      pageSize?: number;
+      current?: number;
+      keyword?: string;
+    } = {},
+    sort: Record<string, SortOrder> = {},
+    options: ListRequestType = {},
+    config?: CollectionConfigType
   ) {
     if (!collectionName) {
       return {
@@ -33,20 +42,7 @@ class CollectionService {
 
     // Handle search parameters
     const searchParams: any = { filters: {} };
-
-    // Handle individual field filters
-    Object.keys(params).forEach((key) => {
-      if (
-        key !== 'search' &&
-        key !== 'current' &&
-        key !== 'pageSize' &&
-        params[key]
-      ) {
-        searchParams.filters[key] = {
-          $contains: params[key],
-        };
-      }
-    });
+    searchParams.filters = generateCollectionFilters(params, config);
 
     // add filter from options
     if (options.filters) {

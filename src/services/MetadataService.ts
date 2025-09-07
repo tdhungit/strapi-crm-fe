@@ -18,6 +18,11 @@ export interface MetadataCollectionType {
   };
 }
 
+export interface LayoutEditItemType {
+  name: string;
+  size: number;
+}
+
 export interface CollectionConfigType {
   collectionName: string;
   attributes: {
@@ -29,7 +34,7 @@ export interface CollectionConfigType {
   metadatas: MetadataCollectionType;
   layouts: {
     list: string[];
-    edit: string[][];
+    edit: LayoutEditItemType[][];
   };
   settings: {
     bulkable: boolean;
@@ -62,6 +67,12 @@ export interface FieldLayoutConfigType {
   };
   [key: string]: any;
 }
+
+export interface LayoutEditLineType {
+    name: string;
+    size: number;
+    options: FieldLayoutConfigType;
+  }
 
 class MetadataService {
   private static instance: MetadataService;
