@@ -1,11 +1,19 @@
-import { PageContainer, ProCard } from '@ant-design/pro-components';
+import {
+  PageContainer,
+  ProCard,
+  ProDescriptions,
+} from '@ant-design/pro-components';
 import { Avatar, Flex, Tabs, type TabsProps } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageError from '../../components/PageError';
 import PageLoading from '../../components/PageLoading';
 import RecordPanel from '../../components/panels/RecordPanel';
-import { camelToTitle, getEditLayoutPanels } from '../../helpers/views_helper';
+import {
+  camelToTitle,
+  getEditLayoutColumns,
+  getEditLayoutPanels,
+} from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 import type { CollectionConfigType } from '../../types/layouts';
@@ -14,6 +22,7 @@ export default function CollectionProfile() {
   const { name: module, id } = useParams();
 
   const [config, setConfig] = useState<CollectionConfigType>();
+  const [columns, setColumns] = useState<any>([]);
   const [tabItems, setTabItems] = useState<TabsProps['items']>([]);
   const [mainField, setMainField] = useState<string>('name');
   const [record, setRecord] = useState<any>(); // TODO: typ]
@@ -30,6 +39,8 @@ export default function CollectionProfile() {
           // layout metadata
           MetadataService.getCollectionConfigurations(module).then((cRes) => {
             setConfig(cRes);
+            // columns render
+            setColumns(getEditLayoutColumns(cRes));
             // main field
             setMainField(cRes.settings?.mainField || 'name');
             // get tab items
@@ -87,7 +98,17 @@ export default function CollectionProfile() {
           }
           colSpan='260px'
           headerBordered
-        ></ProCard>
+        >
+          {record?.id && columns.length > 0 && (
+            <ProDescriptions
+              key={`profile-${module}-${id || 0}`}
+              title={null}
+              column={1}
+              columns={columns}
+              dataSource={record}
+            />
+          )}
+        </ProCard>
         <ProCard bodyStyle={{ padding: '0 16px' }}>
           <Tabs
             defaultActiveKey='1'
