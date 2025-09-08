@@ -92,3 +92,12 @@ export interface ListLayoutOptions {
   };
   onClickMainField?: (record: any) => void;
 }
+
+export interface PanelItemType {
+  name: string;
+  label: string;
+  type: string;
+  module: string;
+  parentModule: string;
+  field: any;
+}

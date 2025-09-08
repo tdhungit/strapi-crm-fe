@@ -2,6 +2,7 @@ import {
   EditOutlined,
   EyeOutlined,
   FileExcelOutlined,
+  FundViewOutlined,
   PlusCircleFilled,
 } from '@ant-design/icons';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
@@ -58,6 +59,12 @@ export default function CollectionList() {
                 className='inline-block'
               >
                 <EyeOutlined />
+              </a>
+              <a
+                href={`/collections/${module}/profile/${record.documentId}`}
+                className='inline-block ml-2'
+              >
+                <FundViewOutlined />
               </a>
               <a
                 href={`/collections/${module}/edit/${record.documentId}`}

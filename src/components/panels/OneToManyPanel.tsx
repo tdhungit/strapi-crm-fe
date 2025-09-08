@@ -5,7 +5,11 @@ import {
   PlusCircleOutlined,
   SelectOutlined,
 } from '@ant-design/icons';
-import { ProTable, type ActionType } from '@ant-design/pro-components';
+import {
+  ProTable,
+  type ActionType,
+  type ProColumns,
+} from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
 import { App, Button } from 'antd';
 import { useRef, useState } from 'react';
@@ -37,62 +41,66 @@ export default function OneToManyPanel({
     return MetadataService.getCollectionConfigurations(relateModule);
   });
 
-  const columns = getListLayoutColumns(config);
-  columns.push({
-    title: 'Actions',
-    dataIndex: 'actions',
-    valueType: 'option',
-    render: (_text: any, record: any) => [
-      <a
-        key={`panel-${relateModule}-btn-view`}
-        href={`/collections/${relateModule}/detail/${record.id}`}
-      >
-        <EyeFilled />
-      </a>,
-      <a
-        key={`panel-${relateModule}-btn-edit`}
-        href={`/collections/${relateModule}/edit/${record.id}`}
-      >
-        <EditFilled />
-      </a>,
-      <a
-        key={`panel-${relateModule}-btn-delete`}
-        onClick={() => {
-          modal.confirm({
-            title: 'Confirm Delete',
-            content:
-              'Are you sure you want to delete this record? This action cannot be undone.',
-            okText: 'Delete',
-            okType: 'danger',
-            cancelText: 'Cancel',
-            onOk: async () => {
-              message.loading('Saving...', 0);
-              try {
-                await CollectionService.removeRelationRecord(
-                  relateModule,
-                  field,
-                  record
-                );
-                message.destroy();
-                ref?.current?.reload();
-                notification.success({
-                  message: 'Deleted successfully',
-                });
-              } catch (error: any) {
-                message.destroy();
-                notification.error({
-                  message:
-                    error?.response?.data?.error?.message || 'Failed to delete',
-                });
-              }
-            },
-          });
-        }}
-      >
-        <DeleteFilled />
-      </a>,
-    ],
-  });
+  let columns: ProColumns<any>[] = [];
+  if (config) {
+    columns = getListLayoutColumns(config);
+    columns.push({
+      title: 'Actions',
+      dataIndex: 'actions',
+      valueType: 'option',
+      render: (_text: any, record: any) => [
+        <a
+          key={`panel-${relateModule}-btn-view`}
+          href={`/collections/${relateModule}/detail/${record.id}`}
+        >
+          <EyeFilled />
+        </a>,
+        <a
+          key={`panel-${relateModule}-btn-edit`}
+          href={`/collections/${relateModule}/edit/${record.id}`}
+        >
+          <EditFilled />
+        </a>,
+        <a
+          key={`panel-${relateModule}-btn-delete`}
+          onClick={() => {
+            modal.confirm({
+              title: 'Confirm Delete',
+              content:
+                'Are you sure you want to delete this record? This action cannot be undone.',
+              okText: 'Delete',
+              okType: 'danger',
+              cancelText: 'Cancel',
+              onOk: async () => {
+                message.loading('Saving...', 0);
+                try {
+                  await CollectionService.removeRelationRecord(
+                    relateModule,
+                    field,
+                    record
+                  );
+                  message.destroy();
+                  ref?.current?.reload();
+                  notification.success({
+                    message: 'Deleted successfully',
+                  });
+                } catch (error: any) {
+                  message.destroy();
+                  notification.error({
+                    message:
+                      error?.response?.data?.error?.message ||
+                      'Failed to delete',
+                  });
+                }
+              },
+            });
+          }}
+        >
+          <DeleteFilled />
+        </a>,
+      ],
+    });
+  }
 
   const onSelectedRecord = async (selectedRecord: any) => {
     message.loading('Saving...', 0);
@@ -123,7 +131,8 @@ export default function OneToManyPanel({
   return (
     <>
       <div className='w-full'>
-        {config?.layouts?.list &&
+        {columns &&
+          config?.layouts?.list &&
           relateModule &&
           field?.mappedBy &&
           record?.id && (
@@ -133,6 +142,8 @@ export default function OneToManyPanel({
               columns={columns}
               search={{
                 searchText: 'Search',
+                labelWidth: 'auto',
+                span: 12,
               }}
               request={async (params, sort) => {
                 return await CollectionService.getTableRequest(

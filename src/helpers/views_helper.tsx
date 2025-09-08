@@ -13,6 +13,7 @@ import type {
   CollectionConfigType,
   LayoutEditLineType,
   ListLayoutOptions,
+  PanelItemType,
 } from '../types/layouts';
 
 export function updateListLayoutFieldRender(
@@ -251,8 +252,10 @@ export function renderEditLayoutRows(
   ));
 }
 
-export function getEditLayoutPanels(config: CollectionConfigType) {
-  const panels: any[] = [];
+export function getEditLayoutPanels(
+  config: CollectionConfigType
+): PanelItemType[] {
+  const panels: PanelItemType[] = [];
   config.layouts.edit.forEach((line: any[]) => {
     line.forEach((item: any) => {
       const fieldOptions = MetadataService.getCollectionFieldLayoutConfig(
@@ -276,7 +279,7 @@ export function getEditLayoutPanels(config: CollectionConfigType) {
           name: item.name,
           label: fieldOptions.label || item.name,
           type: fieldOptions.relation,
-          module,
+          module: module || '',
           parentModule: config.collectionName,
           field: config.attributes?.[item.name] || {},
         });

@@ -13,20 +13,21 @@ import {
 } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
+import type { CollectionConfigType } from '../../types/layouts';
 
 export default function CollectionDetail() {
   const { name: module, id } = useParams();
 
   const [title, setTitle] = useState<string>('');
   const [record, setRecord] = useState<any>({});
-  const [config, setConfig] = useState<any>({});
+  const [config, setConfig] = useState<CollectionConfigType>();
   const [columns, setColumns] = useState<any>([]);
   const [panels, setPanels] = useState<any>([]);
   const [errorPage, setErrorPage] = useState<any>(false);
 
   useEffect(() => {
     if (module) {
-      MetadataService.getCollectionConfigurations(module).then((res: any) => {
+      MetadataService.getCollectionConfigurations(module).then((res) => {
         setConfig(res);
         // Get Panels
         const pns: any = getEditLayoutPanels(res);
