@@ -5,8 +5,8 @@ import {
   FundViewOutlined,
   PlusCircleFilled,
 } from '@ant-design/icons';
-import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Button, message } from 'antd';
+import { PageContainer, ProCard, ProTable } from '@ant-design/pro-components';
+import { Button, message, Splitter } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
@@ -139,56 +139,69 @@ export default function CollectionList() {
         },
       }}
     >
-      <ProTable
-        key={`${module}-list`}
-        columns={columns}
-        rowKey='documentId'
-        actionRef={ref}
-        search={{
-          searchText: 'Search',
-          labelWidth: 'auto',
-          span: 12,
-        }}
-        request={async (params, sort) => {
-          setParams(params);
-          return await CollectionService.getTableRequest(
-            module,
-            params,
-            sort,
-            {
-              populate: getCollectionPopulatedList(config),
-            },
-            config
-          );
-        }}
-        pagination={CollectionService.getTablePagination(config)}
-        toolBarRender={() => [
-          <Button
-            key='create'
-            variant='solid'
-            color='primary'
-            href={`/collections/${module}/create`}
-          >
-            <PlusCircleFilled /> Create
-          </Button>,
-          <Button
-            key='import'
-            variant='solid'
-            color='orange'
-            href={`/imports/${module}?returnUrl=/collections/${module}`}
-          >
-            <FileExcelOutlined /> Import
-          </Button>,
-          <Button
-            key='export'
-            variant='solid'
-            color='volcano'
-            onClick={handleExport}
-          >
-            <FileExcelOutlined /> Export
-          </Button>,
-        ]}
-      />
+      <Splitter>
+        <Splitter.Panel resizable={false}>
+          <ProTable
+            key={`${module}-list`}
+            columns={columns}
+            rowKey='documentId'
+            actionRef={ref}
+            search={{
+              searchText: 'Search',
+              labelWidth: 'auto',
+              span: 12,
+            }}
+            request={async (params, sort) => {
+              setParams(params);
+              return await CollectionService.getTableRequest(
+                module,
+                params,
+                sort,
+                {
+                  populate: getCollectionPopulatedList(config),
+                },
+                config
+              );
+            }}
+            pagination={CollectionService.getTablePagination(config)}
+            toolBarRender={() => [
+              <Button
+                key='create'
+                variant='solid'
+                color='primary'
+                href={`/collections/${module}/create`}
+              >
+                <PlusCircleFilled /> Create
+              </Button>,
+              <Button
+                key='import'
+                variant='solid'
+                color='orange'
+                href={`/imports/${module}?returnUrl=/collections/${module}`}
+              >
+                <FileExcelOutlined /> Import
+              </Button>,
+              <Button
+                key='export'
+                variant='solid'
+                color='volcano'
+                onClick={handleExport}
+              >
+                <FileExcelOutlined /> Export
+              </Button>,
+            ]}
+          />
+        </Splitter.Panel>
+        <Splitter.Panel
+          collapsible
+          resizable={false}
+          defaultSize='20%'
+          min='0%'
+          max='20%'
+        >
+          <ProCard>Widget Here @TODO</ProCard>
+        </Splitter.Panel>
+      </Splitter>
 
       {module && selectRecordId && (
         <CollectionDetailDrawer

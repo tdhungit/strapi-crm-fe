@@ -18,7 +18,7 @@ export default function ChangePasswordModal({
     if (!open) {
       form.resetFields();
     }
-  }, [open, form]);
+  }, [open]);
 
   return (
     <ModalForm
