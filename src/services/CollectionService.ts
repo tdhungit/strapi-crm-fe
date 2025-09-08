@@ -58,7 +58,7 @@ class CollectionService {
       }
     }
 
-    if (options?.populate) {
+    if (options?.populate && options.populate.length > 0) {
       searchParams.populate = options.populate;
     }
 
