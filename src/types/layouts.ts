@@ -35,6 +35,7 @@ export interface CollectionConfigSettingsType {
 }
 
 export interface CollectionConfigType {
+  uid: string;
   collectionName: string;
   attributes: {
     [field: string]: {

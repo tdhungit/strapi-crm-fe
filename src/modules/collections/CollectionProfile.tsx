@@ -17,6 +17,7 @@ import {
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 import type { CollectionConfigType } from '../../types/layouts';
+import CollectionRecordLog from './components/CollectionRecordLog';
 
 export default function CollectionProfile() {
   const { name: module, id } = useParams();
@@ -45,15 +46,28 @@ export default function CollectionProfile() {
             setMainField(cRes.settings?.mainField || 'name');
             // get tab items
             const panels = getEditLayoutPanels(cRes);
+            const newTabItems: TabsProps['items'] = [];
+            if (cRes.uid && res?.data?.id) {
+              newTabItems.push({
+                key: 'logs',
+                label: 'Logs',
+                children: (
+                  <CollectionRecordLog
+                    collection={cRes.uid}
+                    id={res?.data?.id}
+                  />
+                ),
+              });
+            }
+            // add panels to tab
             panels.forEach((panel) => {
-              const newTabItems: TabsProps['items'] = [];
               newTabItems.push({
                 key: panel.name,
                 label: camelToTitle(panel.label),
                 children: <RecordPanel panel={panel} record={res?.data} />,
               });
-              setTabItems(newTabItems);
             });
+            setTabItems(newTabItems);
           });
         });
     }
