@@ -30,6 +30,26 @@ export default function CollectionList() {
   const [params, setParams] = useState<any>({});
   const [selectRecordId, setSelectRecordId] = useState<string>('');
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    // Load collapsed state from localStorage, default to false (expanded)
+    const saved = localStorage.getItem(`collection-${module}-panel-collapsed`);
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  // Save collapsed state to localStorage whenever it changes
+  const handleCollapse = (collapsed: boolean) => {
+    setIsCollapsed(collapsed);
+    localStorage.setItem(
+      `collection-${module}-panel-collapsed`,
+      JSON.stringify(collapsed)
+    );
+  };
+
+  // Update localStorage key when module changes
+  useEffect(() => {
+    const saved = localStorage.getItem(`collection-${module}-panel-collapsed`);
+    setIsCollapsed(saved ? JSON.parse(saved) : false);
+  }, [module]);
 
   useEffect(() => {
     if (selectRecordId) {
@@ -139,7 +159,14 @@ export default function CollectionList() {
         },
       }}
     >
-      <Splitter>
+      <Splitter
+        onResizeEnd={(sizes) => {
+          // When panel is collapsed, its size will be 0
+          const sidebarSize = sizes[1] || 0;
+          const collapsed = sidebarSize === 0;
+          handleCollapse(collapsed);
+        }}
+      >
         <Splitter.Panel resizable={false}>
           <ProTable
             key={`${module}-list`}
@@ -195,7 +222,7 @@ export default function CollectionList() {
         <Splitter.Panel
           collapsible
           resizable={false}
-          defaultSize='20%'
+          defaultSize={isCollapsed ? '0%' : '20%'}
           min='0%'
           max='20%'
         >
