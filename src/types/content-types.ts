@@ -38,6 +38,7 @@ export interface ContentTypeType {
   description: string;
   attributes: ContentTypeAttributeType;
   settings: CollectionConfigSettingsType;
+  isCRM?: boolean;
 }
 
 export interface ContentTypeFiltersType {

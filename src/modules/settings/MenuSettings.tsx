@@ -1,8 +1,9 @@
-import { EditOutlined } from '@ant-design/icons';
+import { EditOutlined, HolderOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import {
   closestCenter,
   DndContext,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
   useDroppable,
@@ -17,33 +18,46 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Button, Col, List, Row, Spin } from 'antd';
+import { Button, Col, List, Row, Spin, Typography } from 'antd';
+import { Card } from 'antd/lib';
 import { useEffect, useState } from 'react';
 import { defaultMenus } from '../../config/menus';
 import MenuService from '../../services/MenuService';
 import MenuModalForm from './components/MenuModalForm';
 
+const { Text } = Typography;
+
 function SortableItem({
   menu,
   listType,
   onEdit,
+  isDragging = false,
 }: {
   menu: any;
   listType: 'available' | 'hidden';
   onEdit: (menu: any) => void;
+  isDragging?: boolean;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: menu.key,
-      data: {
-        type: listType,
-        menu,
-      },
-    });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging: isSortableDragging,
+  } = useSortable({
+    id: menu.key,
+    data: {
+      type: listType,
+      menu,
+    },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: transition || 'transform 200ms ease',
+    opacity: isSortableDragging ? 0.5 : 1,
+    zIndex: isSortableDragging ? 1000 : 'auto',
   };
 
   const handleEditClick = (e: React.MouseEvent) => {
@@ -53,21 +67,56 @@ function SortableItem({
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
-      <List.Item>
-        <div {...listeners} style={{ flex: 1, cursor: 'grab' }}>
-          <List.Item.Meta
-            title={<strong>{menu.label}</strong>}
-            description={menu.key}
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className={`
+        ${isSortableDragging ? 'shadow-lg' : ''}
+        ${isDragging ? 'opacity-50' : ''}
+      `}
+    >
+      <List.Item
+        className={`
+          transition-all duration-200 ease-in-out
+          hover:bg-gray-50 
+          ${isSortableDragging ? 'bg-blue-50 border-blue-300 shadow-md' : ''}
+          border border-gray-200 rounded-md mb-2 px-3 py-2
+        `}
+        style={{
+          cursor: isSortableDragging ? 'grabbing' : 'default',
+        }}
+      >
+        <div className='flex items-center w-full'>
+          <div
+            {...listeners}
+            className='flex items-center mr-3 p-1 rounded hover:bg-gray-100 cursor-grab active:cursor-grabbing'
+            style={{ cursor: isSortableDragging ? 'grabbing' : 'grab' }}
+          >
+            <HolderOutlined className='text-gray-400' />
+          </div>
+          <div className='flex-1'>
+            <List.Item.Meta
+              title={
+                <Text strong className='text-gray-800'>
+                  {menu.label}
+                </Text>
+              }
+              description={
+                <Text type='secondary' className='text-xs'>
+                  {menu.key}
+                </Text>
+              }
+            />
+          </div>
+          <Button
+            type='text'
+            icon={<EditOutlined />}
+            onClick={handleEditClick}
+            className='ml-2 hover:bg-blue-50 hover:text-blue-600'
+            size='small'
           />
         </div>
-        <Button
-          type='link'
-          onClick={handleEditClick}
-          style={{ cursor: 'pointer' }}
-        >
-          <EditOutlined />
-        </Button>
       </List.Item>
     </div>
   );
@@ -90,9 +139,14 @@ function DropZone({
   return (
     <div
       ref={setNodeRef}
-      className={`min-h-[200px] ${
-        isOver ? 'bg-blue-50 border-2 border-blue-300' : ''
-      }`}
+      className={`
+        min-h-[300px] p-4 rounded-lg transition-all duration-300 ease-in-out
+        ${
+          isOver
+            ? 'bg-blue-50 border-2 border-dashed border-blue-400 shadow-inner'
+            : 'bg-gray-50 border-2 border-dashed border-gray-200'
+        }
+      `}
     >
       {children}
     </div>
@@ -104,6 +158,7 @@ export default function MenuSettings() {
   const [hiddenItems, setHiddenItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [shouldSave, setShouldSave] = useState(false);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
@@ -134,11 +189,23 @@ export default function MenuSettings() {
   }, [items, shouldSave]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const handleDragStart = (event: any) => {
+    setActiveId(event.active.id);
+  };
+
+  const handleDragCancel = () => {
+    setActiveId(null);
+  };
 
   const handleEditMenu = (menu: any) => {
     setEditingItem(menu);
@@ -193,6 +260,7 @@ export default function MenuSettings() {
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
+    setActiveId(null);
 
     if (!over) return;
 
@@ -362,64 +430,117 @@ export default function MenuSettings() {
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
       >
-        <Row gutter={16} className='mt-4'>
+        <Row gutter={24} className='mt-6'>
           <Col span={12}>
-            <DropZone listType='available'>
-              <SortableContext
-                items={items?.map((item) => item.key) || []}
-                strategy={verticalListSortingStrategy}
-              >
-                <List
-                  dataSource={items || []}
-                  renderItem={(menu) => (
-                    <SortableItem
-                      menu={menu}
-                      listType='available'
-                      onEdit={handleEditMenu}
-                    />
-                  )}
-                  locale={{ emptyText: 'No available menu items.' }}
-                  bordered
-                  size='small'
-                  header={
-                    <div className='text-sm font-bold'>
-                      Available Menu Items
+            <Card
+              title={
+                <div className='flex items-center'>
+                  <div className='w-3 h-3 bg-green-500 rounded-full mr-2'></div>
+                  <Text strong>Available Menu Items</Text>
+                  <Text type='secondary' className='ml-2'>
+                    ({items.length})
+                  </Text>
+                </div>
+              }
+              className='shadow-sm'
+              bodyStyle={{ padding: '12px' }}
+            >
+              <DropZone listType='available'>
+                <SortableContext
+                  items={items?.map((item) => item.key) || []}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {items.length === 0 ? (
+                    <div className='text-center py-8 text-gray-400'>
+                      <Text type='secondary'>No available menu items</Text>
+                      <br />
+                      <Text type='secondary' className='text-xs'>
+                        Drag items from hidden list to make them available
+                      </Text>
                     </div>
-                  }
-                  className='bg-white'
-                />
-              </SortableContext>
-            </DropZone>
+                  ) : (
+                    <div className='space-y-1'>
+                      {items.map((menu) => (
+                        <SortableItem
+                          key={menu.key}
+                          menu={menu}
+                          listType='available'
+                          onEdit={handleEditMenu}
+                          isDragging={activeId === menu.key}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </SortableContext>
+              </DropZone>
+            </Card>
           </Col>
           <Col span={12}>
-            <DropZone listType='hidden'>
-              <SortableContext
-                items={hiddenItems?.map((item) => item.key) || []}
-                strategy={verticalListSortingStrategy}
-              >
-                <List
-                  dataSource={hiddenItems || []}
-                  renderItem={(menu) => (
-                    <SortableItem
-                      menu={menu}
-                      listType='hidden'
-                      onEdit={handleEditMenu}
-                    />
+            <Card
+              title={
+                <div className='flex items-center'>
+                  <div className='w-3 h-3 bg-gray-400 rounded-full mr-2'></div>
+                  <Text strong>Hidden Menu Items</Text>
+                  <Text type='secondary' className='ml-2'>
+                    ({hiddenItems.length})
+                  </Text>
+                </div>
+              }
+              className='shadow-sm'
+              bodyStyle={{ padding: '12px' }}
+            >
+              <DropZone listType='hidden'>
+                <SortableContext
+                  items={hiddenItems?.map((item) => item.key) || []}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {hiddenItems.length === 0 ? (
+                    <div className='text-center py-8 text-gray-400'>
+                      <Text type='secondary'>No hidden menu items</Text>
+                      <br />
+                      <Text type='secondary' className='text-xs'>
+                        Drag items from available list to hide them
+                      </Text>
+                    </div>
+                  ) : (
+                    <div className='space-y-1'>
+                      {hiddenItems.map((menu) => (
+                        <SortableItem
+                          key={menu.key}
+                          menu={menu}
+                          listType='hidden'
+                          onEdit={handleEditMenu}
+                          isDragging={activeId === menu.key}
+                        />
+                      ))}
+                    </div>
                   )}
-                  locale={{ emptyText: 'No hidden menu items.' }}
-                  bordered
-                  size='small'
-                  header={
-                    <div className='text-sm font-bold'>Hidden Menu Items</div>
-                  }
-                  className='bg-white'
-                />
-              </SortableContext>
-            </DropZone>
+                </SortableContext>
+              </DropZone>
+            </Card>
           </Col>
         </Row>
+
+        <DragOverlay>
+          {activeId ? (
+            <div className='transform rotate-3 shadow-2xl'>
+              <SortableItem
+                menu={
+                  [...items, ...hiddenItems].find(
+                    (item) => item.key === activeId
+                  ) || {}
+                }
+                listType='available'
+                onEdit={() => {}}
+                isDragging={true}
+              />
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
 
       <MenuModalForm
