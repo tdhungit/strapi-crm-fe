@@ -1,14 +1,10 @@
-const collectionModules = import.meta.glob(
-  '../../../collection/widgets/components/*.tsx',
-  { eager: true }
-);
+const collectionModules = import.meta.glob('./components/*.tsx', {
+  eager: true,
+});
 
-const rawModules = import.meta.glob(
-  '../../../modules/*/widgets/components/*.tsx',
-  {
-    eager: true,
-  }
-);
+const rawModules = import.meta.glob('../../*/widgets/components/*.tsx', {
+  eager: true,
+});
 
 const widgets: Record<string, Record<string, React.FC>> = {};
 const defaults: Record<string, React.FC> = {};
