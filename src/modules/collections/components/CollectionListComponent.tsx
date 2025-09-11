@@ -7,7 +7,11 @@ import {
   PlusCircleFilled,
   ProfileFilled,
 } from '@ant-design/icons';
-import { PageContainer, ProTable } from '@ant-design/pro-components';
+import {
+  PageContainer,
+  ProTable,
+  type PageHeaderProps,
+} from '@ant-design/pro-components';
 import { Button, message } from 'antd';
 import { Flex } from 'antd/lib';
 import { useEffect, useRef, useState } from 'react';
@@ -25,11 +29,36 @@ import CollectionWidgets from './CollectionWidgets';
 
 export default function CollectionListComponent({
   module,
+  header,
+  extra,
 }: {
   module: string;
+  header?:
+    | Partial<PageHeaderProps> & {
+        children?: React.ReactNode;
+      };
   [key: string]: any;
+  extra: React.ReactNode[];
 }) {
   const ref = useRef<any>(null);
+
+  const defaultHeader: Partial<PageHeaderProps> & {
+    children?: React.ReactNode;
+  } = {
+    title: `${module?.toUpperCase()}`,
+    breadcrumb: {
+      items: [
+        {
+          title: 'Home',
+          href: '/home',
+        },
+        {
+          title: capitalizeFirstLetter(module || ''),
+          href: `/collections/${module}`,
+        },
+      ],
+    },
+  };
 
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
@@ -155,22 +184,9 @@ export default function CollectionListComponent({
 
   return (
     <PageContainer
-      header={{
-        title: `${module?.toUpperCase()}`,
-        breadcrumb: {
-          items: [
-            {
-              title: 'Home',
-              href: '/home',
-            },
-            {
-              title: capitalizeFirstLetter(module || ''),
-              href: `/collections/${module}`,
-            },
-          ],
-        },
-      }}
+      header={header || defaultHeader}
       extra={[
+        ...(extra?.length > 0 ? extra : []),
         <Button
           key='toggle-widgets'
           type='default'
