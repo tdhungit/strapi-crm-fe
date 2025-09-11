@@ -3,10 +3,13 @@ import {
   EyeOutlined,
   FileExcelOutlined,
   FundViewOutlined,
+  PieChartFilled,
   PlusCircleFilled,
+  ProfileFilled,
 } from '@ant-design/icons';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Button, message, Splitter } from 'antd';
+import { Button, message } from 'antd';
+import { Flex } from 'antd/lib';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageLoading from '../../components/PageLoading';
@@ -44,6 +47,12 @@ export default function CollectionList() {
       `collection-${module}-panel-collapsed`,
       JSON.stringify(collapsed)
     );
+  };
+
+  // Toggle the widget panel
+  const toggleWidgetPanel = () => {
+    const newCollapsed = !isCollapsed;
+    handleCollapse(newCollapsed);
   };
 
   // Update localStorage key when module changes
@@ -159,16 +168,19 @@ export default function CollectionList() {
           ],
         },
       }}
+      extra={[
+        <Button
+          key='toggle-widgets'
+          type='default'
+          onClick={toggleWidgetPanel}
+          title={isCollapsed ? 'Show Widgets' : 'Hide Widgets'}
+        >
+          {isCollapsed ? <ProfileFilled /> : <PieChartFilled />}
+        </Button>,
+      ]}
     >
-      <Splitter
-        onResizeEnd={(sizes) => {
-          // When panel is collapsed, its size will be 0
-          const sidebarSize = sizes[1] || 0;
-          const collapsed = sidebarSize === 0;
-          handleCollapse(collapsed);
-        }}
-      >
-        <Splitter.Panel resizable={false}>
+      <Flex gap={0}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <ProTable
             key={`${module}-list`}
             columns={columns}
@@ -219,17 +231,19 @@ export default function CollectionList() {
               </Button>,
             ]}
           />
-        </Splitter.Panel>
-        <Splitter.Panel
-          collapsible
-          resizable={false}
-          defaultSize={isCollapsed ? '0%' : '20%'}
-          min='0%'
-          max='20%'
-        >
-          {module && <CollectionWidgets module={module} />}
-        </Splitter.Panel>
-      </Splitter>
+        </div>
+
+        {!isCollapsed && (
+          <div
+            className='w-[300px]'
+            style={{
+              transition: 'all 0.3s ease',
+            }}
+          >
+            {module && <CollectionWidgets module={module} />}
+          </div>
+        )}
+      </Flex>
 
       {module && selectRecordId && (
         <CollectionDetailDrawer

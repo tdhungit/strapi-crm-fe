@@ -37,7 +37,10 @@ for (const path in rawModules) {
 export const defaultWidgets = defaults;
 export const moduleWidgets = widgets;
 
-export function getWidget(moduleName: string, widgetName: string): React.FC {
+export function getWidget(
+  moduleName: string,
+  widgetName: string
+): React.FC<any> {
   return widgets[moduleName]?.[widgetName] || defaults[widgetName] || <></>;
 }
 

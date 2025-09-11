@@ -54,7 +54,7 @@ export default function CollectionWidgets({ module }: { module: string }) {
   }
 
   return (
-    <div className='p-4 space-y-4'>
+    <div className='pl-2'>
       {widgets.map((widgetName) => {
         const WidgetComponent = getWidget(module, widgetName);
 
@@ -70,7 +70,7 @@ export default function CollectionWidgets({ module }: { module: string }) {
 
         return (
           <div key={widgetName} className='widget-container'>
-            <WidgetComponent />
+            <WidgetComponent module={module} />
           </div>
         );
       })}
