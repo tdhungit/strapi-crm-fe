@@ -21,7 +21,7 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
           break;
         case 'enumeration':
           setDisplayValue(
-            <EnumerationView type={item.options} value={value} />
+            <EnumerationView type={item.options || item} value={value} />
           );
           break;
         case 'component':

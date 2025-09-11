@@ -28,11 +28,22 @@ class CollectionService {
     sort: Record<string, SortOrder> = {},
     options: ListRequestType = {},
     config?: CollectionConfigType
-  ) {
+  ): Promise<{
+    data: any[];
+    meta: {
+      pagination: {
+        total: number;
+        pageSize?: number;
+        page?: number;
+        pageCount?: number;
+      };
+      [key: string]: any;
+    };
+  }> {
     if (!collectionName) {
       return {
         data: [],
-        total: 0,
+        meta: { pagination: { total: 0 } },
       };
     }
 
@@ -62,11 +73,20 @@ class CollectionService {
       searchParams.populate = options.populate;
     }
 
-    return await ApiService.getClient()
+    if (params?.pageSize) {
+      searchParams.pagination = {
+        page: params.current,
+        pageSize: params.pageSize,
+      };
+    }
+
+    const res: any = await ApiService.getClient()
       .collection(collectionName)
       .find({
         ...searchParams,
       });
+
+    return res;
   }
 
   getTablePagination(config: any, options: any = {}) {

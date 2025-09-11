@@ -193,7 +193,7 @@ export default function CollectionList() {
             }}
             request={async (params, sort) => {
               setParams(params);
-              return await CollectionService.getTableRequest(
+              const res = await CollectionService.getTableRequest(
                 module,
                 params,
                 sort,
@@ -202,6 +202,11 @@ export default function CollectionList() {
                 },
                 config
               );
+              return {
+                data: res.data,
+                success: true,
+                total: res.meta.pagination.total,
+              };
             }}
             pagination={CollectionService.getTablePagination(config)}
             toolBarRender={() => [
