@@ -8,5 +8,5 @@ export default function EnumerationView(props: Props) {
   const options = type?.enum || [];
   const value = props.value;
   const label = options.find((option: any) => option === value);
-  return <>{label}</>;
+  return <>{label || props.value}</>;
 }
