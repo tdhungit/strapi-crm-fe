@@ -256,7 +256,7 @@ export default function ModuleWidgetSettings() {
               size='large'
             >
               {crmContentTypes.map((contentType) => (
-                <Option key={contentType.uid} value={contentType.singularName}>
+                <Option key={contentType.uid} value={contentType.pluralName}>
                   {contentType.displayName}
                 </Option>
               ))}

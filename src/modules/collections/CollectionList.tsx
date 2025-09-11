@@ -5,7 +5,7 @@ import {
   FundViewOutlined,
   PlusCircleFilled,
 } from '@ant-design/icons';
-import { PageContainer, ProCard, ProTable } from '@ant-design/pro-components';
+import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { Button, message, Splitter } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -19,6 +19,7 @@ import ApiService from '../../services/ApiService';
 import CollectionService from '../../services/CollectionService';
 import MetadataService from '../../services/MetadataService';
 import CollectionDetailDrawer from './components/CollectionDetailDrawer';
+import CollectionWidgets from './components/CollectionWidgets';
 
 export default function CollectionList() {
   // Get the 'name' parameter from the route
@@ -226,7 +227,7 @@ export default function CollectionList() {
           min='0%'
           max='20%'
         >
-          <ProCard>Widget Here @TODO</ProCard>
+          {module && <CollectionWidgets module={module} />}
         </Splitter.Panel>
       </Splitter>
 
