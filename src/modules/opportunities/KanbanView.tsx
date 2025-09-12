@@ -1,4 +1,9 @@
-import { DatabaseFilled, DollarOutlined } from '@ant-design/icons';
+import {
+  DatabaseFilled,
+  DollarOutlined,
+  DownOutlined,
+  RightOutlined,
+} from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import type { DropResult } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
@@ -123,6 +128,8 @@ interface KanbanColumnProps {
   loading: boolean;
   onLoadMore: () => void;
   hasMore: boolean;
+  isCollapsed: boolean;
+  onToggle: () => void;
 }
 
 function KanbanColumn({
@@ -132,6 +139,8 @@ function KanbanColumn({
   loading,
   onLoadMore,
   hasMore,
+  isCollapsed,
+  onToggle,
 }: KanbanColumnProps) {
   // Generate stage-specific colors
   const getStageColor = (stageName: string) => {
@@ -161,113 +170,150 @@ function KanbanColumn({
   return (
     <Card
       size='small'
-      className='max-h-[800px] w-64 flex-shrink-0'
+      className={`max-h-[800px] ${
+        isCollapsed ? 'w-16' : 'w-64'
+      } flex-shrink-0 transition-all duration-300`}
       title={
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center space-x-2'>
-            <div
-              className={`w-2 h-6 rounded-full bg-gradient-to-b ${getStageColor(
-                stage
-              )}`}
-            ></div>
-            <div className='flex items-baseline space-x-2'>
-              <span className='text-sm font-medium text-gray-800'>{stage}</span>
+        isCollapsed ? (
+          <div
+            className='flex flex-col items-center cursor-pointer hover:bg-gray-50 -mx-4 -my-2 px-2 py-2 rounded'
+            onClick={onToggle}
+          >
+            <RightOutlined className='text-xs text-gray-500 mb-1' />
+            <Badge
+              count={count}
+              size='small'
+              style={{
+                backgroundColor: getBadgeColor(stage),
+                fontSize: '9px',
+              }}
+            />
+          </div>
+        ) : (
+          <div
+            className='flex items-center justify-between cursor-pointer hover:bg-gray-50 -mx-4 -my-2 px-4 py-2 rounded'
+            onClick={onToggle}
+          >
+            <div className='flex items-center space-x-2'>
+              <DownOutlined className='text-xs text-gray-500' />
+              <div
+                className={`w-2 h-6 rounded-full bg-gradient-to-b ${getStageColor(
+                  stage
+                )}`}
+              ></div>
+              <div className='flex items-baseline space-x-2'>
+                <span className='text-sm font-medium text-gray-800'>
+                  {stage}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )
       }
-      extra={[
-        <Badge
-          key={`stage-${stage}-count`}
-          count={count}
-          size='small'
-          style={{
-            backgroundColor: getBadgeColor(stage),
-            fontSize: '10px',
-          }}
-        />,
-      ]}
+      extra={
+        !isCollapsed
+          ? [
+              <Badge
+                key={`stage-${stage}-count`}
+                count={count}
+                size='small'
+                style={{
+                  backgroundColor: getBadgeColor(stage),
+                  fontSize: '10px',
+                }}
+              />,
+            ]
+          : undefined
+      }
       styles={{
         body: {
-          padding: '8px',
-          height: '740px',
+          padding: isCollapsed ? '4px' : '8px',
+          height: isCollapsed ? '740px' : '740px',
           display: 'flex',
           flexDirection: 'column',
         },
       }}
     >
-      <div className='flex flex-col h-full'>
-        <Droppable droppableId={stage}>
-          {(provided, snapshot) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className={`space-y-1 flex-1 overflow-y-auto ${
-                snapshot.isDraggingOver ? 'bg-blue-50' : ''
-              }`}
-              style={{ scrollbarWidth: 'thin' }}
-            >
-              {opportunities.map((opportunity, index) => (
-                <Draggable
-                  key={opportunity.documentId}
-                  draggableId={opportunity.documentId}
-                  index={index}
-                >
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <OpportunityCard
-                        opportunity={opportunity}
-                        isDragging={snapshot.isDragging}
-                      />
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
+      {isCollapsed ? (
+        <div className='flex flex-col items-center justify-center h-full'>
+          <div className='text-xs text-gray-500 font-medium transform -rotate-90 whitespace-nowrap'>
+            {stage}
+          </div>
+        </div>
+      ) : (
+        <div className='flex flex-col h-full'>
+          <Droppable droppableId={stage}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className={`space-y-1 flex-1 overflow-y-auto ${
+                  snapshot.isDraggingOver ? 'bg-blue-50' : ''
+                }`}
+                style={{ scrollbarWidth: 'thin' }}
+              >
+                {opportunities.map((opportunity, index) => (
+                  <Draggable
+                    key={opportunity.documentId}
+                    draggableId={opportunity.documentId}
+                    index={index}
+                  >
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <OpportunityCard
+                          opportunity={opportunity}
+                          isDragging={snapshot.isDragging}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
 
-              {loading && (
-                <div className='text-center py-4'>
-                  <Spin size='small' />
-                  <Text type='secondary' className='block mt-2 text-xs'>
-                    Loading...
-                  </Text>
-                </div>
-              )}
+                {loading && (
+                  <div className='text-center py-4'>
+                    <Spin size='small' />
+                    <Text type='secondary' className='block mt-2 text-xs'>
+                      Loading...
+                    </Text>
+                  </div>
+                )}
 
-              {opportunities.length === 0 && !loading && (
-                <div className='text-center py-8'>
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={
-                      <Text type='secondary' className='text-xs'>
-                        No opportunities
-                      </Text>
-                    }
-                  />
-                </div>
-              )}
+                {opportunities.length === 0 && !loading && (
+                  <div className='text-center py-8'>
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description={
+                        <Text type='secondary' className='text-xs'>
+                          No opportunities
+                        </Text>
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </Droppable>
+
+          {hasMore && !loading && (
+            <div className='mt-2 pt-2 border-t border-gray-100'>
+              <Button
+                type='dashed'
+                block
+                onClick={onLoadMore}
+                className='text-xs'
+                size='small'
+              >
+                Load More
+              </Button>
             </div>
           )}
-        </Droppable>
-
-        {hasMore && !loading && (
-          <div className='mt-2 pt-2 border-t border-gray-100'>
-            <Button
-              type='dashed'
-              block
-              onClick={onLoadMore}
-              className='text-xs'
-              size='small'
-            >
-              Load More
-            </Button>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </Card>
   );
 }
@@ -286,6 +332,16 @@ export default function KanbanView() {
   const [pagination, setPagination] = useState<{
     [key: string]: { page: number; hasMore: boolean };
   }>({});
+  const [collapsedColumns, setCollapsedColumns] = useState<{
+    [key: string]: boolean;
+  }>(() => {
+    try {
+      const saved = localStorage.getItem('kanban-collapsed-columns');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
 
   const fetchStatistics = async () => {
     try {
@@ -393,6 +449,27 @@ export default function KanbanView() {
   const handleLoadMore = (stage: string) => {
     const currentPage = pagination[stage]?.page || 1;
     loadOpportunities(stage, currentPage + 1, true);
+  };
+
+  const handleToggleColumn = (stage: string) => {
+    setCollapsedColumns((prev) => {
+      const newState = {
+        ...prev,
+        [stage]: !prev[stage],
+      };
+
+      // Save to localStorage
+      try {
+        localStorage.setItem(
+          'kanban-collapsed-columns',
+          JSON.stringify(newState)
+        );
+      } catch (error) {
+        console.warn('Failed to save collapsed columns state:', error);
+      }
+
+      return newState;
+    });
   };
 
   const handleDragEnd = async (result: DropResult) => {
@@ -537,6 +614,8 @@ export default function KanbanView() {
                 loading={loadingStages[stage] || false}
                 onLoadMore={() => handleLoadMore(stage)}
                 hasMore={pagination[stage]?.hasMore || false}
+                isCollapsed={collapsedColumns[stage] || false}
+                onToggle={() => handleToggleColumn(stage)}
               />
             ))}
           </div>
