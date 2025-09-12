@@ -2,6 +2,7 @@ import {
   DatabaseFilled,
   DollarOutlined,
   DownOutlined,
+  PlusCircleFilled,
   RightOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
@@ -21,6 +22,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RankingView from '../../components/fields/ranking/RankingView';
 import ApiService from '../../services/ApiService';
+import CollectionFormModal from '../collections/components/CollectionFormModal';
 
 const { Text } = Typography;
 
@@ -168,7 +170,7 @@ function KanbanColumn({
       'Needs Analysis': 'from-indigo-500 to-indigo-600',
       'Value Proposition': 'from-yellow-500 to-yellow-600',
       'Identifying Decision Makers': 'from-cyan-500 to-cyan-600',
-      'Perception Analysis': 'from-mint-500 to-mint-600',
+      'Perception Analysis': 'from-violet-500 to-violet-600',
     };
     return stageColors[stageName] || 'from-gray-500 to-gray-600';
   };
@@ -360,6 +362,8 @@ export default function KanbanView() {
       return {};
     }
   });
+
+  const [openCreateModal, setOpenCreateModal] = useState(false);
 
   const fetchStatistics = async () => {
     try {
@@ -609,6 +613,13 @@ export default function KanbanView() {
       }}
       extra={[
         <Button
+          key='create-opportunity-modal'
+          type='primary'
+          onClick={() => setOpenCreateModal(true)}
+        >
+          <PlusCircleFilled />
+        </Button>,
+        <Button
           key='opportunities-list'
           type='default'
           onClick={() => navigate('/collections/opportunities')}
@@ -639,6 +650,16 @@ export default function KanbanView() {
           </div>
         </DragDropContext>
       </div>
+
+      <CollectionFormModal
+        collectionName='opportunities'
+        open={openCreateModal}
+        onOpenChange={setOpenCreateModal}
+        onFinish={() => {
+          fetchStatistics();
+          setOpenCreateModal(false);
+        }}
+      />
     </PageContainer>
   );
 }
