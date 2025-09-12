@@ -1,20 +1,7 @@
 import { DatabaseFilled, DollarOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import {
-  DndContext,
-  type DragEndEvent,
-  DragOverlay,
-  type DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import type { DropResult } from '@hello-pangea/dnd';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { Avatar, Badge, Button, Card, Empty, Spin, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +14,8 @@ interface StageStatistics {
 }
 
 interface Opportunity {
-  id: string;
+  id: number;
+  documentId: string;
   name: string;
   stage: string;
   amount?: number;
@@ -43,21 +31,6 @@ interface OpportunityCardProps {
 }
 
 function OpportunityCard({ opportunity, isDragging }: OpportunityCardProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging: isSortableDragging,
-  } = useSortable({ id: opportunity.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging || isSortableDragging ? 0.8 : 1,
-  };
-
   const accountName = opportunity?.account?.name || 'N/A';
 
   // Generate a color based on the opportunity name for visual variety
@@ -75,73 +48,71 @@ function OpportunityCard({ opportunity, isDragging }: OpportunityCardProps) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card
-        size='small'
-        className={`mb-2 cursor-grab hover:shadow-md transition-all duration-200 border-l-3 ${getCardColor(
-          opportunity.name
-        )} bg-white`}
-        styles={{
-          body: {
-            padding: 8,
-          },
-        }}
-      >
-        <div className='space-y-1.5'>
-          <Text
-            strong
-            className='block text-xs text-gray-800 leading-tight line-clamp-2'
-          >
-            {opportunity.name}
-          </Text>
+    <Card
+      size='small'
+      className={`mb-2 cursor-grab hover:shadow-md transition-all duration-200 border-l-3 ${getCardColor(
+        opportunity.name
+      )} bg-white ${isDragging ? 'opacity-80' : ''}`}
+      styles={{
+        body: {
+          padding: 8,
+        },
+      }}
+    >
+      <div className='space-y-1.5'>
+        <Text
+          strong
+          className='block text-xs text-gray-800 leading-tight line-clamp-2'
+        >
+          {opportunity.name}
+        </Text>
 
-          {accountName && (
-            <div className='flex items-center space-x-1'>
-              <Avatar
-                size={16}
-                className='bg-blue-500'
-                style={{ fontSize: '9px', minWidth: '16px', marginRight: 2 }}
-              >
-                {accountName.charAt(0).toUpperCase()}
-              </Avatar>
-              <Text
-                type='secondary'
-                className='text-xs text-gray-600 truncate flex-1'
-              >
-                {accountName}
-              </Text>
-            </div>
-          )}
+        {accountName && (
+          <div className='flex items-center space-x-1'>
+            <Avatar
+              size={16}
+              className='bg-blue-500'
+              style={{ fontSize: '9px', minWidth: '16px', marginRight: 2 }}
+            >
+              {accountName.charAt(0).toUpperCase()}
+            </Avatar>
+            <Text
+              type='secondary'
+              className='text-xs text-gray-600 truncate flex-1'
+            >
+              {accountName}
+            </Text>
+          </div>
+        )}
 
-          {opportunity.amount && (
-            <div className='flex items-center space-x-1'>
-              <DollarOutlined className='text-green-600 text-xs' />
-              <Text className='text-xs font-medium text-green-700'>
-                ${opportunity.amount.toLocaleString()}
-              </Text>
-            </div>
-          )}
+        {opportunity.amount && (
+          <div className='flex items-center space-x-1'>
+            <DollarOutlined className='text-green-600 text-xs' />
+            <Text className='text-xs font-medium text-green-700'>
+              ${opportunity.amount.toLocaleString()}
+            </Text>
+          </div>
+        )}
 
-          {opportunity.assigned_user?.username && (
-            <div className='flex items-center space-x-1'>
-              <Avatar
-                size={16}
-                className='bg-blue-500'
-                style={{ fontSize: '9px', minWidth: '16px', marginRight: 2 }}
-              >
-                {opportunity.assigned_user.username.charAt(0).toUpperCase()}
-              </Avatar>
-              <Text
-                type='secondary'
-                className='text-xs text-gray-600 truncate flex-1'
-              >
-                {opportunity.assigned_user.username}
-              </Text>
-            </div>
-          )}
-        </div>
-      </Card>
-    </div>
+        {opportunity.assigned_user?.username && (
+          <div className='flex items-center space-x-1'>
+            <Avatar
+              size={16}
+              className='bg-blue-500'
+              style={{ fontSize: '9px', minWidth: '16px', marginRight: 2 }}
+            >
+              {opportunity.assigned_user.username.charAt(0).toUpperCase()}
+            </Avatar>
+            <Text
+              type='secondary'
+              className='text-xs text-gray-600 truncate flex-1'
+            >
+              {opportunity.assigned_user.username}
+            </Text>
+          </div>
+        )}
+      </div>
+    </Card>
   );
 }
 
@@ -226,41 +197,62 @@ function KanbanColumn({
       }}
     >
       <div className='flex flex-col h-full'>
-        <SortableContext
-          items={opportunities.map((op) => op.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div
-            className='space-y-1 flex-1 overflow-y-auto'
-            style={{ scrollbarWidth: 'thin' }}
-          >
-            {opportunities.map((opportunity) => (
-              <OpportunityCard key={opportunity.id} opportunity={opportunity} />
-            ))}
+        <Droppable droppableId={stage}>
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className={`space-y-1 flex-1 overflow-y-auto ${
+                snapshot.isDraggingOver ? 'bg-blue-50' : ''
+              }`}
+              style={{ scrollbarWidth: 'thin' }}
+            >
+              {opportunities.map((opportunity, index) => (
+                <Draggable
+                  key={opportunity.documentId}
+                  draggableId={opportunity.documentId}
+                  index={index}
+                >
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    >
+                      <OpportunityCard
+                        opportunity={opportunity}
+                        isDragging={snapshot.isDragging}
+                      />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
 
-            {loading && (
-              <div className='text-center py-4'>
-                <Spin size='small' />
-                <Text type='secondary' className='block mt-2 text-xs'>
-                  Loading...
-                </Text>
-              </div>
-            )}
+              {loading && (
+                <div className='text-center py-4'>
+                  <Spin size='small' />
+                  <Text type='secondary' className='block mt-2 text-xs'>
+                    Loading...
+                  </Text>
+                </div>
+              )}
 
-            {opportunities.length === 0 && !loading && (
-              <div className='text-center py-8'>
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description={
-                    <Text type='secondary' className='text-xs'>
-                      No opportunities
-                    </Text>
-                  }
-                />
-              </div>
-            )}
-          </div>
-        </SortableContext>
+              {opportunities.length === 0 && !loading && (
+                <div className='text-center py-8'>
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={
+                      <Text type='secondary' className='text-xs'>
+                        No opportunities
+                      </Text>
+                    }
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </Droppable>
 
         {hasMore && !loading && (
           <div className='mt-2 pt-2 border-t border-gray-100'>
@@ -294,15 +286,6 @@ export default function KanbanView() {
   const [pagination, setPagination] = useState<{
     [key: string]: { page: number; hasMore: boolean };
   }>({});
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
 
   const fetchStatistics = async () => {
     try {
@@ -358,6 +341,21 @@ export default function KanbanView() {
     }
   };
 
+  const updateOpportunityStage = async (
+    opportunity: Opportunity,
+    newStage: string
+  ) => {
+    try {
+      await ApiService.getClient()
+        .collection('opportunities')
+        .update(opportunity.documentId, {
+          stage: newStage,
+        });
+    } catch (error) {
+      console.error('Failed to update opportunity stage:', error);
+    }
+  };
+
   const loadOpportunities = async (
     stage: string,
     page: number = 1,
@@ -397,18 +395,76 @@ export default function KanbanView() {
     loadOpportunities(stage, currentPage + 1, true);
   };
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-  };
+  const handleDragEnd = async (result: DropResult) => {
+    const { destination, source, draggableId } = result;
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveId(null);
+    // If dropped outside a droppable area
+    if (!destination) return;
 
-    if (!over) return;
+    // If dropped in the same position
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
 
-    // Handle stage change logic here
-    console.log('Move opportunity', active, 'to stage', over);
+    const sourceStage = source.droppableId;
+    const destinationStage = destination.droppableId;
+
+    // Create a copy of the opportunities state
+    const newOpportunitiesByStage = { ...opportunitiesByStage };
+
+    // Get the dragged opportunity
+    const draggedOpportunity =
+      newOpportunitiesByStage[sourceStage][source.index];
+
+    // Remove from source
+    newOpportunitiesByStage[sourceStage] = newOpportunitiesByStage[
+      sourceStage
+    ].filter((_, index) => index !== source.index);
+
+    // Add to destination
+    if (!newOpportunitiesByStage[destinationStage]) {
+      newOpportunitiesByStage[destinationStage] = [];
+    }
+    newOpportunitiesByStage[destinationStage].splice(destination.index, 0, {
+      ...draggedOpportunity,
+      stage: destinationStage,
+    });
+
+    // Update statistics optimistically
+    const newStatistics = { ...statistics };
+    if (newStatistics[sourceStage]) {
+      newStatistics[sourceStage] = Math.max(0, newStatistics[sourceStage] - 1);
+    }
+    if (newStatistics[destinationStage]) {
+      newStatistics[destinationStage] = newStatistics[destinationStage] + 1;
+    } else {
+      newStatistics[destinationStage] = 1;
+    }
+
+    // Update state optimistically
+    setOpportunitiesByStage(newOpportunitiesByStage);
+    setStatistics(newStatistics);
+
+    // Update opportunity stage via API
+    try {
+      await updateOpportunityStage(draggedOpportunity, destinationStage);
+      console.log(
+        'Successfully moved opportunity',
+        draggableId,
+        'from',
+        sourceStage,
+        'to',
+        destinationStage
+      );
+    } catch (error) {
+      console.error('Failed to update opportunity stage:', error);
+      // Revert the optimistic updates on error
+      setOpportunitiesByStage(opportunitiesByStage);
+      setStatistics(statistics);
+    }
   };
 
   useEffect(() => {
@@ -435,12 +491,6 @@ export default function KanbanView() {
       </div>
     );
   }
-
-  const activeOpportunity = activeId
-    ? Object.values(opportunitiesByStage)
-        .flat()
-        .find((op) => op.id === activeId)
-    : null;
 
   return (
     <PageContainer
@@ -473,11 +523,7 @@ export default function KanbanView() {
       ]}
     >
       <div className='p-0'>
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
+        <DragDropContext onDragEnd={handleDragEnd}>
           <div
             className='flex space-x-3 overflow-x-auto pb-4'
             style={{ scrollbarWidth: 'thin' }}
@@ -494,15 +540,7 @@ export default function KanbanView() {
               />
             ))}
           </div>
-
-          <DragOverlay>
-            {activeOpportunity && (
-              <div className='rotate-3 scale-105'>
-                <OpportunityCard opportunity={activeOpportunity} isDragging />
-              </div>
-            )}
-          </DragOverlay>
-        </DndContext>
+        </DragDropContext>
       </div>
     </PageContainer>
   );
