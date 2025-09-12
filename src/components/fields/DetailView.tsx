@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AddressView from './address/AddressView';
 import EnumerationView from './enumeration/EnumerationView';
+import RankingView from './ranking/RankingView';
 import RelationView from './relation/RelationView';
 import RichTextView from './richtext/RichtextView';
 
@@ -10,20 +11,27 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
   useEffect(() => {
     if (data[item.name]) {
       const value = data[item.name];
-      const type = item.type || 'string';
+      let type = item.type || 'string';
+
+      if (item.customField) {
+        type = item.customField;
+      }
 
       switch (type) {
         case 'relation':
           setDisplayValue(<RelationView item={item} data={data} />);
           break;
+
         case 'richtext':
           setDisplayValue(<RichTextView value={value} />);
           break;
+
         case 'enumeration':
           setDisplayValue(
             <EnumerationView type={item.options || item} value={value} />
           );
           break;
+
         case 'component':
           switch (item.component) {
             case 'common.address':
@@ -33,6 +41,11 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
               break;
           }
           break;
+
+        case 'plugin::crm-fields.ranking':
+          setDisplayValue(<RankingView value={value} />);
+          break;
+
         case 'string':
         default:
           setDisplayValue(value);

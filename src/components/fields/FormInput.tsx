@@ -5,6 +5,7 @@ import type { FieldLayoutConfigType } from '../../types/layouts';
 import AddressInput from './address/AddressInput';
 import AssignUserInput from './assign-user/AssignUserInput';
 import EnumerationInput from './enumeration/EnumerationInput';
+import RankingInput from './ranking/RankingInput';
 import RelationInput from './relation/RelationInput';
 import RichtextInput from './richtext/RichtextInput';
 
@@ -27,7 +28,12 @@ export default function FormInput({
 
   let input = <Input placeholder={placeholder} size='middle' />;
 
-  switch (item.type) {
+  let itemType = item.type || 'string';
+  if (item.customField) {
+    itemType = item.customField;
+  }
+
+  switch (itemType) {
     case 'date':
       input = (
         <DatePicker
@@ -37,15 +43,19 @@ export default function FormInput({
         />
       );
       break;
+
     case 'number':
       input = <InputNumber />;
       break;
+
     case 'enumeration':
       input = <EnumerationInput type={item.options} />;
       break;
+
     case 'richtext':
       input = <RichtextInput value={data[item.name]} />;
       break;
+
     case 'relation':
       if (item.name === 'assigned_user') {
         input = (
@@ -71,6 +81,7 @@ export default function FormInput({
         );
       }
       break;
+
     case 'component':
       switch (item.component) {
         case 'common.address':
@@ -93,6 +104,11 @@ export default function FormInput({
           break;
       }
       break;
+
+    case 'plugin::crm-fields.ranking':
+      input = <RankingInput value={data[item.name]} />;
+      break;
+
     case 'string':
     default:
       break;
