@@ -7,9 +7,19 @@ import {
 import { PageContainer } from '@ant-design/pro-components';
 import type { DropResult } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import { Avatar, Badge, Button, Card, Empty, Spin, Typography } from 'antd';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  Empty,
+  Flex,
+  Spin,
+  Typography,
+} from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import RankingView from '../../components/fields/ranking/RankingView';
 import ApiService from '../../services/ApiService';
 
 const { Text } = Typography;
@@ -99,23 +109,28 @@ function OpportunityCard({ opportunity, isDragging }: OpportunityCardProps) {
           </div>
         )}
 
-        {opportunity.assigned_user?.username && (
-          <div className='flex items-center space-x-1'>
-            <Avatar
-              size={16}
-              className='bg-blue-500'
-              style={{ fontSize: '9px', minWidth: '16px', marginRight: 2 }}
-            >
-              {opportunity.assigned_user.username.charAt(0).toUpperCase()}
-            </Avatar>
-            <Text
-              type='secondary'
-              className='text-xs text-gray-600 truncate flex-1'
-            >
-              {opportunity.assigned_user.username}
-            </Text>
+        <Flex align='flex-end' justify='space-between'>
+          {opportunity.assigned_user?.username && (
+            <div className='flex items-center space-x-1'>
+              <Avatar
+                size={16}
+                className='bg-blue-500'
+                style={{ fontSize: '9px', minWidth: '16px', marginRight: 2 }}
+              >
+                {opportunity.assigned_user.username.charAt(0).toUpperCase()}
+              </Avatar>
+              <Text
+                type='secondary'
+                className='text-xs text-gray-600 truncate flex-1'
+              >
+                {opportunity.assigned_user.username}
+              </Text>
+            </div>
+          )}
+          <div className='text-right'>
+            <RankingView value={opportunity.ranking || 0} fontSize={14} />
           </div>
-        )}
+        </Flex>
       </div>
     </Card>
   );
@@ -151,6 +166,9 @@ function KanbanColumn({
       Negotiation: 'from-red-500 to-red-600',
       'Closed Won': 'from-green-500 to-green-600',
       'Needs Analysis': 'from-indigo-500 to-indigo-600',
+      'Value Proposition': 'from-yellow-500 to-yellow-600',
+      'Identifying Decision Makers': 'from-cyan-500 to-cyan-600',
+      'Perception Analysis': 'from-mint-500 to-mint-600',
     };
     return stageColors[stageName] || 'from-gray-500 to-gray-600';
   };
