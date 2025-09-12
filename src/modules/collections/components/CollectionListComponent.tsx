@@ -38,7 +38,7 @@ export default function CollectionListComponent({
         children?: React.ReactNode;
       };
   [key: string]: any;
-  extra: React.ReactNode[];
+  extra?: React.ReactNode[];
 }) {
   const ref = useRef<any>(null);
 
@@ -186,7 +186,7 @@ export default function CollectionListComponent({
     <PageContainer
       header={header || defaultHeader}
       extra={[
-        ...(extra?.length > 0 ? extra : []),
+        ...(extra || []),
         <Button
           key='toggle-widgets'
           type='default'
