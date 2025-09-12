@@ -183,6 +183,9 @@ function KanbanColumn({
       Negotiation: '#ef4444',
       'Closed Won': '#10b981',
       'Needs Analysis': '#6366f1',
+      'Value Proposition': '#FCB53B',
+      'Identifying Decision Makers': '#5682B1',
+      'Perception Analysis': '#9112BC',
     };
     return badgeColors[stageName] || '#6b7280';
   };
