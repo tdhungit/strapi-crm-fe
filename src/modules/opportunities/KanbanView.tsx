@@ -444,13 +444,13 @@ export default function KanbanView() {
       newStatistics[destinationStage] = 1;
     }
 
-    // Update state optimistically
-    setOpportunitiesByStage(newOpportunitiesByStage);
-    setStatistics(newStatistics);
-
     // Update opportunity stage via API
     try {
       await updateOpportunityStage(draggedOpportunity, destinationStage);
+      // Update state optimistically
+      setOpportunitiesByStage(newOpportunitiesByStage);
+      setStatistics(newStatistics);
+
       console.log(
         'Successfully moved opportunity',
         draggableId,
