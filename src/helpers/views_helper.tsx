@@ -419,3 +419,15 @@ export function generateCollectionSort(
 
   return sortConfig;
 }
+
+export function strapiClientErrorMessage(err: any): string {
+  const errors = err.message.split(':');
+  let message = errors[errors.length - 1].trim();
+
+  if (err.name === 'HTTPForbiddenError') {
+    message =
+      'Permission denied. You do not have permission to perform this action.';
+  }
+
+  return message;
+}

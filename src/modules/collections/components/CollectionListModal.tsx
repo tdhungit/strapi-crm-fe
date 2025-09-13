@@ -1,8 +1,11 @@
 import { CheckOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Modal } from 'antd';
+import { App, Button, Modal } from 'antd';
 import { useEffect, useState } from 'react';
-import { getListLayoutColumns } from '../../../helpers/views_helper';
+import {
+  getListLayoutColumns,
+  strapiClientErrorMessage,
+} from '../../../helpers/views_helper';
 import CollectionService from '../../../services/CollectionService';
 import MetadataService from '../../../services/MetadataService';
 
@@ -23,6 +26,8 @@ export default function CollectionListModal({
   onOpenChange: (open: boolean) => void;
   onFinish?: (values: any, options: any) => void;
 }) {
+  const { message } = App.useApp();
+
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
 
@@ -79,7 +84,26 @@ export default function CollectionListModal({
         }}
         columns={columns}
         request={async (params, sort) => {
-          return await CollectionService.getTableRequest(module, params, sort);
+          try {
+            const res = await CollectionService.getTableRequest(
+              module,
+              params,
+              sort
+            );
+            return {
+              data: res.data,
+              success: true,
+              total: res.meta.pagination.total,
+            };
+          } catch (err: any) {
+            const errorMessage = strapiClientErrorMessage(err);
+            message.error(errorMessage);
+            return {
+              data: [],
+              success: false,
+              total: 0,
+            };
+          }
         }}
         rowKey='documentId'
         pagination={CollectionService.getTablePagination(config)}

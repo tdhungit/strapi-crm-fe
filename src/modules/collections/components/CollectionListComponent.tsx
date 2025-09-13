@@ -12,7 +12,7 @@ import {
   ProTable,
   type PageHeaderProps,
 } from '@ant-design/pro-components';
-import { Button, message } from 'antd';
+import { App, Button } from 'antd';
 import { Flex } from 'antd/lib';
 import { useEffect, useRef, useState } from 'react';
 import PageLoading from '../../../components/PageLoading';
@@ -20,6 +20,7 @@ import {
   capitalizeFirstLetter,
   getCollectionPopulatedList,
   getListLayoutColumns,
+  strapiClientErrorMessage,
 } from '../../../helpers/views_helper';
 import ApiService from '../../../services/ApiService';
 import CollectionService from '../../../services/CollectionService';
@@ -40,6 +41,7 @@ export default function CollectionListComponent({
   [key: string]: any;
   extra?: React.ReactNode[];
 }) {
+  const { message } = App.useApp();
   const ref = useRef<any>(null);
 
   const defaultHeader: Partial<PageHeaderProps> & {
@@ -211,20 +213,30 @@ export default function CollectionListComponent({
             }}
             request={async (params, sort) => {
               setParams(params);
-              const res = await CollectionService.getTableRequest(
-                module,
-                params,
-                sort,
-                {
-                  populate: getCollectionPopulatedList(config),
-                },
-                config
-              );
-              return {
-                data: res.data,
-                success: true,
-                total: res.meta.pagination.total,
-              };
+              try {
+                const res = await CollectionService.getTableRequest(
+                  module,
+                  params,
+                  sort,
+                  {
+                    populate: getCollectionPopulatedList(config),
+                  },
+                  config
+                );
+                return {
+                  data: res.data,
+                  success: true,
+                  total: res.meta.pagination.total,
+                };
+              } catch (err: any) {
+                const messageError = strapiClientErrorMessage(err);
+                message.error(messageError);
+                return {
+                  data: [],
+                  success: false,
+                  total: 0,
+                };
+              }
             }}
             pagination={CollectionService.getTablePagination(config)}
             toolBarRender={() => [
