@@ -29,6 +29,10 @@ export default function DefaultLayout() {
 
   const [isOpenChangePassword, setIsOpenChangePassword] = useState(false);
 
+  const [collapsed, setCollapsed] = useState(false);
+  const [menuItems, setMenuItems] = useState<any[]>([]);
+  const [userRole, setUserRole] = useState<string>('');
+
   const { data: user } = useRequest(() =>
     ApiService.request('get', '/users/me')
   );
@@ -36,11 +40,9 @@ export default function DefaultLayout() {
   useEffect(() => {
     if (user) {
       dispatch(setUserStore(user));
+      setUserRole(user.role?.name || '');
     }
   }, [user, dispatch]);
-
-  const [collapsed, setCollapsed] = useState(false);
-  const [menuItems, setMenuItems] = useState<any[]>([]);
 
   const { data: appSettings } = useRequest(() => {
     return MenuService.getAppSettings();
@@ -57,6 +59,13 @@ export default function DefaultLayout() {
         },
       ];
       appSettings.menus.forEach((item: any) => {
+        if (
+          userRole !== 'Administrator' &&
+          item.uid === 'api::setting.setting'
+        ) {
+          return;
+        }
+
         const IconComponent = iconMap[item.icon] || FileTextOutlined;
         let children: any;
         if (item.children && item.children.length > 0) {
@@ -83,7 +92,7 @@ export default function DefaultLayout() {
       }
       link.href = appSettings.uiConfig.favicon;
     }
-  }, [appSettings]);
+  }, [appSettings, userRole]);
 
   return (
     <Layout style={{ minHeight: '100vh', width: '100%' }}>
@@ -186,18 +195,14 @@ export default function DefaultLayout() {
                     label: 'Profile',
                     onClick: () => navigate('/users/profile'),
                   },
-                  {
-                    key: 'settings',
-                    icon: <SettingOutlined />,
-                    label: 'Settings',
-                    onClick: () => navigate('/settings'),
-                  },
-                  {
-                    key: 'menu-settings',
-                    icon: <SettingOutlined />,
-                    label: 'Menu Settings',
-                    onClick: () => navigate('/settings/menus'),
-                  },
+                  userRole === 'Administrator'
+                    ? {
+                        key: 'settings',
+                        icon: <SettingOutlined />,
+                        label: 'Settings',
+                        onClick: () => navigate('/settings'),
+                      }
+                    : null,
                   {
                     type: 'divider',
                   },
