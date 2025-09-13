@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import MediaManagerModal from '../../MediaManagerModal';
 
 interface MediaFile {
-  id: number;
-  documentId: string;
-  name: string;
-  url: string;
-  mime: string;
-  size: number;
+  id?: number;
+  documentId?: string;
+  name?: string;
+  url?: string;
+  mime?: string;
+  size?: number;
 }
 
 interface Props {
@@ -41,6 +41,17 @@ export default function MediaInput({
 
   // Normalize value to array for consistent handling
   const normalizedValue = Array.isArray(value) ? value : value ? [value] : [];
+
+  const handleSelectMedia = (media: MediaFile) => {
+    if (multiple) {
+      setValue([...normalizedValue, media]);
+      onChange?.([...normalizedValue, media]);
+      return;
+    }
+
+    setValue(media);
+    onChange?.(media);
+  };
 
   return (
     <>
@@ -93,10 +104,7 @@ export default function MediaInput({
       <MediaManagerModal
         open={open}
         onOpenChange={setOpen}
-        onSelect={(media: any) => {
-          setValue(media);
-          onChange?.(media);
-        }}
+        onSelect={handleSelectMedia}
       />
     </>
   );
