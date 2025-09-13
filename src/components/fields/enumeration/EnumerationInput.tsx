@@ -14,8 +14,10 @@ export default function EnumerationInput(props: Props) {
   useEffect(() => {
     if (props.value) {
       setValue(props.value);
+    } else if (props.type.default) {
+      setValue(props.type.default);
     }
-  }, [props.value]);
+  }, [props.value, props.type.default]);
 
   useEffect(() => {
     if (props.type.enum) {

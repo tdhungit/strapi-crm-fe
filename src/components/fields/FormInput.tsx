@@ -5,6 +5,7 @@ import type { FieldLayoutConfigType } from '../../types/layouts';
 import AddressInput from './address/AddressInput';
 import AssignUserInput from './assign-user/AssignUserInput';
 import EnumerationInput from './enumeration/EnumerationInput';
+import MediaInput from './media/MediaInput';
 import RankingInput from './ranking/RankingInput';
 import RelationInput from './relation/RelationInput';
 import RichtextInput from './richtext/RichtextInput';
@@ -25,6 +26,7 @@ export default function FormInput({
   const rules = item.required
     ? [{ required: true, message: `${item.label || item.name} is required` }]
     : [];
+  const extra = <></>;
 
   let input = <Input placeholder={placeholder} size='middle' />;
 
@@ -109,6 +111,13 @@ export default function FormInput({
       input = <RankingInput value={data[item.name]} />;
       break;
 
+    case 'media':
+      input = (
+        <MediaInput value={data[item.name]} options={item.options as any} />
+      );
+      // extra = <Form.Item name='documentId' hidden />;
+      break;
+
     case 'string':
     default:
       break;
@@ -133,14 +142,17 @@ export default function FormInput({
   }
 
   return (
-    <Form.Item
-      name={item.name}
-      label={camelToTitle(label)}
-      rules={rules}
-      getValueProps={getValueProps}
-      normalize={normalize}
-    >
-      {input}
-    </Form.Item>
+    <>
+      <Form.Item
+        name={item.name}
+        label={camelToTitle(label)}
+        rules={rules}
+        getValueProps={getValueProps}
+        normalize={normalize}
+      >
+        {input}
+      </Form.Item>
+      {extra}
+    </>
   );
 }

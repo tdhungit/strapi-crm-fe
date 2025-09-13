@@ -9,6 +9,7 @@ import {
 } from '../../../helpers/views_helper';
 import ApiService from '../../../services/ApiService';
 import MetadataService from '../../../services/MetadataService';
+import { normalizeRecord } from '../../../helpers/collection_helper';
 
 export default function CollectionFormComponent({
   module,
@@ -56,10 +57,11 @@ export default function CollectionFormComponent({
 
     try {
       message.loading('Saving...');
+      const normalizedValues = normalizeRecord(values, config);
       if (id) {
-        await ApiService.getClient().collection(module).update(id, values);
+        await ApiService.getClient().collection(module).update(id, normalizedValues);
       } else {
-        await ApiService.getClient().collection(module).create(values);
+        await ApiService.getClient().collection(module).create(normalizedValues);
       }
       message.destroy();
       notification.success({

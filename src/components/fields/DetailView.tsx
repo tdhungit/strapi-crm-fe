@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AddressView from './address/AddressView';
 import EnumerationView from './enumeration/EnumerationView';
+import MediaView from './media/MediaView';
 import RankingView from './ranking/RankingView';
 import RelationView from './relation/RelationView';
 import RichTextView from './richtext/RichtextView';
@@ -44,6 +45,10 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
 
         case 'plugin::crm-fields.ranking':
           setDisplayValue(<RankingView value={value} />);
+          break;
+
+        case 'media':
+          setDisplayValue(<MediaView value={value} />);
           break;
 
         case 'string':
