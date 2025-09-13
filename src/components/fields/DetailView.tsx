@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import AddressView from './address/AddressView';
+import BooleanView from './boolean/BooleanView';
 import EnumerationView from './enumeration/EnumerationView';
 import MediaView from './media/MediaView';
+import PasswordView from './password/PasswordView';
 import RankingView from './ranking/RankingView';
 import RelationView from './relation/RelationView';
 import RichTextView from './richtext/RichtextView';
@@ -49,6 +51,14 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
 
         case 'media':
           setDisplayValue(<MediaView value={value} />);
+          break;
+
+        case 'boolean':
+          setDisplayValue(<BooleanView value={value ? true : false} />);
+          break;
+
+        case 'password':
+          setDisplayValue(<PasswordView />);
           break;
 
         case 'string':

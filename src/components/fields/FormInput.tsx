@@ -4,8 +4,10 @@ import { camelToTitle } from '../../helpers/views_helper';
 import type { FieldLayoutConfigType } from '../../types/layouts';
 import AddressInput from './address/AddressInput';
 import AssignUserInput from './assign-user/AssignUserInput';
+import BooleanInput from './boolean/BooleanInput';
 import EnumerationInput from './enumeration/EnumerationInput';
 import MediaInput from './media/MediaInput';
+import PasswordInput from './password/PasswordInput';
 import RankingInput from './ranking/RankingInput';
 import RelationInput from './relation/RelationInput';
 import RichtextInput from './richtext/RichtextInput';
@@ -116,6 +118,14 @@ export default function FormInput({
         <MediaInput value={data[item.name]} options={item.options as any} />
       );
       // extra = <Form.Item name='documentId' hidden />;
+      break;
+
+    case 'boolean':
+      input = <BooleanInput value={data[item.name] ? true : false} />;
+      break;
+
+    case 'password':
+      input = <PasswordInput />;
       break;
 
     case 'string':
