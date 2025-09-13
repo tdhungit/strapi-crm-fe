@@ -1,5 +1,15 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Card, Col, Form, Input, Modal, Row, Select, Space } from 'antd';
+import {
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  Modal,
+  Row,
+  Select,
+  Space,
+} from 'antd';
 import React, { useEffect, useState } from 'react';
 import { iconMap } from '../../../config/icons';
 import routes from '../../../config/routes';
@@ -14,7 +24,9 @@ interface MenuItem {
 
 interface MenuModalFormProps {
   visible: boolean;
-  menuItem?: (MenuItem & { children?: { route: string; label: string }[] }) | null;
+  menuItem?:
+    | (MenuItem & { children?: { route: string; label: string }[] })
+    | null;
   onCancel: () => void;
   onSave: (values: MenuItem) => void;
   loading?: boolean;
@@ -28,7 +40,9 @@ export default function MenuModalForm({
   loading = false,
 }: MenuModalFormProps) {
   const [form] = Form.useForm();
-  const [childrenItems, setChildrenItems] = useState<{ key: string; label: string }[]>([]);
+  const [childrenItems, setChildrenItems] = useState<
+    { key: string; label: string }[]
+  >([]);
 
   // Reset form and children state when modal opens/closes or menuItem changes
   useEffect(() => {
@@ -80,7 +94,11 @@ export default function MenuModalForm({
     setChildrenItems(newChildren);
   };
 
-  const updateChildItem = (index: number, field: 'key' | 'label', value: string) => {
+  const updateChildItem = (
+    index: number,
+    field: 'key' | 'label',
+    value: string
+  ) => {
     const newChildren = [...childrenItems];
     newChildren[index] = { ...newChildren[index], [field]: value };
     setChildrenItems(newChildren);
@@ -127,17 +145,7 @@ export default function MenuModalForm({
           icon: undefined,
         }}
       >
-        <Form.Item
-          name='key'
-          label='Menu Key'
-          rules={[
-            { required: true, message: 'Please enter the menu key' },
-            {
-              pattern: /^[a-z0-9-]+$/,
-              message: 'Only lowercase letters, numbers, and hyphens are allowed',
-            },
-          ]}
-        >
+        <Form.Item name='key' label='Menu Key'>
           <Input
             placeholder='e.g., dashboard, user-management'
             disabled={!!menuItem} // Key cannot be changed for existing items
@@ -164,7 +172,9 @@ export default function MenuModalForm({
             placeholder='Select an icon'
             showSearch
             filterOption={(input, option: any) =>
-              (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
+              (option?.label as string)
+                ?.toLowerCase()
+                .includes(input.toLowerCase())
             }
             options={iconOptions}
           />
@@ -176,25 +186,39 @@ export default function MenuModalForm({
               <Card key={index} size='small' className='bg-gray-50'>
                 <Row gutter={8} align='middle'>
                   <Col span={10}>
-                    <Form.Item label='Route' required style={{ marginBottom: 8 }}>
+                    <Form.Item
+                      label='Route'
+                      required
+                      style={{ marginBottom: 8 }}
+                    >
                       <Select
                         placeholder='Select route'
                         value={child.key}
-                        onChange={(value) => updateChildItem(index, 'key', value)}
+                        onChange={(value) =>
+                          updateChildItem(index, 'key', value)
+                        }
                         options={routeOptions}
                         showSearch
                         filterOption={(input: string, option: any) =>
-                          option?.label?.toLowerCase().includes(input.toLowerCase())
+                          option?.label
+                            ?.toLowerCase()
+                            .includes(input.toLowerCase())
                         }
                       />
                     </Form.Item>
                   </Col>
                   <Col span={10}>
-                    <Form.Item label='Label' required style={{ marginBottom: 8 }}>
+                    <Form.Item
+                      label='Label'
+                      required
+                      style={{ marginBottom: 8 }}
+                    >
                       <Input
                         placeholder='Enter label'
                         value={child.label}
-                        onChange={(e) => updateChildItem(index, 'label', e.target.value)}
+                        onChange={(e) =>
+                          updateChildItem(index, 'label', e.target.value)
+                        }
                       />
                     </Form.Item>
                   </Col>
@@ -211,7 +235,12 @@ export default function MenuModalForm({
               </Card>
             ))}
 
-            <Button type='dashed' onClick={addChildItem} icon={<PlusOutlined />} className='w-full'>
+            <Button
+              type='dashed'
+              onClick={addChildItem}
+              icon={<PlusOutlined />}
+              className='w-full'
+            >
               Add Child Item
             </Button>
           </div>
