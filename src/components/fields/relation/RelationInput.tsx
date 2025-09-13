@@ -40,10 +40,12 @@ export default function RelationInput(props: {
   }, [initialValues]);
 
   const fetchOptions = async (search: string): Promise<any[]> => {
-    return ApiService.request(
-      'get',
-      `/${contentType.pluralName}?_q=${search}`
-    ).then((res) => {
+    // If no search term, fetch first 10 items
+    const url = search
+      ? `/${contentType.pluralName}?_q=${search}`
+      : `/${contentType.pluralName}?_limit=10&_sort=id:asc`;
+
+    return ApiService.request('get', url).then((res) => {
       const results = Array.isArray(res) ? res : res.data ? res.data : [];
       return results.map((item: any) => ({
         label: item[keyLabel],

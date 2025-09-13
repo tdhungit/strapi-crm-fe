@@ -164,7 +164,7 @@ export default function ModuleWidgetSettings() {
         const response = await ApiService.request('get', `/settings/user`, {
           name: 'widgets',
         });
-        currentSettings = response?.data?.value || {};
+        currentSettings = response?.widgets || {};
       } catch (error) {
         console.error('Failed to fetch current settings:', error);
         // If no settings exist yet, start with empty object

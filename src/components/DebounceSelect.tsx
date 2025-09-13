@@ -16,7 +16,11 @@ export default function DebounceSelect<
     value: string | number;
     avatar?: string;
   } = any
->({ fetchOptions, debounceTimeout = 300, ...props }: DebounceSelectProps<ValueType>) {
+>({
+  fetchOptions,
+  debounceTimeout = 300,
+  ...props
+}: DebounceSelectProps<ValueType>) {
   const [fetching, setFetching] = useState(false);
   const [options, setOptions] = useState<ValueType[]>([]);
   const fetchRef = useRef(0);
@@ -48,12 +52,20 @@ export default function DebounceSelect<
       filterOption={false}
       showSearch
       onSearch={debounceFetcher}
+      onFocus={() => {
+        // Load initial options when focused if no options are available and not currently fetching
+        if (options.length === 0 && !fetching) {
+          debounceFetcher('');
+        }
+      }}
       notFoundContent={fetching ? <Spin size='small' /> : 'No results found'}
       {...props}
       options={options}
       optionRender={(option) => (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          {option.data.avatar && <Avatar src={option.data.avatar} style={{ marginRight: 8 }} />}
+          {option.data.avatar && (
+            <Avatar src={option.data.avatar} style={{ marginRight: 8 }} />
+          )}
           {option.label}
         </div>
       )}
