@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import {
+  App,
   Button,
   Card,
   Col,
@@ -40,6 +41,8 @@ export default function ModuleWidgetSettings() {
   const [displayedWidgets, setDisplayedWidgets] = useState<WidgetItem[]>([]);
   const [draggedItem, setDraggedItem] = useState<WidgetItem | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const { notification } = App.useApp();
 
   useEffect(() => {
     if (selectedModule) {
@@ -166,6 +169,10 @@ export default function ModuleWidgetSettings() {
         console.error('Failed to fetch current settings:', error);
         // If no settings exist yet, start with empty object
         currentSettings = {};
+
+        notification.error({
+          message: 'Failed to fetch current settings',
+        });
       }
 
       // Update settings for current module
@@ -190,9 +197,17 @@ export default function ModuleWidgetSettings() {
 
       await getCurrentSettings(widgetItems);
 
+      notification.success({
+        message: 'Widget settings saved successfully',
+      });
+
       // You could add a success message here
       console.log('Widget settings saved successfully');
     } catch (error) {
+      notification.error({
+        message: 'Failed to save widget settings',
+      });
+
       console.error('Failed to save widget settings:', error);
       // You could add error handling/notification here
     } finally {

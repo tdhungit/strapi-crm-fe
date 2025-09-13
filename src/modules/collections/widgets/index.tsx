@@ -19,9 +19,7 @@ for (const path in collectionModules) {
 }
 
 for (const path in rawModules) {
-  const match = path.match(
-    /modules\/([^/]+)\/widgets\/components\/([^/]+)\.tsx$/
-  );
+  const match = path.match(/([^/]+)\/widgets\/components\/([^/]+)\.tsx$/);
   if (match) {
     const moduleName = match[1];
     if (moduleName === 'collection') continue;
@@ -46,6 +44,7 @@ export function getWidget(
 
 export function getWidgets(moduleName: string): Record<string, React.FC> {
   const moduleWidgets = widgets[moduleName] || {};
+  // Add default widgets
   for (const widgetName in defaults) {
     if (!moduleWidgets[widgetName])
       moduleWidgets[widgetName] = defaults[widgetName];
