@@ -27,7 +27,52 @@ import {
   Typography,
 } from 'antd';
 import grapesjs, { type Editor } from 'grapesjs';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
+
+// Error Boundary Component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('EmailTemplateBuilder Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 20, textAlign: 'center' }}>
+          <h3>Something went wrong with the Properties panel.</h3>
+          <p>Please refresh the page or try selecting a different component.</p>
+          <button
+            onClick={() => this.setState({ hasError: false })}
+            style={{
+              padding: '8px 16px',
+              background: '#1890ff',
+              color: 'white',
+              border: 'none',
+              borderRadius: 4,
+              cursor: 'pointer',
+            }}
+          >
+            Try Again
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 const { Title } = Typography;
 const { Sider, Header, Content } = Layout;
@@ -199,34 +244,156 @@ function RightSidebar() {
   const editor = useEditor();
   const { token } = theme.useToken();
   const [selectedComponent, setSelectedComponent] = useState<any>(null);
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Local state for input values to enable controlled components
+  const [localValues, setLocalValues] = useState<Record<string, any>>({});
+
+  // Update local values when component changes
+  React.useEffect(() => {
+    if (selectedComponent && typeof selectedComponent.get === 'function') {
+      setLocalValues({
+        content:
+          (typeof selectedComponent.getInnerHTML === 'function'
+            ? selectedComponent.getInnerHTML()
+            : selectedComponent.get('content')) || '',
+        backgroundColor:
+          selectedComponent.getStyle?.('background-color') ||
+          selectedComponent.get('style')?.['background-color'] ||
+          '#ffffff',
+        color:
+          selectedComponent.getStyle?.('color') ||
+          selectedComponent.get('style')?.['color'] ||
+          '#000000',
+        fontSize:
+          (typeof selectedComponent.getStyle === 'function'
+            ? selectedComponent.getStyle('font-size')
+            : selectedComponent.get('style')?.['font-size']) || '',
+        padding:
+          (typeof selectedComponent.getStyle === 'function'
+            ? selectedComponent.getStyle('padding')
+            : selectedComponent.get('style')?.['padding']) || '',
+        margin:
+          (typeof selectedComponent.getStyle === 'function'
+            ? selectedComponent.getStyle('margin')
+            : selectedComponent.get('style')?.['margin']) || '',
+        borderRadius:
+          (typeof selectedComponent.getStyle === 'function'
+            ? selectedComponent.getStyle('border-radius')
+            : selectedComponent.get('style')?.['border-radius']) || '',
+        src: selectedComponent.get('src') || '',
+        href: selectedComponent.get('href') || '',
+      });
+    } else {
+      setLocalValues({});
+    }
+  }, [selectedComponent]);
+
+  // Debounced update function to avoid resetting focus on every keystroke
+  const debouncedUpdate = useCallback(() => {
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+    updateTimeoutRef.current = setTimeout(() => {
+      if (selectedComponent) {
+        console.log(
+          'Debounced update for component:',
+          selectedComponent.get('tagName')
+        );
+        editor.trigger('component:update', selectedComponent);
+        editor.trigger('change');
+      }
+    }, 300); // 300ms delay
+  }, [editor, selectedComponent]);
+
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Listen for component selection changes
   React.useEffect(() => {
     const handleSelect = () => {
-      const selected = editor.getSelected();
-      setSelectedComponent(selected);
-
-      // Component selection tracking
-      // Video detection logic is handled in the properties panel rendering
+      try {
+        const selected = editor.getSelected();
+        console.log('Component selected:', selected);
+        // Validate that the selected component has the expected methods
+        if (selected && typeof selected.get === 'function') {
+          setSelectedComponent(selected);
+        } else {
+          console.warn('Invalid component selected:', selected);
+          setSelectedComponent(null);
+        }
+      } catch (error) {
+        console.error('Error in component selection:', error);
+        setSelectedComponent(null);
+      }
     };
 
     const handleDeselect = () => {
+      console.log('Component deselected');
       setSelectedComponent(null);
     };
 
-    editor.on('component:selected', handleSelect);
-    editor.on('component:deselected', handleDeselect);
+    const handleUpdate = (component: any) => {
+      console.log('Component updated:', component);
+      // Do NOT force re-render of properties panel to avoid resetting focus
+      // The component updates will be reflected automatically without state reset
+    };
+
+    // Add error handling for event listeners
+    try {
+      editor.on('component:selected', handleSelect);
+      editor.on('component:deselected', handleDeselect);
+      editor.on('component:update', handleUpdate);
+      editor.on('component:styleUpdate', handleUpdate);
+    } catch (error) {
+      console.error('Error adding event listeners:', error);
+    }
 
     return () => {
-      editor.off('component:selected', handleSelect);
-      editor.off('component:deselected', handleDeselect);
+      try {
+        editor.off('component:selected', handleSelect);
+        editor.off('component:deselected', handleDeselect);
+        editor.off('component:update', handleUpdate);
+        editor.off('component:styleUpdate', handleUpdate);
+      } catch (error) {
+        console.error('Error removing event listeners:', error);
+      }
     };
-  }, [editor]);
+  }, [editor]); // Remove selectedComponent from dependencies to prevent constant re-registration
 
-  const updateComponent = () => {
-    // Trigger a re-render
-    editor.trigger('change:canvasOffset');
-  };
+  // Immediate update function for color and instant feedback properties
+  const immediateUpdate = useCallback(() => {
+    if (selectedComponent) {
+      // Only trigger the minimal necessary events
+      editor.trigger('component:update', selectedComponent);
+    }
+  }, [editor, selectedComponent]);
+
+  const updateComponent = useCallback(() => {
+    // Lightweight component update without forcing refresh that resets selection
+    if (selectedComponent) {
+      console.log(
+        'Updating component:',
+        selectedComponent.get('tagName'),
+        selectedComponent.getId?.()
+      );
+
+      // Only trigger necessary update events
+      editor.trigger('component:update', selectedComponent);
+
+      // Trigger a minimal change event for canvas update
+      editor.trigger('change');
+
+      // Do NOT call editor.refresh() as it resets component selection
+      // Do NOT call setSelectedComponent() to avoid state reset
+    }
+  }, [editor, selectedComponent]);
 
   return (
     <div
@@ -241,45 +408,76 @@ function RightSidebar() {
       <Title level={5} style={{ margin: '0 0 12px 0', fontSize: 14 }}>
         Properties
       </Title>
-      {selectedComponent ? (
+      {selectedComponent && typeof selectedComponent.get === 'function' ? (
         <Card size='small' style={{ marginBottom: 16 }}>
           <div style={{ marginBottom: 8 }}>
             <Typography.Text strong style={{ fontSize: 12 }}>
               Component: {selectedComponent.get('tagName') || 'Element'}
             </Typography.Text>
+            {/* Debug info */}
+            <div style={{ fontSize: 10, color: '#666', marginTop: 4 }}>
+              ID:{' '}
+              {typeof selectedComponent.getId === 'function'
+                ? selectedComponent.getId()
+                : 'N/A'}{' '}
+              | Type: {selectedComponent.get('type') || 'default'}
+            </div>
           </div>
 
           {/* Text Content for text-based elements */}
-          {(selectedComponent.get('tagName') === 'div' ||
-            selectedComponent.get('tagName') === 'p' ||
-            selectedComponent.get('tagName') === 'h1' ||
-            selectedComponent.get('tagName') === 'h2' ||
-            selectedComponent.get('tagName') === 'h3' ||
-            selectedComponent.get('tagName') === 'a') && (
-            <div style={{ marginBottom: 8 }}>
-              <Typography.Text
-                style={{ fontSize: 11, display: 'block', marginBottom: 4 }}
-              >
-                Text Content
-              </Typography.Text>
-              <input
-                type='text'
-                value={selectedComponent.get('content') || ''}
-                onChange={(e) => {
-                  selectedComponent.set('content', e.target.value);
-                  updateComponent();
-                }}
-                style={{
-                  width: '100%',
-                  padding: '4px 8px',
-                  border: `1px solid ${token.colorBorder}`,
-                  borderRadius: 4,
-                  fontSize: 11,
-                }}
-                placeholder='Enter text content'
-              />
-            </div>
-          )}
+          {selectedComponent &&
+            typeof selectedComponent.get === 'function' &&
+            (selectedComponent.get('tagName') === 'div' ||
+              selectedComponent.get('tagName') === 'p' ||
+              selectedComponent.get('tagName') === 'h1' ||
+              selectedComponent.get('tagName') === 'h2' ||
+              selectedComponent.get('tagName') === 'h3' ||
+              selectedComponent.get('tagName') === 'a') && (
+              <div style={{ marginBottom: 8 }}>
+                <Typography.Text
+                  style={{ fontSize: 11, display: 'block', marginBottom: 4 }}
+                >
+                  Text Content
+                </Typography.Text>
+                <input
+                  type='text'
+                  value={localValues.content || ''}
+                  onChange={(e) => {
+                    try {
+                      const newValue = e.target.value;
+                      console.log('Updating text content:', newValue);
+
+                      // Update local state immediately for UI responsiveness
+                      setLocalValues((prev) => ({
+                        ...prev,
+                        content: newValue,
+                      }));
+
+                      // Update component
+                      if (
+                        typeof selectedComponent.getInnerHTML === 'function'
+                      ) {
+                        selectedComponent.components(newValue);
+                      } else if (typeof selectedComponent.set === 'function') {
+                        selectedComponent.set('content', newValue);
+                      }
+                      // Use debounced update for text inputs to avoid focus loss
+                      debouncedUpdate();
+                    } catch (error) {
+                      console.error('Error updating text content:', error);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '4px 8px',
+                    border: `1px solid ${token.colorBorder}`,
+                    borderRadius: 4,
+                    fontSize: 11,
+                  }}
+                  placeholder='Enter text content'
+                />
+              </div>
+            )}
 
           {/* Background Color */}
           <div style={{ marginBottom: 8 }}>
@@ -290,14 +488,32 @@ function RightSidebar() {
             </Typography.Text>
             <input
               type='color'
-              value={
-                selectedComponent.getStyle('background-color') || '#ffffff'
-              }
+              value={localValues.backgroundColor || '#ffffff'}
               onChange={(e) => {
-                selectedComponent.setStyle({
-                  'background-color': e.target.value,
-                });
-                updateComponent();
+                try {
+                  const newValue = e.target.value;
+                  console.log('Updating background color:', newValue);
+
+                  // Update local state immediately
+                  setLocalValues((prev) => ({
+                    ...prev,
+                    backgroundColor: newValue,
+                  }));
+
+                  if (typeof selectedComponent.setStyle === 'function') {
+                    selectedComponent.setStyle({
+                      'background-color': newValue,
+                    });
+                  } else if (typeof selectedComponent.addStyle === 'function') {
+                    // Fallback for different component types
+                    selectedComponent.addStyle({
+                      'background-color': newValue,
+                    });
+                  }
+                  immediateUpdate();
+                } catch (error) {
+                  console.error('Error updating background color:', error);
+                }
               }}
               style={{
                 width: '100%',
@@ -317,10 +533,25 @@ function RightSidebar() {
             </Typography.Text>
             <input
               type='color'
-              value={selectedComponent.getStyle('color') || '#000000'}
+              value={localValues.color || '#000000'}
               onChange={(e) => {
-                selectedComponent.setStyle({ color: e.target.value });
-                updateComponent();
+                try {
+                  const newValue = e.target.value;
+                  console.log('Updating text color:', newValue);
+
+                  // Update local state immediately
+                  setLocalValues((prev) => ({ ...prev, color: newValue }));
+
+                  if (typeof selectedComponent.setStyle === 'function') {
+                    selectedComponent.setStyle({ color: newValue });
+                  } else if (typeof selectedComponent.addStyle === 'function') {
+                    // Fallback for different component types
+                    selectedComponent.addStyle({ color: newValue });
+                  }
+                  immediateUpdate();
+                } catch (error) {
+                  console.error('Error updating text color:', error);
+                }
               }}
               style={{
                 width: '100%',
@@ -340,10 +571,21 @@ function RightSidebar() {
             </Typography.Text>
             <input
               type='text'
-              value={selectedComponent.getStyle('font-size') || ''}
+              value={localValues.fontSize || ''}
               onChange={(e) => {
-                selectedComponent.setStyle({ 'font-size': e.target.value });
-                updateComponent();
+                try {
+                  const newValue = e.target.value;
+
+                  // Update local state immediately
+                  setLocalValues((prev) => ({ ...prev, fontSize: newValue }));
+
+                  if (typeof selectedComponent.setStyle === 'function') {
+                    selectedComponent.setStyle({ 'font-size': newValue });
+                  }
+                  debouncedUpdate();
+                } catch (error) {
+                  console.error('Error updating font size:', error);
+                }
               }}
               style={{
                 width: '100%',
@@ -365,10 +607,21 @@ function RightSidebar() {
             </Typography.Text>
             <input
               type='text'
-              value={selectedComponent.getStyle('padding') || ''}
+              value={localValues.padding || ''}
               onChange={(e) => {
-                selectedComponent.setStyle({ padding: e.target.value });
-                updateComponent();
+                try {
+                  const newValue = e.target.value;
+
+                  // Update local state immediately
+                  setLocalValues((prev) => ({ ...prev, padding: newValue }));
+
+                  if (typeof selectedComponent.setStyle === 'function') {
+                    selectedComponent.setStyle({ padding: newValue });
+                  }
+                  debouncedUpdate();
+                } catch (error) {
+                  console.error('Error updating padding:', error);
+                }
               }}
               style={{
                 width: '100%',
@@ -390,10 +643,21 @@ function RightSidebar() {
             </Typography.Text>
             <input
               type='text'
-              value={selectedComponent.getStyle('margin') || ''}
+              value={localValues.margin || ''}
               onChange={(e) => {
-                selectedComponent.setStyle({ margin: e.target.value });
-                updateComponent();
+                try {
+                  const newValue = e.target.value;
+
+                  // Update local state immediately
+                  setLocalValues((prev) => ({ ...prev, margin: newValue }));
+
+                  if (typeof selectedComponent.setStyle === 'function') {
+                    selectedComponent.setStyle({ margin: newValue });
+                  }
+                  debouncedUpdate();
+                } catch (error) {
+                  console.error('Error updating margin:', error);
+                }
               }}
               style={{
                 width: '100%',
@@ -415,10 +679,26 @@ function RightSidebar() {
             </Typography.Text>
             <input
               type='text'
-              value={selectedComponent.getStyle('border-radius') || ''}
+              value={localValues.borderRadius || ''}
               onChange={(e) => {
-                selectedComponent.setStyle({ 'border-radius': e.target.value });
-                updateComponent();
+                try {
+                  const newValue = e.target.value;
+
+                  // Update local state immediately
+                  setLocalValues((prev) => ({
+                    ...prev,
+                    borderRadius: newValue,
+                  }));
+
+                  if (typeof selectedComponent.setStyle === 'function') {
+                    selectedComponent.setStyle({
+                      'border-radius': newValue,
+                    });
+                  }
+                  debouncedUpdate();
+                } catch (error) {
+                  console.error('Error updating border radius:', error);
+                }
               }}
               style={{
                 width: '100%',
@@ -432,251 +712,298 @@ function RightSidebar() {
           </div>
 
           {/* For images - src attribute */}
-          {selectedComponent.get('tagName') === 'img' && (
-            <div style={{ marginBottom: 8 }}>
-              <Typography.Text
-                style={{ fontSize: 11, display: 'block', marginBottom: 4 }}
-              >
-                Image Source
-              </Typography.Text>
-              <input
-                type='text'
-                value={selectedComponent.get('src') || ''}
-                onChange={(e) => {
-                  selectedComponent.set('src', e.target.value);
-                  updateComponent();
-                }}
-                style={{
-                  width: '100%',
-                  padding: '4px 8px',
-                  border: `1px solid ${token.colorBorder}`,
-                  borderRadius: 4,
-                  fontSize: 11,
-                }}
-                placeholder='Enter image URL'
-              />
-            </div>
-          )}
+          {selectedComponent &&
+            typeof selectedComponent.get === 'function' &&
+            selectedComponent.get('tagName') === 'img' && (
+              <div style={{ marginBottom: 8 }}>
+                <Typography.Text
+                  style={{ fontSize: 11, display: 'block', marginBottom: 4 }}
+                >
+                  Image Source
+                </Typography.Text>
+                <input
+                  type='text'
+                  value={localValues.src || ''}
+                  onChange={(e) => {
+                    try {
+                      const newValue = e.target.value;
+
+                      // Update local state immediately
+                      setLocalValues((prev) => ({ ...prev, src: newValue }));
+
+                      if (typeof selectedComponent.set === 'function') {
+                        selectedComponent.set('src', newValue);
+                      }
+                      debouncedUpdate();
+                    } catch (error) {
+                      console.error('Error updating image src:', error);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '4px 8px',
+                    border: `1px solid ${token.colorBorder}`,
+                    borderRadius: 4,
+                    fontSize: 11,
+                  }}
+                  placeholder='Enter image URL'
+                />
+              </div>
+            )}
 
           {/* For links - href attribute */}
-          {selectedComponent.get('tagName') === 'a' && (
-            <div style={{ marginBottom: 8 }}>
-              <Typography.Text
-                style={{ fontSize: 11, display: 'block', marginBottom: 4 }}
-              >
-                Link URL
-              </Typography.Text>
-              <input
-                type='text'
-                value={selectedComponent.get('href') || ''}
-                onChange={(e) => {
-                  selectedComponent.set('href', e.target.value);
-                  updateComponent();
-                }}
-                style={{
-                  width: '100%',
-                  padding: '4px 8px',
-                  border: `1px solid ${token.colorBorder}`,
-                  borderRadius: 4,
-                  fontSize: 11,
-                }}
-                placeholder='Enter link URL'
-              />
-            </div>
-          )}
+          {selectedComponent &&
+            typeof selectedComponent.get === 'function' &&
+            selectedComponent.get('tagName') === 'a' && (
+              <div style={{ marginBottom: 8 }}>
+                <Typography.Text
+                  style={{ fontSize: 11, display: 'block', marginBottom: 4 }}
+                >
+                  Link URL
+                </Typography.Text>
+                <input
+                  type='text'
+                  value={localValues.href || ''}
+                  onChange={(e) => {
+                    try {
+                      const newValue = e.target.value;
+
+                      // Update local state immediately
+                      setLocalValues((prev) => ({ ...prev, href: newValue }));
+
+                      if (typeof selectedComponent.set === 'function') {
+                        selectedComponent.set('href', newValue);
+                      }
+                      debouncedUpdate();
+                    } catch (error) {
+                      console.error('Error updating link href:', error);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '4px 8px',
+                    border: `1px solid ${token.colorBorder}`,
+                    borderRadius: 4,
+                    fontSize: 11,
+                  }}
+                  placeholder='Enter link URL'
+                />
+              </div>
+            )}
 
           {/* For video thumbnails - enhanced detection */}
-          {
-            // Direct link with video thumbnail
-            ((selectedComponent.get('tagName') === 'a' &&
-              selectedComponent.find('img').length > 0 &&
-              (selectedComponent
-                .find('img')
-                .at(0)
-                ?.get('alt')
-                ?.includes('Video') ||
-                selectedComponent
-                  .find('img')
-                  .at(0)
-                  ?.get('class')
-                  ?.includes('video-thumbnail'))) ||
-              // Video component div
-              (selectedComponent.get('tagName') === 'div' &&
-                (selectedComponent.get('class')?.includes('video-component') ||
-                  (selectedComponent.find('a').length > 0 &&
-                    selectedComponent.find('img').length > 0 &&
-                    (selectedComponent
+          {(() => {
+            try {
+              if (
+                !selectedComponent ||
+                typeof selectedComponent.get !== 'function'
+              ) {
+                return null;
+              }
+
+              const isVideoComponent =
+                // Direct link with video thumbnail
+                (selectedComponent.get('tagName') === 'a' &&
+                  typeof selectedComponent.find === 'function' &&
+                  selectedComponent.find('img').length > 0 &&
+                  (selectedComponent
+                    .find('img')
+                    .at(0)
+                    ?.get('alt')
+                    ?.includes('Video') ||
+                    selectedComponent
                       .find('img')
                       .at(0)
-                      ?.get('alt')
-                      ?.includes('Video') ||
-                      selectedComponent
+                      ?.get('class')
+                      ?.includes('video-thumbnail'))) ||
+                // Video component div
+                (selectedComponent.get('tagName') === 'div' &&
+                  (selectedComponent
+                    .get('class')
+                    ?.includes('video-component') ||
+                    (typeof selectedComponent.find === 'function' &&
+                      selectedComponent.find('a').length > 0 &&
+                      selectedComponent.find('img').length > 0 &&
+                      (selectedComponent
                         .find('img')
                         .at(0)
-                        ?.get('class')
-                        ?.includes('video-thumbnail') ||
-                      selectedComponent
-                        .find('img')
-                        .at(0)
-                        ?.get('src')
-                        ?.includes('youtube.com') ||
-                      selectedComponent
-                        .find('img')
-                        .at(0)
-                        ?.get('src')
-                        ?.includes('vimeo.com'))))) ||
-              // Direct image selection with video characteristics
-              (selectedComponent.get('tagName') === 'img' &&
-                selectedComponent.parent() &&
-                selectedComponent.parent()?.get('tagName') === 'a' &&
-                (selectedComponent.get('alt')?.includes('Video') ||
-                  selectedComponent.get('class')?.includes('video-thumbnail') ||
-                  selectedComponent.get('src')?.includes('youtube.com') ||
-                  selectedComponent.get('src')?.includes('vimeo.com') ||
-                  selectedComponent
-                    .parent()
-                    ?.parent()
-                    ?.get('class')
-                    ?.includes('video-component')))) && (
-              <>
-                <div style={{ marginBottom: 8 }}>
-                  <Typography.Text
-                    style={{ fontSize: 11, display: 'block', marginBottom: 4 }}
-                  >
-                    Video Link URL
-                  </Typography.Text>
-                  <input
-                    type='text'
-                    value={
-                      selectedComponent.get('tagName') === 'a'
-                        ? selectedComponent.get('href') || ''
-                        : selectedComponent.get('tagName') === 'div' &&
-                          selectedComponent.find('a').length > 0
-                        ? selectedComponent.find('a').at(0).get('href') || ''
-                        : selectedComponent.get('tagName') === 'img' &&
-                          selectedComponent.parent() &&
-                          selectedComponent.parent().get('tagName') === 'a'
-                        ? selectedComponent.parent().get('href') || ''
-                        : selectedComponent.get('tagName') === 'img' &&
-                          selectedComponent.parent() &&
-                          selectedComponent.parent().parent() &&
-                          selectedComponent.parent().parent().find('a').length >
-                            0
-                        ? selectedComponent
-                            .parent()
-                            .parent()
-                            .find('a')
-                            .at(0)
-                            .get('href') || ''
-                        : ''
-                    }
-                    onChange={(e) => {
-                      if (selectedComponent.get('tagName') === 'a') {
-                        selectedComponent.set('href', e.target.value);
-                      } else if (
-                        selectedComponent.get('tagName') === 'div' &&
-                        selectedComponent.find('a').length > 0
-                      ) {
-                        selectedComponent
-                          .find('a')
-                          .at(0)
-                          .set('href', e.target.value);
-                      } else if (
-                        selectedComponent.get('tagName') === 'img' &&
-                        selectedComponent.parent() &&
-                        selectedComponent.parent().get('tagName') === 'a'
-                      ) {
-                        selectedComponent.parent().set('href', e.target.value);
-                      } else if (
-                        selectedComponent.get('tagName') === 'img' &&
-                        selectedComponent.parent() &&
-                        selectedComponent.parent().parent() &&
-                        selectedComponent.parent().parent().find('a').length > 0
-                      ) {
-                        selectedComponent
-                          .parent()
-                          .parent()
-                          .find('a')
-                          .at(0)
-                          .set('href', e.target.value);
-                      }
-                      updateComponent();
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '4px 8px',
-                      border: `1px solid ${token.colorBorder}`,
-                      borderRadius: 4,
-                      fontSize: 11,
-                    }}
-                    placeholder='Enter video URL (YouTube, Vimeo, etc.)'
-                  />
-                </div>
-                <div style={{ marginBottom: 8 }}>
-                  <Typography.Text
-                    style={{ fontSize: 11, display: 'block', marginBottom: 4 }}
-                  >
-                    Thumbnail Image URL
-                  </Typography.Text>
-                  <input
-                    type='text'
-                    value={
-                      selectedComponent.get('tagName') === 'img'
-                        ? selectedComponent.get('src') || ''
-                        : selectedComponent.find('img').length > 0
-                        ? selectedComponent.find('img').at(0).get('src') || ''
-                        : ''
-                    }
-                    onChange={(e) => {
-                      if (selectedComponent.get('tagName') === 'img') {
-                        selectedComponent.set('src', e.target.value);
-                      } else if (selectedComponent.find('img').length > 0) {
+                        ?.get('alt')
+                        ?.includes('Video') ||
                         selectedComponent
                           .find('img')
                           .at(0)
-                          .set('src', e.target.value);
-                      }
-                      updateComponent();
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '4px 8px',
-                      border: `1px solid ${token.colorBorder}`,
-                      borderRadius: 4,
-                      fontSize: 11,
-                    }}
-                    placeholder='Enter thumbnail image URL'
-                  />
-                </div>
-                <div
+                          ?.get('class')
+                          ?.includes('video-thumbnail') ||
+                        selectedComponent
+                          .find('img')
+                          .at(0)
+                          ?.get('src')
+                          ?.includes('youtube.com') ||
+                        selectedComponent
+                          .find('img')
+                          .at(0)
+                          ?.get('src')
+                          ?.includes('vimeo.com'))))) ||
+                // Direct image selection with video characteristics
+                (selectedComponent.get('tagName') === 'img' &&
+                  typeof selectedComponent.parent === 'function' &&
+                  selectedComponent.parent() &&
+                  selectedComponent.parent()?.get('tagName') === 'a' &&
+                  (selectedComponent.get('alt')?.includes('Video') ||
+                    selectedComponent
+                      .get('class')
+                      ?.includes('video-thumbnail') ||
+                    selectedComponent.get('src')?.includes('youtube.com') ||
+                    selectedComponent.get('src')?.includes('vimeo.com') ||
+                    selectedComponent
+                      .parent()
+                      ?.parent()
+                      ?.get('class')
+                      ?.includes('video-component')));
+
+              return isVideoComponent;
+            } catch (error) {
+              console.error('Error in video component detection:', error);
+              return false;
+            }
+          })() && (
+            <>
+              <div style={{ marginBottom: 8 }}>
+                <Typography.Text
+                  style={{ fontSize: 11, display: 'block', marginBottom: 4 }}
+                >
+                  Video Link URL
+                </Typography.Text>
+                <input
+                  type='text'
+                  value={
+                    selectedComponent.get('tagName') === 'a'
+                      ? selectedComponent.get('href') || ''
+                      : selectedComponent.get('tagName') === 'div' &&
+                        selectedComponent.find('a').length > 0
+                      ? selectedComponent.find('a').at(0).get('href') || ''
+                      : selectedComponent.get('tagName') === 'img' &&
+                        selectedComponent.parent() &&
+                        selectedComponent.parent().get('tagName') === 'a'
+                      ? selectedComponent.parent().get('href') || ''
+                      : selectedComponent.get('tagName') === 'img' &&
+                        selectedComponent.parent() &&
+                        selectedComponent.parent().parent() &&
+                        selectedComponent.parent().parent().find('a').length > 0
+                      ? selectedComponent
+                          .parent()
+                          .parent()
+                          .find('a')
+                          .at(0)
+                          .get('href') || ''
+                      : ''
+                  }
+                  onChange={(e) => {
+                    if (selectedComponent.get('tagName') === 'a') {
+                      selectedComponent.set('href', e.target.value);
+                    } else if (
+                      selectedComponent.get('tagName') === 'div' &&
+                      selectedComponent.find('a').length > 0
+                    ) {
+                      selectedComponent
+                        .find('a')
+                        .at(0)
+                        .set('href', e.target.value);
+                    } else if (
+                      selectedComponent.get('tagName') === 'img' &&
+                      selectedComponent.parent() &&
+                      selectedComponent.parent().get('tagName') === 'a'
+                    ) {
+                      selectedComponent.parent().set('href', e.target.value);
+                    } else if (
+                      selectedComponent.get('tagName') === 'img' &&
+                      selectedComponent.parent() &&
+                      selectedComponent.parent().parent() &&
+                      selectedComponent.parent().parent().find('a').length > 0
+                    ) {
+                      selectedComponent
+                        .parent()
+                        .parent()
+                        .find('a')
+                        .at(0)
+                        .set('href', e.target.value);
+                    }
+                    updateComponent();
+                  }}
                   style={{
-                    marginBottom: 8,
-                    padding: '8px',
-                    background: token.colorBgContainer,
+                    width: '100%',
+                    padding: '4px 8px',
                     border: `1px solid ${token.colorBorder}`,
                     borderRadius: 4,
+                    fontSize: 11,
+                  }}
+                  placeholder='Enter video URL (YouTube, Vimeo, etc.)'
+                />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <Typography.Text
+                  style={{ fontSize: 11, display: 'block', marginBottom: 4 }}
+                >
+                  Thumbnail Image URL
+                </Typography.Text>
+                <input
+                  type='text'
+                  value={
+                    selectedComponent.get('tagName') === 'img'
+                      ? selectedComponent.get('src') || ''
+                      : selectedComponent.find('img').length > 0
+                      ? selectedComponent.find('img').at(0).get('src') || ''
+                      : ''
+                  }
+                  onChange={(e) => {
+                    if (selectedComponent.get('tagName') === 'img') {
+                      selectedComponent.set('src', e.target.value);
+                    } else if (selectedComponent.find('img').length > 0) {
+                      selectedComponent
+                        .find('img')
+                        .at(0)
+                        .set('src', e.target.value);
+                    }
+                    updateComponent();
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '4px 8px',
+                    border: `1px solid ${token.colorBorder}`,
+                    borderRadius: 4,
+                    fontSize: 11,
+                  }}
+                  placeholder='Enter thumbnail image URL'
+                />
+              </div>
+              <div
+                style={{
+                  marginBottom: 8,
+                  padding: '8px',
+                  background: token.colorBgContainer,
+                  border: `1px solid ${token.colorBorder}`,
+                  borderRadius: 4,
+                }}
+              >
+                <Typography.Text
+                  style={{
+                    fontSize: 10,
+                    color: token.colorTextSecondary,
+                    display: 'block',
+                    marginBottom: 4,
                   }}
                 >
-                  <Typography.Text
-                    style={{
-                      fontSize: 10,
-                      color: token.colorTextSecondary,
-                      display: 'block',
-                      marginBottom: 4,
-                    }}
-                  >
-                    💡 Quick Setup for YouTube:
-                  </Typography.Text>
-                  <Typography.Text
-                    style={{ fontSize: 10, color: token.colorTextSecondary }}
-                  >
-                    For YouTube videos, you can use:
-                    https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg
-                  </Typography.Text>
-                </div>
-              </>
-            )
-          }
+                  💡 Quick Setup for YouTube:
+                </Typography.Text>
+                <Typography.Text
+                  style={{ fontSize: 10, color: token.colorTextSecondary }}
+                >
+                  For YouTube videos, you can use:
+                  https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg
+                </Typography.Text>
+              </div>
+            </>
+          )}
 
           {/* For videos - legacy video elements */}
           {(selectedComponent.get('tagName') === 'video' ||
@@ -1160,7 +1487,9 @@ export default function EmailTemplateBuilder() {
             reverseArrow
           >
             <WithEditor>
-              <RightSidebar />
+              <ErrorBoundary>
+                <RightSidebar />
+              </ErrorBoundary>
             </WithEditor>
           </Sider>
         </Layout>
