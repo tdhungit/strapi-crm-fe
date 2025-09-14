@@ -828,6 +828,8 @@ export default function EmailTemplateBuilder() {
   const [previewMode, setPreviewMode] = useState(false);
   const { token } = theme.useToken();
 
+  const editorHeight = '89vh';
+
   const onEditor = (editor: Editor) => {
     console.log('Editor loaded', { editor });
 
@@ -939,12 +941,12 @@ export default function EmailTemplateBuilder() {
       media: '🔗',
     });
 
-    editor.BlockManager.add('image', {
-      label: 'Image',
-      content: { type: 'image' },
-      category: 'Basic',
-      media: '🖼️',
-    });
+    // editor.BlockManager.add('image', {
+    //   label: 'Image',
+    //   content: { type: 'image' },
+    //   category: 'Basic',
+    //   media: '🖼️',
+    // });
 
     editor.BlockManager.add('video', {
       label: 'Video',
@@ -975,23 +977,23 @@ export default function EmailTemplateBuilder() {
 
     // Add our custom email template blocks
     editor.BlockManager.add('text-block', {
-      label: 'Text',
+      label: 'Text Centered',
       content:
         '<div style="padding: 20px; font-family: Arial, sans-serif; line-height: 1.5;">Insert your text here. You can edit this content by clicking on it.</div>',
       category: 'Basic',
       media: '📝',
     });
 
-    editor.BlockManager.add('image-block', {
-      label: 'Image',
-      content:
-        '<img src="https://picsum.photos/400/250" alt="placeholder" style="width: 100%; height: auto; display: block; border-radius: 8px;">',
-      category: 'Basic',
-      media: '🖼️',
-    });
+    // editor.BlockManager.add('image-block', {
+    //   label: 'Image',
+    //   content:
+    //     '<img src="https://picsum.photos/400/250" alt="placeholder" style="width: 100%; height: auto; display: block; border-radius: 8px;">',
+    //   category: 'Basic',
+    //   media: '🖼️',
+    // });
 
     editor.BlockManager.add('image-simple-block', {
-      label: 'Simple Image',
+      label: 'Image',
       content:
         '<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDQwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjRjVGNUY1Ii8+CjxyZWN0IHg9IjE3NSIgeT0iMTAwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNEOUQ5RDkiLz4KPHN2ZyB4PSIxODUiIHk9IjExMCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjOTk5OTk5Ij4KPHA+SW1hZ2U8L3A+Cjwvc3ZnPgo8L3N2Zz4K" alt="placeholder" style="width: 100%; height: auto; display: block; border-radius: 8px;">',
       category: 'Basic',
@@ -1088,12 +1090,18 @@ export default function EmailTemplateBuilder() {
   };
 
   return (
-    <div style={{ height: '100vh', background: token.colorBgLayout }}>
+    <div
+      style={{
+        height: editorHeight,
+        background: token.colorBgLayout,
+        borderTop: '1px solid #ddd',
+      }}
+    >
       <GjsEditor
         grapesjs={grapesjs}
         grapesjsCss='https://unpkg.com/grapesjs/dist/css/grapes.min.css'
         options={{
-          height: '100vh',
+          height: editorHeight,
           storageManager: false,
           panels: { defaults: [] },
           canvas: {
@@ -1109,7 +1117,7 @@ export default function EmailTemplateBuilder() {
         }}
         onEditor={onEditor}
       >
-        <Layout style={{ height: '100vh' }}>
+        <Layout style={{ height: editorHeight }}>
           <Sider
             width={280}
             collapsedWidth={0}
