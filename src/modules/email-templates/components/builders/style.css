@@ -38,10 +38,15 @@
   height: calc(100% - 45px) !important;
 }
 
+.gjs-am-file-uploader {
+  width: 35% !important;
+}
+
 .gjs-am-assets-cont {
   margin-left: 10px !important;
   background-color: #fff !important;
   color: #000 !important;
+  width: 65% !important;
 }
 
 .gjs-am-file-uploader #gjs-am-title {
