@@ -29,7 +29,25 @@ const gjsOptions: EditorConfig = {
     pages: [
       {
         name: 'Home page',
-        component: `<h1>GrapesJS React Custom UI</h1>`,
+        component: `
+          <div style="max-width: 600px; margin: 0 auto; background: white; font-family: Arial, sans-serif;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+              <h1 style="margin: 0; color: white; font-size: 32px; font-weight: bold;">Welcome to our Newsletter</h1>
+              <p style="margin: 15px 0 0 0; color: rgba(255,255,255,0.9); font-size: 18px;">Stay updated with our latest news and offers</p>
+            </div>
+            <div style="padding: 40px 20px;">
+              <p style="margin: 0 0 20px 0; line-height: 1.6; color: #333; font-size: 16px;">
+                Thank you for subscribing to our newsletter! We're excited to share our latest updates, exclusive offers, and valuable content with you.
+              </p>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="#" style="display: inline-block; padding: 15px 30px; background: #007bff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">Get Started</a>
+              </div>
+              <p style="margin: 20px 0 0 0; line-height: 1.6; color: #666; font-size: 14px;">
+                If you have any questions, feel free to reach out to our support team. We're here to help!
+              </p>
+            </div>
+          </div>
+        `,
       },
     ],
   },
@@ -48,14 +66,6 @@ export default function EmailTemplateBuilder() {
       grapesjs='https://unpkg.com/grapesjs'
       grapesjsCss='https://unpkg.com/grapesjs/dist/css/grapes.min.css'
       options={gjsOptions}
-      plugins={
-        [
-          // {
-          //   id: 'gjs-blocks-basic',
-          //   src: 'https://unpkg.com/grapesjs-blocks-basic',
-          // },
-        ]
-      }
       onEditor={onEditor}
     >
       <div className={`flex h-[calc(100vh-115px)] border-t border-gray-200`}>
