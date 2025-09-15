@@ -98,32 +98,17 @@ export function addEditorBlocks(editor: Editor) {
     `,
   });
 
-  editor.BlockManager.add('button', {
-    label: 'Button',
-    media: `<svg viewBox="0 0 24 24">
-        <path fill="currentColor" d="M20 20.5C20 21.3 19.3 22 18.5 22H13C12.6 22 12.3 21.9 12 21.6L8 17.4L8.7 16.6C8.9 16.4 9.2 16.3 9.5 16.3H9.7L12 18V9C12 8.4 12.4 8 13 8S14 8.4 14 9V13.5L15.2 13.6L19.1 15.8C19.6 16 20 16.6 20 17.1V20.5M20 2H4C2.9 2 2 2.9 2 4V12C2 13.1 2.9 14 4 14H8V12H4V4H20V12H18V14H20C21.1 14 22 13.1 22 12V4C22 2.9 21.1 2 20 2Z" />
-    </svg>`,
-    content: '<a class="button">Button</a>',
-  });
-
-  editor.BlockManager.add('divider', {
-    label: 'Divider',
-    media: `<svg viewBox="0 0 24 24">
-        <path fill="currentColor" d="M21 18H2V20H21V18M19 10V14H4V10H19M20 8H3C2.45 8 2 8.45 2 9V15C2 15.55 2.45 16 3 16H20C20.55 16 21 15.55 21 15V9C21 8.45 20.55 8 20 8M21 4H2V6H21V4Z" />
-    </svg>`,
+  editor.BlockManager.add('header-block', {
+    label: 'Header',
     content: `
-      <table style="width: 100%; margin-top: 10px; margin-bottom: 10px;">
-        <tr>
-          <td class="divider"></td>
-        </tr>
-      </table>
-      <style>
-        .divider {
-          background-color: rgba(0, 0, 0, 0.1);
-          height: 1px;
-        }
-      </style>
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center; font-family: Arial, sans-serif;">
+        <h1 style="margin: 0; color: white; font-size: 32px; font-weight: bold;">Welcome</h1>
+        <p style="margin: 15px 0 0 0; color: rgba(255,255,255,0.9); font-size: 18px;">Your beautiful email starts here</p>
+      </div>
     `,
+    media: `<svg viewBox="0 0 24 24">
+      <path fill="currentColor" d="M20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20M4,6V18H20V6H4M6,9H18V11H6V9M6,13H16V15H6V13Z" />
+    </svg>`,
   });
 
   editor.BlockManager.add('text', {
@@ -149,6 +134,34 @@ export function addEditorBlocks(editor: Editor) {
       <p class="paragraph">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
       </p>
+    `,
+  });
+
+  editor.BlockManager.add('button', {
+    label: 'Button',
+    media: `<svg viewBox="0 0 24 24">
+        <path fill="currentColor" d="M20 20.5C20 21.3 19.3 22 18.5 22H13C12.6 22 12.3 21.9 12 21.6L8 17.4L8.7 16.6C8.9 16.4 9.2 16.3 9.5 16.3H9.7L12 18V9C12 8.4 12.4 8 13 8S14 8.4 14 9V13.5L15.2 13.6L19.1 15.8C19.6 16 20 16.6 20 17.1V20.5M20 2H4C2.9 2 2 2.9 2 4V12C2 13.1 2.9 14 4 14H8V12H4V4H20V12H18V14H20C21.1 14 22 13.1 22 12V4C22 2.9 21.1 2 20 2Z" />
+    </svg>`,
+    content: '<a class="button">Button</a>',
+  });
+
+  editor.BlockManager.add('divider', {
+    label: 'Divider',
+    media: `<svg viewBox="0 0 24 24">
+        <path fill="currentColor" d="M21 18H2V20H21V18M19 10V14H4V10H19M20 8H3C2.45 8 2 8.45 2 9V15C2 15.55 2.45 16 3 16H20C20.55 16 21 15.55 21 15V9C21 8.45 20.55 8 20 8M21 4H2V6H21V4Z" />
+    </svg>`,
+    content: `
+      <table style="width: 100%; margin-top: 10px; margin-bottom: 10px;">
+        <tr>
+          <td class="divider"></td>
+        </tr>
+      </table>
+      <style>
+        .divider {
+          background-color: rgba(0, 0, 0, 0.1);
+          height: 1px;
+        }
+      </style>
     `,
   });
 
@@ -201,5 +214,45 @@ export function addEditorBlocks(editor: Editor) {
         'min-width': '50px',
       },
     },
+  });
+
+  editor.BlockManager.add('social-block', {
+    label: 'Social',
+    content: `
+      <div style="text-align: center; padding: 30px 20px; background: #f8f9fa; font-family: Arial, sans-serif;">
+        <h3 style="margin: 0 0 20px 0; color: #343a40; font-size: 20px;">Follow Us</h3>
+        <div style="display: inline-block;">
+          <a href="#" style="display: inline-block; margin: 0 10px; padding: 15px; background: #1877f2; color: white; text-decoration: none; border-radius: 50%; width: 50px; height: 50px; line-height: 20px; font-weight: bold;">f</a>
+          <a href="#" style="display: inline-block; margin: 0 10px; padding: 15px; background: #1da1f2; color: white; text-decoration: none; border-radius: 50%; width: 50px; height: 50px; line-height: 20px; font-weight: bold;">t</a>
+          <a href="#" style="display: inline-block; margin: 0 10px; padding: 15px; background: #0077b5; color: white; text-decoration: none; border-radius: 50%; width: 50px; height: 50px; line-height: 20px; font-weight: bold;">in</a>
+          <a href="#" style="display: inline-block; margin: 0 10px; padding: 15px; background: #e1306c; color: white; text-decoration: none; border-radius: 50%; width: 50px; height: 50px; line-height: 20px; font-weight: bold;">ig</a>
+        </div>
+      </div>
+    `,
+    media: `<svg viewBox="0 0 24 24">
+      <path fill="currentColor" d="M20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20M4,6V18H20V6H4M6,9H18V11H6V9M6,13H16V15H6V13Z" />
+    </svg>`,
+  });
+
+  editor.BlockManager.add('footer-block', {
+    label: 'Footer',
+    content: `
+      <div style="background: #2c3e50; color: white; padding: 40px 20px; text-align: center; font-family: Arial, sans-serif;">
+        <div style="margin-bottom: 20px;">
+          <h3 style="margin: 0 0 10px 0; color: white; font-size: 18px;">Stay Connected</h3>
+          <p style="margin: 0; color: #bdc3c7; font-size: 14px;">Follow us on social media for updates</p>
+        </div>
+        <div style="border-top: 1px solid #34495e; padding-top: 20px; margin-top: 20px;">
+          <p style="margin: 0 0 10px 0; color: #bdc3c7; font-size: 12px;">© 2024 Your Company. All rights reserved.</p>
+          <p style="margin: 0; color: #95a5a6; font-size: 11px;">
+            <a href="#" style="color: #95a5a6; text-decoration: none; margin: 0 10px;">Unsubscribe</a>
+            <a href="#" style="color: #95a5a6; text-decoration: none; margin: 0 10px;">Privacy Policy</a>
+          </p>
+        </div>
+      </div>
+    `,
+    media: `<svg viewBox="0 0 24 24">
+      <path fill="currentColor" d="M20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20M4,6V18H20V6H4M6,9H18V11H6V9M6,13H16V15H6V13Z" />
+    </svg>`,
   });
 }

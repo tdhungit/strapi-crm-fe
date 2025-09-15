@@ -38,7 +38,7 @@ const gjsOptions: EditorConfig = {
 export default function EmailTemplateBuilder() {
   const onEditor = (editor: Editor) => {
     (window as any).editor = editor;
-
+    editor.runCommand('sw-visibility');
     addEditorBlocks(editor);
   };
 
