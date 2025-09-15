@@ -7,7 +7,9 @@ export default function CustomTraitManager({
   return (
     <div className='gjs-custom-style-manager text-left mt-3 p-1'>
       {!traits.length ? (
-        <div>No properties available</div>
+        <div className='text-xs border border-gray-200 rounded p-2'>
+          No properties available
+        </div>
       ) : (
         traits.map((trait) => (
           <TraitPropertyField key={trait.getId()} trait={trait} />

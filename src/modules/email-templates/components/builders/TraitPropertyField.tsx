@@ -124,7 +124,7 @@ export default function TraitPropertyField({
   return (
     <div {...rest} className={cx('mb-3 px-1 w-full')}>
       <div className={cx('flex mb-2 items-center')}>
-        <div className='flex-grow capitalize'>{trait.getLabel()}</div>
+        <div className='flex-grow capitalize text-xs'>{trait.getLabel()}</div>
       </div>
       {inputToRender}
     </div>

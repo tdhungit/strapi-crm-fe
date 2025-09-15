@@ -1,6 +1,11 @@
 import { DevicesProvider, WithEditor } from '@grapesjs/react';
 
-import { Select } from 'antd';
+import {
+  DesktopOutlined,
+  MobileOutlined,
+  TabletOutlined,
+} from '@ant-design/icons';
+import { Radio } from 'antd';
 import * as React from 'react';
 import { cx } from './common';
 import TopBarButtons from './TopbarButtons';
@@ -12,17 +17,29 @@ export default function TopBar({
     <div className={cx('gjs-top-sidebar flex items-center p-1', className)}>
       <DevicesProvider>
         {({ selected, select, devices }) => (
-          <Select
-            value={selected}
-            onChange={(value) => select(value)}
-            size='small'
-          >
-            {devices.map((device) => (
-              <Select.Option value={device.id} key={device.id}>
-                {device.getName()}
-              </Select.Option>
-            ))}
-          </Select>
+          <>
+            <Radio.Group
+              value={selected}
+              onChange={(e) => select(e.target.value)}
+              optionType='button'
+              buttonStyle='solid'
+            >
+              {devices.map((device) => (
+                <Radio.Button
+                  value={device.id}
+                  key={device.id}
+                  title={device.getName()}
+                >
+                  {device.id === 'desktop' && <DesktopOutlined />}
+                  {device.id === 'tablet' && <TabletOutlined />}
+                  {device.id === 'mobileLandscape' && <MobileOutlined />}
+                  {device.id === 'mobilePortrait' && (
+                    <MobileOutlined className='rotate-90' />
+                  )}
+                </Radio.Button>
+              ))}
+            </Radio.Group>
+          </>
         )}
       </DevicesProvider>
       <WithEditor>

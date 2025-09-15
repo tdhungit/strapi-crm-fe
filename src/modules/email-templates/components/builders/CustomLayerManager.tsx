@@ -117,7 +117,7 @@ export default function CustomLayerManager({
 
   return (
     <div
-      className='gjs-custom-layer-manager h-full overflow-y-auto overflow-x-hidden text-sm text-left select-none relative'
+      className='gjs-custom-layer-manager h-full overflow-y-auto overflow-x-hidden text-sm text-left select-none relative p-2'
       style={wrapGridStyle}
       onPointerDown={onDragStart}
       onPointerMove={onDragMove}

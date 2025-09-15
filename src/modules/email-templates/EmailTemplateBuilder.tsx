@@ -10,6 +10,7 @@ import CustomModal from './components/builders/CustomModal';
 import CustomTraitManager from './components/builders/CustomTraitManager';
 import RightSidebar from './components/builders/RightSidebar';
 import TopBar from './components/builders/TopBar';
+import { addEditorBlocks } from './components/builders/common';
 import './components/builders/style.css';
 
 const gjsOptions: EditorConfig = {
@@ -36,8 +37,9 @@ const gjsOptions: EditorConfig = {
 
 export default function EmailTemplateBuilder() {
   const onEditor = (editor: Editor) => {
-    console.log('Editor loaded');
     (window as any).editor = editor;
+
+    addEditorBlocks(editor);
   };
 
   return (
@@ -46,23 +48,25 @@ export default function EmailTemplateBuilder() {
       grapesjs='https://unpkg.com/grapesjs'
       grapesjsCss='https://unpkg.com/grapesjs/dist/css/grapes.min.css'
       options={gjsOptions}
-      plugins={[
-        {
-          id: 'gjs-blocks-basic',
-          src: 'https://unpkg.com/grapesjs-blocks-basic',
-        },
-      ]}
+      plugins={
+        [
+          // {
+          //   id: 'gjs-blocks-basic',
+          //   src: 'https://unpkg.com/grapesjs-blocks-basic',
+          // },
+        ]
+      }
       onEditor={onEditor}
     >
       <div className={`flex h-[calc(100vh-115px)] border-t border-gray-200`}>
         <RightSidebar
-          className={`gjs-column-l w-[220px] border-l border-gray-200 overflow-y-auto`}
+          className={`gjs-column-l w-[240px] border-l border-gray-200 overflow-y-auto`}
         />
         <div className='gjs-column-m flex flex-col flex-grow'>
           <TopBar className='min-h-[48px]' />
           <Canvas className='flex-grow gjs-custom-editor-canvas' />
         </div>
-        <div className='gjs-column-r w-[220px] border-l border-gray-200 overflow-y-auto'>
+        <div className='gjs-column-r w-[240px] border-l border-gray-200 overflow-y-auto'>
           <TraitsProvider>
             {(props) => <CustomTraitManager {...props} />}
           </TraitsProvider>

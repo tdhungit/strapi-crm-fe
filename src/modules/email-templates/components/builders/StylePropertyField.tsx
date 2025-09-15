@@ -8,7 +8,7 @@ import Icon, {
   DeleteOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { Button, Input, Radio, Select, Slider } from 'antd';
+import { Button, Col, Input, Radio, Select, Slider } from 'antd';
 import type {
   Property,
   PropertyComposite,
@@ -82,7 +82,9 @@ export default function StylePropertyField({
                 key={radioProp.getOptionId(option)}
                 value={radioProp.getOptionId(option)}
               >
-                {radioProp.getOptionLabel(option)}
+                <span className='text-xs'>
+                  {radioProp.getOptionLabel(option)}
+                </span>
               </Radio>
             ))}
           </Radio.Group>
@@ -104,7 +106,9 @@ export default function StylePropertyField({
                 key={selectProp.getOptionId(option)}
                 value={selectProp.getOptionId(option)}
               >
-                {selectProp.getOptionLabel(option)}
+                <span className='text-xs'>
+                  {selectProp.getOptionLabel(option)}
+                </span>
               </Select.Option>
             ))}
           </Select>
@@ -245,12 +249,9 @@ export default function StylePropertyField({
   }
 
   return (
-    <div
-      {...rest}
-      className={cx('mb-3 px-1', prop.isFull() ? 'w-full' : 'w-1/2')}
-    >
+    <Col {...rest} span={prop.isFull() ? 24 : 12}>
       <div className={cx('flex mb-2 items-center', canClear && 'text-sky-300')}>
-        <div className='flex-grow capitalize'>{prop.getLabel()}</div>
+        <div className='flex-grow capitalize text-xs'>{prop.getLabel()}</div>
         {canClear && (
           <button onClick={() => prop.clear()}>
             <Icon size={0.7} component={CloseOutlined} />
@@ -267,6 +268,6 @@ export default function StylePropertyField({
         )}
       </div>
       {inputToRender}
-    </div>
+    </Col>
   );
 }

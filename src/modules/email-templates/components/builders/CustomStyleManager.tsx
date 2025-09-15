@@ -1,5 +1,5 @@
 import { type StylesResultProps } from '@grapesjs/react';
-import { Collapse, type CollapseProps } from 'antd';
+import { Collapse, Row, type CollapseProps } from 'antd';
 import StylePropertyField from './StylePropertyField';
 
 export default function CustomStyleManager({
@@ -12,18 +12,18 @@ export default function CustomStyleManager({
       key: sector.getId(),
       label: sector.getName(),
       children: (
-        <div className={`flex flex-wrap`}>
+        <Row gutter={[16, 16]}>
           {sector.getProperties().map((prop) => (
             <StylePropertyField key={prop.getId()} prop={prop} />
           ))}
-        </div>
+        </Row>
       ),
     });
   });
 
   return (
     <div className='gjs-custom-style-manager text-left'>
-      <Collapse items={items} />
+      <Collapse items={items} size='small' />
     </div>
   );
 }

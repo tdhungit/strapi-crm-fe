@@ -3,7 +3,6 @@ import {
   LayersProvider,
   SelectorsProvider,
   StylesProvider,
-  TraitsProvider,
 } from '@grapesjs/react';
 import { Tabs } from 'antd';
 import * as React from 'react';
@@ -14,13 +13,11 @@ import {
   AppstoreAddOutlined,
   EditOutlined,
   LayoutOutlined,
-  SettingOutlined,
 } from '@ant-design/icons';
 import CustomBlockManager from './CustomBlockManager';
 import CustomLayerManager from './CustomLayerManager';
 import CustomSelectorManager from './CustomSelectorManager';
 import CustomStyleManager from './CustomStyleManager';
-import CustomTraitManager from './CustomTraitManager';
 
 export default function RightSidebar({
   className,
@@ -28,7 +25,12 @@ export default function RightSidebar({
   const [selectedTab, setSelectedTab] = useState('components');
 
   return (
-    <div className={cx('gjs-right-sidebar flex flex-col', className)}>
+    <div
+      className={cx(
+        'gjs-right-sidebar flex flex-col pt-2 em-builder-left-bar',
+        className
+      )}
+    >
       <Tabs
         type='card'
         defaultActiveKey={selectedTab}
@@ -47,23 +49,14 @@ export default function RightSidebar({
             key: 'properties',
             label: <EditOutlined />,
             children: (
-              <TraitsProvider>
-                {(props) => <CustomTraitManager {...props} />}
-              </TraitsProvider>
-            ),
-          },
-          {
-            key: 'settings',
-            label: <SettingOutlined />,
-            children: (
-              <>
+              <div className='p-2'>
                 <SelectorsProvider>
                   {(props) => <CustomSelectorManager {...props} />}
                 </SelectorsProvider>
                 <StylesProvider>
                   {(props) => <CustomStyleManager {...props} />}
                 </StylesProvider>
-              </>
+              </div>
             ),
           },
           {
