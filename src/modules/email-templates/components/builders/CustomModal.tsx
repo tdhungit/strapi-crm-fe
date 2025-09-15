@@ -18,10 +18,10 @@ export default function CustomModal({
       open={props.open}
       onCancel={close}
       onOk={close}
-      style={{ padding: 0 }}
+      width={1000}
       styles={{
-        body: {
-          padding: 0,
+        content: {
+          padding: 10,
         },
       }}
       {...props}

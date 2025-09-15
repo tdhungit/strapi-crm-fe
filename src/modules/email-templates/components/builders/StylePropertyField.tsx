@@ -1,7 +1,7 @@
 import { useEditor } from '@grapesjs/react';
 import * as React from 'react';
 
-import Icon, {
+import {
   ArrowDownOutlined,
   ArrowUpOutlined,
   CloseOutlined,
@@ -71,21 +71,36 @@ export default function StylePropertyField({
     />
   );
 
+  console.log(type);
+
   switch (type) {
+    case 'number':
+      {
+        inputToRender = (
+          <Input
+            placeholder={defValue}
+            value={value}
+            onChange={onChange}
+            size='small'
+            type='number'
+          />
+        );
+      }
+      break;
     case 'radio':
       {
         const radioProp = prop as PropertyRadio;
         inputToRender = (
-          <Radio.Group value={value} onChange={onChange}>
+          <Radio.Group value={value} onChange={onChange} size='small'>
             {radioProp.getOptions().map((option) => (
-              <Radio
+              <Radio.Button
                 key={radioProp.getOptionId(option)}
                 value={radioProp.getOptionId(option)}
               >
                 <span className='text-xs'>
                   {radioProp.getOptionLabel(option)}
                 </span>
-              </Radio>
+              </Radio.Button>
             ))}
           </Radio.Group>
         );
@@ -206,15 +221,18 @@ export default function StylePropertyField({
                     size='small'
                     onClick={() => layer.move(layer.getIndex() - 1)}
                   >
-                    <Icon size={0.7} component={ArrowUpOutlined} />
+                    <ArrowUpOutlined className='text-[10px]' />
                   </Button>
                   <Button
                     size='small'
                     onClick={() => layer.move(layer.getIndex() + 1)}
                   >
-                    <Icon size={0.7} component={ArrowDownOutlined} />
+                    <ArrowDownOutlined className='text-[10px]' />
                   </Button>
-                  <button className='flex-grow' onClick={() => layer.select()}>
+                  <button
+                    className='flex-grow text-xs'
+                    onClick={() => layer.select()}
+                  >
                     {layer.getLabel()}
                   </button>
                   <div
@@ -230,7 +248,7 @@ export default function StylePropertyField({
                     {isTextShadow && 'T'}
                   </div>
                   <Button size='small' onClick={() => layer.remove()}>
-                    <Icon size={0.7} component={DeleteOutlined} />
+                    <DeleteOutlined className='text-[10px]' />
                   </Button>
                 </div>
                 {layer.isSelected() && (
@@ -250,21 +268,29 @@ export default function StylePropertyField({
 
   return (
     <Col {...rest} span={prop.isFull() ? 24 : 12}>
-      <div className={cx('flex mb-2 items-center', canClear && 'text-sky-300')}>
+      <div
+        className={cx(
+          'flex mb-2 items-center align-top',
+          canClear && 'text-sky-300'
+        )}
+      >
         <div className='flex-grow capitalize text-xs'>{prop.getLabel()}</div>
         {canClear && (
-          <button onClick={() => prop.clear()}>
-            <Icon size={0.7} component={CloseOutlined} />
-          </button>
+          <div className='flex-grow text-xs'>
+            <button onClick={() => prop.clear()} className='h-[12px]'>
+              <CloseOutlined className='text-[10px]' />
+            </button>
+          </div>
         )}
         {type === 'stack' && (
-          <Button
-            size='small'
-            className='!ml-2'
-            onClick={() => (prop as PropertyStack).addLayer({}, { at: 0 })}
-          >
-            <Icon size={1} component={PlusOutlined} />
-          </Button>
+          <div className='flex-grow text-xs'>
+            <button
+              className='!ml-2'
+              onClick={() => (prop as PropertyStack).addLayer({}, { at: 0 })}
+            >
+              <PlusOutlined className='text-[10px]' />
+            </button>
+          </div>
         )}
       </div>
       {inputToRender}

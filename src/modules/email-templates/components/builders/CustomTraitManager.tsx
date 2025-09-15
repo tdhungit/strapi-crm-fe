@@ -1,4 +1,5 @@
-import { type TraitsResultProps } from '@grapesjs/react';
+import { StylesProvider, type TraitsResultProps } from '@grapesjs/react';
+import CustomStyleTypography from './CustomStyleTypography';
 import TraitPropertyField from './TraitPropertyField';
 
 export default function CustomTraitManager({
@@ -15,6 +16,12 @@ export default function CustomTraitManager({
           <TraitPropertyField key={trait.getId()} trait={trait} />
         ))
       )}
+
+      <div>
+        <StylesProvider>
+          {(props) => <CustomStyleTypography {...props} />}
+        </StylesProvider>
+      </div>
     </div>
   );
 }
