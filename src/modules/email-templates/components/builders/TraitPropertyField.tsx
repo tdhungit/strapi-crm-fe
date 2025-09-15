@@ -115,7 +115,9 @@ export default function TraitPropertyField({
     case 'button':
       {
         inputToRender = (
-          <Button onClick={handleButtonClick}>{trait.getLabel()}</Button>
+          <Button size='small' onClick={handleButtonClick}>
+            {trait.getLabel()}
+          </Button>
         );
       }
       break;

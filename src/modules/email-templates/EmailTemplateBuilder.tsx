@@ -1,9 +1,11 @@
 import GjsEditor, { Canvas, TraitsProvider } from '@grapesjs/react';
 import type { Editor, EditorConfig } from 'grapesjs';
+import { useState } from 'react';
+import MediaManagerModal from '../../components/MediaManagerModal';
 import CustomTraitManager from './components/builders/CustomTraitManager';
 import RightSidebar from './components/builders/RightSidebar';
 import TopBar from './components/builders/TopBar';
-import { addEditorBlocks } from './components/builders/common';
+import { addEditorBlocks, addEditorTraits } from './components/builders/common';
 import './components/builders/style.css';
 
 const gjsOptions: EditorConfig = {
@@ -40,34 +42,66 @@ const gjsOptions: EditorConfig = {
 };
 
 export default function EmailTemplateBuilder() {
+  const [gjsEditor, setGjsEditor] = useState<Editor | null>(null);
+  const [openMediaManager, setOpenMediaManager] = useState(false);
+
   const onEditor = (editor: Editor) => {
     (window as any).editor = editor;
+
+    editor.Commands.add('open-media-manager', {
+      run: () => {
+        setOpenMediaManager(true);
+      },
+    });
+
     editor.runCommand('sw-visibility');
     addEditorBlocks(editor);
+    addEditorTraits(editor);
+
+    setGjsEditor(editor);
+  };
+
+  const handleSelectMedia = (media: any) => {
+    if (gjsEditor) {
+      let url = media.url;
+      if (url.startsWith('/')) {
+        url = import.meta.env.VITE_MEDIA_URL + url;
+      }
+      const component = gjsEditor.getSelected();
+      component?.set('src', url);
+    }
   };
 
   return (
-    <GjsEditor
-      className='gjs-custom-editor text-black bg-gray-50'
-      grapesjs='https://unpkg.com/grapesjs'
-      grapesjsCss='https://unpkg.com/grapesjs/dist/css/grapes.min.css'
-      options={gjsOptions}
-      onEditor={onEditor}
-    >
-      <div className={`flex h-[calc(100vh-115px)] border-t border-gray-200`}>
-        <RightSidebar
-          className={`gjs-column-l w-[240px] border-l border-gray-200 overflow-y-auto`}
-        />
-        <div className='gjs-column-m flex flex-col flex-grow'>
-          <TopBar className='min-h-[48px]' />
-          <Canvas className='flex-grow gjs-custom-editor-canvas' />
+    <>
+      <GjsEditor
+        className='gjs-custom-editor text-black bg-gray-50'
+        grapesjs='https://unpkg.com/grapesjs'
+        grapesjsCss='https://unpkg.com/grapesjs/dist/css/grapes.min.css'
+        options={gjsOptions}
+        onEditor={onEditor}
+      >
+        <div className={`flex h-[calc(100vh-115px)] border-t border-gray-200`}>
+          <RightSidebar
+            className={`gjs-column-l w-[280px] border-l border-gray-200 overflow-y-auto`}
+          />
+          <div className='gjs-column-m flex flex-col flex-grow'>
+            <TopBar className='min-h-[48px]' />
+            <Canvas className='flex-grow gjs-custom-editor-canvas' />
+          </div>
+          <div className='gjs-column-r w-[280px] border-l border-gray-200 overflow-y-auto'>
+            <TraitsProvider>
+              {(props) => <CustomTraitManager {...props} />}
+            </TraitsProvider>
+          </div>
         </div>
-        <div className='gjs-column-r w-[240px] border-l border-gray-200 overflow-y-auto'>
-          <TraitsProvider>
-            {(props) => <CustomTraitManager {...props} />}
-          </TraitsProvider>
-        </div>
-      </div>
-    </GjsEditor>
+      </GjsEditor>
+
+      <MediaManagerModal
+        open={openMediaManager}
+        onOpenChange={setOpenMediaManager}
+        onSelect={handleSelectMedia}
+      />
+    </>
   );
 }

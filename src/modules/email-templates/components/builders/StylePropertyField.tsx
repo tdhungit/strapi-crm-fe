@@ -71,7 +71,7 @@ export default function StylePropertyField({
     />
   );
 
-  console.log(type);
+  // console.log(type);
 
   switch (type) {
     case 'number':
