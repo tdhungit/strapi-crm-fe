@@ -1,4 +1,5 @@
 import { StylesProvider, type TraitsResultProps } from '@grapesjs/react';
+import { Alert } from 'antd';
 import CustomStyleTypography from './CustomStyleTypography';
 import TraitPropertyField from './TraitPropertyField';
 
@@ -8,8 +9,8 @@ export default function CustomTraitManager({
   return (
     <div className='gjs-custom-style-manager text-left mt-3 p-1'>
       {!traits.length ? (
-        <div className='text-xs border border-gray-200 rounded p-2'>
-          No properties available
+        <div className='mb-4'>
+          <Alert message='No properties available' type='error' />
         </div>
       ) : (
         traits.map((trait) => (

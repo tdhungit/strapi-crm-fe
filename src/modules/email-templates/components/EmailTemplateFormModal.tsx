@@ -11,13 +11,13 @@ import { getEditorHtml } from './builders/common';
 
 export default function EmailTemplateFormModal({
   open,
-  id,
+  data,
   editor,
   onOpenChange,
   onFinish,
 }: {
   open: boolean;
-  id?: string;
+  data?: any;
   editor?: Editor;
   onOpenChange: (open: boolean) => void;
   onFinish?: (record: any) => void;
@@ -26,7 +26,6 @@ export default function EmailTemplateFormModal({
   const [form] = Form.useForm();
 
   const [config, setConfig] = useState<any>({});
-  const [data, setData] = useState<any>({});
 
   useEffect(() => {
     MetadataService.getCollectionConfigurations('email-templates').then(
@@ -37,22 +36,10 @@ export default function EmailTemplateFormModal({
   }, []);
 
   useEffect(() => {
-    if (form && id) {
-      // Fetch user data for editing
-      ApiService.getClient()
-        .collection('email-templates')
-        .findOne(id, { populate: '*' })
-        .then((res) => {
-          form.setFieldsValue(res?.data);
-          setData(res?.data);
-        })
-        .catch(() => {
-          notification.error({
-            message: 'Failed to fetch data',
-          });
-        });
+    if (form && data) {
+      form.setFieldsValue(data);
     }
-  }, [id, form]);
+  }, [form, data]);
 
   const renderEditLayoutRows = (
     config: CollectionConfigType,
@@ -91,21 +78,28 @@ export default function EmailTemplateFormModal({
       }
 
       let record;
-      if (id) {
+      message.loading('Saving...', 0);
+      if (data?.documentId) {
         record = await ApiService.getClient()
           .collection('email-templates')
-          .update(id, values);
+          .update(data.documentId, values);
       } else {
         record = await ApiService.getClient()
           .collection('email-templates')
           .create(values);
       }
 
-      message.success('Saved successfully');
+      message.destroy();
+      notification.success({
+        message: 'Saved successfully',
+      });
       onOpenChange(false);
       onFinish?.(record);
     } catch (error) {
-      message.error('Failed to save');
+      message.destroy();
+      notification.error({
+        message: 'Failed to save',
+      });
       console.error('Form validation failed:', error);
     }
   };

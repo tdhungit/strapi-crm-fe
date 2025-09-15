@@ -1,8 +1,9 @@
 import GjsEditor, { Canvas, TraitsProvider } from '@grapesjs/react';
 import type { Editor, EditorConfig } from 'grapesjs';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import MediaManagerModal from '../../components/MediaManagerModal';
+import ApiService from '../../services/ApiService';
 import { addEditorBlocks, addEditorTraits } from './components/builders/common';
 import CustomTraitManager from './components/builders/CustomTraitManager';
 import RightSidebar from './components/builders/RightSidebar';
@@ -45,10 +46,12 @@ const gjsOptions: EditorConfig = {
 
 export default function EmailTemplateBuilder() {
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const [gjsEditor, setGjsEditor] = useState<Editor | null>(null);
   const [openMediaManager, setOpenMediaManager] = useState(false);
   const [openSaveModal, setOpenSaveModal] = useState(false);
+  const [data, setData] = useState<any>({});
 
   const onEditor = (editor: Editor) => {
     (window as any).editor = editor;
@@ -77,6 +80,20 @@ export default function EmailTemplateBuilder() {
     }
   };
 
+  useEffect(() => {
+    if (id && gjsEditor) {
+      ApiService.getClient()
+        .collection('email-templates')
+        .findOne(id)
+        .then((res) => {
+          setData(res?.data);
+          if (res?.data?.rawContent?.projectData) {
+            gjsEditor.loadProjectData(res.data.rawContent.projectData);
+          }
+        });
+    }
+  }, [id, gjsEditor]);
+
   return (
     <>
       <GjsEditor
@@ -94,6 +111,7 @@ export default function EmailTemplateBuilder() {
             <TopBar
               className='min-h-[48px]'
               onSelectSave={() => setOpenSaveModal(true)}
+              onCancel={() => navigate('/collections/email-templates')}
             />
             <Canvas className='flex-grow gjs-custom-editor-canvas' />
           </div>
@@ -116,6 +134,7 @@ export default function EmailTemplateBuilder() {
           open={openSaveModal}
           onOpenChange={setOpenSaveModal}
           editor={gjsEditor}
+          data={data}
           onFinish={(record) => {
             if (record?.data?.documentId) {
               navigate(

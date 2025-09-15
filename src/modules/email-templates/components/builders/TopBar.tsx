@@ -14,8 +14,10 @@ import TopBarButtons from './TopbarButtons';
 export default function TopBar({
   className,
   onSelectSave,
+  onCancel,
 }: React.HTMLAttributes<HTMLDivElement> & {
   onSelectSave: () => void;
+  onCancel: () => void;
 }) {
   return (
     <div className={cx('gjs-top-sidebar flex items-center p-1', className)}>
@@ -50,6 +52,9 @@ export default function TopBar({
       <div className='ml-auto'>
         <Button type='primary' icon={<SaveOutlined />} onClick={onSelectSave}>
           Save
+        </Button>
+        <Button onClick={onCancel} className='ml-2'>
+          Cancel
         </Button>
       </div>
 

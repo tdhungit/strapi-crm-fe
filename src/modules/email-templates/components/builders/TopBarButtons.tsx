@@ -2,7 +2,6 @@ import { useEditor } from '@grapesjs/react';
 import * as React from 'react';
 
 import Icon, {
-  CodeOutlined,
   ExpandOutlined,
   EyeInvisibleOutlined,
   RedoOutlined,
@@ -26,19 +25,6 @@ export default function TopBarButtons({
   const { UndoManager, Commands } = editor;
   const cmdButtons: CommandButton[] = [
     {
-      id: 'core:component-outline',
-      iconPath: EyeInvisibleOutlined,
-    },
-    {
-      id: 'core:fullscreen',
-      iconPath: ExpandOutlined,
-      options: { target: '#root' },
-    },
-    {
-      id: 'core:open-code',
-      iconPath: CodeOutlined,
-    },
-    {
       id: 'core:undo',
       iconPath: UndoOutlined,
       disabled: () => !UndoManager.hasUndo(),
@@ -48,6 +34,19 @@ export default function TopBarButtons({
       iconPath: RedoOutlined,
       disabled: () => !UndoManager.hasRedo(),
     },
+    {
+      id: 'core:component-outline',
+      iconPath: EyeInvisibleOutlined,
+    },
+    {
+      id: 'core:fullscreen',
+      iconPath: ExpandOutlined,
+      options: { target: '#root' },
+    },
+    // {
+    //   id: 'core:open-code',
+    //   iconPath: CodeOutlined,
+    // },
   ];
 
   useEffect(() => {
