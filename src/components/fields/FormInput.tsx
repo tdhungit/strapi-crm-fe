@@ -32,8 +32,8 @@ export default function FormInput({
 
   let input = <Input placeholder={placeholder} size='middle' />;
 
-  let itemType = item.type || 'string';
-  if (item.customField) {
+  let itemType = item?.type || 'string';
+  if (item?.customField) {
     itemType = item.customField;
   }
 
@@ -134,14 +134,14 @@ export default function FormInput({
   }
 
   const getValueProps = (value: any) => {
-    if (item.type === 'date' && value && typeof value === 'string') {
+    if (item?.type === 'date' && value && typeof value === 'string') {
       return { value: dayjs(value) };
     }
     return { value };
   };
 
   const normalize = (value: any) => {
-    if (item.type === 'date' && value && dayjs.isDayjs(value)) {
+    if (item?.type === 'date' && value && dayjs.isDayjs(value)) {
       return value.format('YYYY-MM-DD');
     }
     return value;

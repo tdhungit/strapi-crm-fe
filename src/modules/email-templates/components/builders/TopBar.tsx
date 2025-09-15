@@ -3,16 +3,20 @@ import { DevicesProvider, WithEditor } from '@grapesjs/react';
 import {
   DesktopOutlined,
   MobileOutlined,
+  SaveOutlined,
   TabletOutlined,
 } from '@ant-design/icons';
-import { Radio } from 'antd';
+import { Button, Radio } from 'antd';
 import * as React from 'react';
 import { cx } from './common';
 import TopBarButtons from './TopbarButtons';
 
 export default function TopBar({
   className,
-}: React.HTMLAttributes<HTMLDivElement>) {
+  onSelectSave,
+}: React.HTMLAttributes<HTMLDivElement> & {
+  onSelectSave: () => void;
+}) {
   return (
     <div className={cx('gjs-top-sidebar flex items-center p-1', className)}>
       <DevicesProvider>
@@ -42,6 +46,13 @@ export default function TopBar({
           </>
         )}
       </DevicesProvider>
+
+      <div className='ml-auto'>
+        <Button type='primary' icon={<SaveOutlined />} onClick={onSelectSave}>
+          Save
+        </Button>
+      </div>
+
       <WithEditor>
         <TopBarButtons className='ml-auto px-2' />
       </WithEditor>

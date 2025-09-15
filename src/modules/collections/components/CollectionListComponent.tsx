@@ -229,6 +229,7 @@ export default function CollectionListComponent({
                   total: res.meta.pagination.total,
                 };
               } catch (err: any) {
+                console.log(err);
                 const messageError = strapiClientErrorMessage(err);
                 message.error(messageError);
                 return {

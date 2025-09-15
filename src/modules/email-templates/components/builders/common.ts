@@ -1,4 +1,5 @@
 import type { Editor } from 'grapesjs';
+import juice from 'juice';
 
 export const MAIN_BG_COLOR = 'bg-white';
 
@@ -13,6 +14,23 @@ export const ROUND_BORDER_COLOR = `rounded border ${MAIN_BORDER_COLOR}`;
 export function cx(...inputs: any[]): string {
   const inp = Array.isArray(inputs[0]) ? inputs[0] : [...inputs];
   return inp.filter(Boolean).join(' ');
+}
+
+export function getEditorHtml(editor: Editor) {
+  const html = editor.getHtml();
+  const css = editor.getCss();
+  const fullHtml = `
+    <html>
+      <head>
+        <style>${css}</style>
+      </head>
+      <body>
+        ${html}
+      </body>
+    </html>
+  `;
+  const inlineHtml = juice(fullHtml);
+  return inlineHtml;
 }
 
 export function addEditorBlocks(editor: Editor) {

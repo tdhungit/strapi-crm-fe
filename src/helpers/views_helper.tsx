@@ -316,7 +316,7 @@ export function getCollectionPopulatedList(
 
   config.layouts.list.forEach((field: string) => {
     const options = config.attributes[field];
-    if (['relation', 'component'].includes(options.type)) {
+    if (['relation', 'component'].includes(options?.type || '')) {
       populate.push(field);
     }
   });

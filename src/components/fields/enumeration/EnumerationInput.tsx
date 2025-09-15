@@ -17,19 +17,21 @@ export default function EnumerationInput(props: Props) {
     } else if (props.type.default) {
       setValue(props.type.default);
     }
-  }, [props.value, props.type.default]);
+    props.onChange?.(value);
+  }, [props]);
 
   useEffect(() => {
-    if (props.type.enum) {
+    if (props?.type?.enum) {
       const options = props.type.enum.map((value: any) => ({
         value: value,
         label: value,
       }));
       setOptions(options);
     }
-  }, [props.type.enum]);
+  }, [props]);
 
   const onChange = (value: string) => {
+    setValue(value);
     props.onChange?.(value);
   };
 

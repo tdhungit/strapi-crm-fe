@@ -12,6 +12,11 @@ const routes = [
     element: <EmailTemplateBuilderByAi />,
     name: 'Email Template Builder By AI',
   },
+  {
+    path: '/collections/email-templates/edit/:id',
+    element: <EmailTemplateBuilder />,
+    name: 'Email Template Edit',
+  },
 ];
 
 export default routes;

@@ -1,12 +1,14 @@
 import GjsEditor, { Canvas, TraitsProvider } from '@grapesjs/react';
 import type { Editor, EditorConfig } from 'grapesjs';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MediaManagerModal from '../../components/MediaManagerModal';
+import { addEditorBlocks, addEditorTraits } from './components/builders/common';
 import CustomTraitManager from './components/builders/CustomTraitManager';
 import RightSidebar from './components/builders/RightSidebar';
-import TopBar from './components/builders/TopBar';
-import { addEditorBlocks, addEditorTraits } from './components/builders/common';
 import './components/builders/style.css';
+import TopBar from './components/builders/TopBar';
+import EmailTemplateFormModal from './components/EmailTemplateFormModal';
 
 const gjsOptions: EditorConfig = {
   height: 'calc(100vh-115px)',
@@ -42,8 +44,11 @@ const gjsOptions: EditorConfig = {
 };
 
 export default function EmailTemplateBuilder() {
+  const navigate = useNavigate();
+
   const [gjsEditor, setGjsEditor] = useState<Editor | null>(null);
   const [openMediaManager, setOpenMediaManager] = useState(false);
+  const [openSaveModal, setOpenSaveModal] = useState(false);
 
   const onEditor = (editor: Editor) => {
     (window as any).editor = editor;
@@ -86,7 +91,10 @@ export default function EmailTemplateBuilder() {
             className={`gjs-column-l w-[280px] border-l border-gray-200 overflow-y-auto`}
           />
           <div className='gjs-column-m flex flex-col flex-grow'>
-            <TopBar className='min-h-[48px]' />
+            <TopBar
+              className='min-h-[48px]'
+              onSelectSave={() => setOpenSaveModal(true)}
+            />
             <Canvas className='flex-grow gjs-custom-editor-canvas' />
           </div>
           <div className='gjs-column-r w-[280px] border-l border-gray-200 overflow-y-auto'>
@@ -102,6 +110,23 @@ export default function EmailTemplateBuilder() {
         onOpenChange={setOpenMediaManager}
         onSelect={handleSelectMedia}
       />
+
+      {gjsEditor && (
+        <EmailTemplateFormModal
+          open={openSaveModal}
+          onOpenChange={setOpenSaveModal}
+          editor={gjsEditor}
+          onFinish={(record) => {
+            if (record?.data?.documentId) {
+              navigate(
+                `/collections/email-templates/detail/${record.data.documentId}`
+              );
+            } else {
+              navigate(`/collections/email-templates`);
+            }
+          }}
+        />
+      )}
     </>
   );
 }

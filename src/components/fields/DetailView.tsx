@@ -14,9 +14,9 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
   useEffect(() => {
     if (data[item.name]) {
       const value = data[item.name];
-      let type = item.type || 'string';
+      let type = item?.type || 'string';
 
-      if (item.customField) {
+      if (item?.customField) {
         type = item.customField;
       }
 
@@ -59,6 +59,9 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
 
         case 'password':
           setDisplayValue(<PasswordView />);
+          break;
+
+        case 'json':
           break;
 
         case 'string':
