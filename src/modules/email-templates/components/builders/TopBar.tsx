@@ -32,10 +32,10 @@ export default function TopBar({
                 >
                   {device.id === 'desktop' && <DesktopOutlined />}
                   {device.id === 'tablet' && <TabletOutlined />}
-                  {device.id === 'mobileLandscape' && <MobileOutlined />}
-                  {device.id === 'mobilePortrait' && (
+                  {device.id === 'mobileLandscape' && (
                     <MobileOutlined className='rotate-90' />
                   )}
+                  {device.id === 'mobilePortrait' && <MobileOutlined />}
                 </Radio.Button>
               ))}
             </Radio.Group>
