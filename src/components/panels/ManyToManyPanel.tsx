@@ -41,6 +41,8 @@ export default function ManyToManyPanel({
   const [config, setConfig] = useState<any>([]);
   const [columns, setColumns] = useState<any>([]);
 
+  const relateField = field?.inversedBy || field?.mappedBy;
+
   useEffect(() => {
     if (relateModule) {
       MetadataService.getCollectionConfigurations(relateModule).then((res) => {
@@ -78,7 +80,7 @@ export default function ManyToManyPanel({
                       try {
                         await CollectionService.removeRelationRecord(
                           relateModule,
-                          field.inversedBy,
+                          relateField,
                           selectedRecord,
                           record
                         );
@@ -115,7 +117,7 @@ export default function ManyToManyPanel({
     try {
       await CollectionService.addRelationRecord(
         relateModule,
-        field.inversedBy,
+        relateField,
         selectedRecord,
         record
       );
@@ -139,7 +141,7 @@ export default function ManyToManyPanel({
     try {
       await CollectionService.addRelationRecords(
         relateModule,
-        field.inversedBy,
+        relateField,
         record.id,
         selectedRecordIds as number[]
       );
@@ -171,7 +173,7 @@ export default function ManyToManyPanel({
   return (
     <>
       <div className='w-full'>
-        {columns && relateModule && field?.inversedBy && record?.id && (
+        {columns && relateModule && relateField && record?.id && (
           <ProTable
             key={`${relateModule}-panel-list`}
             actionRef={ref}
@@ -188,7 +190,9 @@ export default function ManyToManyPanel({
                 sort,
                 {
                   filters: {
-                    [field.inversedBy]: record.id,
+                    [relateField]: {
+                      id: record.id,
+                    },
                   },
                   populate: getCollectionPopulatedList(config),
                 },
