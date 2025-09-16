@@ -13,7 +13,10 @@ import {
 import { useRequest } from 'ahooks';
 import { App, Button } from 'antd';
 import { useRef, useState } from 'react';
-import { getListLayoutColumns } from '../../helpers/views_helper';
+import {
+  getCollectionPopulatedList,
+  getListLayoutColumns,
+} from '../../helpers/views_helper';
 import CollectionFormModal from '../../modules/collections/components/CollectionFormModal';
 import CollectionListModal from '../../modules/collections/components/CollectionListModal';
 import CollectionService from '../../services/CollectionService';
@@ -186,7 +189,9 @@ export default function OneToManyPanel({
                     filters: {
                       [field.mappedBy]: record.id,
                     },
-                  }
+                    populate: getCollectionPopulatedList(config),
+                  },
+                  config
                 );
               }}
               rowKey='documentId'

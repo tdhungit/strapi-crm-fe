@@ -3,6 +3,7 @@ import { ProTable, type ActionType } from '@ant-design/pro-components';
 import { App, Button, Modal } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import {
+  getCollectionPopulatedList,
   getListLayoutColumns,
   strapiClientErrorMessage,
 } from '../../../helpers/views_helper';
@@ -56,6 +57,7 @@ export default function CollectionListModal({
       relateField: relateField,
       multiple: true,
     });
+    setSelectedIds([]);
     onOpenChange(false);
   };
 
@@ -123,7 +125,11 @@ export default function CollectionListModal({
             const res = await CollectionService.getTableRequest(
               module,
               params,
-              sort
+              sort,
+              {
+                populate: getCollectionPopulatedList(config),
+              },
+              config
             );
             return {
               data: res.data,
@@ -145,7 +151,7 @@ export default function CollectionListModal({
         options={false}
         rowSelection={{
           // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
-          // selectedRowKeys: selectedIds,
+          selectedRowKeys: selectedIds,
           preserveSelectedRowKeys: true,
           onChange: (selectedRowKeys: any) => {
             setSelectedIds(selectedRowKeys);
