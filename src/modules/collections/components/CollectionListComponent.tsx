@@ -32,6 +32,7 @@ export default function CollectionListComponent({
   module,
   header,
   extra,
+  toolBarRender,
 }: {
   module: string;
   header?:
@@ -40,27 +41,10 @@ export default function CollectionListComponent({
       };
   [key: string]: any;
   extra?: React.ReactNode[];
+  toolBarRender?: boolean | React.ReactNode[];
 }) {
   const { message } = App.useApp();
   const ref = useRef<any>(null);
-
-  const defaultHeader: Partial<PageHeaderProps> & {
-    children?: React.ReactNode;
-  } = {
-    title: `${module?.toUpperCase()}`,
-    breadcrumb: {
-      items: [
-        {
-          title: 'Home',
-          href: '/home',
-        },
-        {
-          title: capitalizeFirstLetter(module || ''),
-          href: `/collections/${module}`,
-        },
-      ],
-    },
-  };
 
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
@@ -182,6 +166,56 @@ export default function CollectionListComponent({
     });
   };
 
+  const defaultHeader: Partial<PageHeaderProps> & {
+    children?: React.ReactNode;
+  } = {
+    title: `${module?.toUpperCase()}`,
+    breadcrumb: {
+      items: [
+        {
+          title: 'Home',
+          href: '/home',
+        },
+        {
+          title: capitalizeFirstLetter(module || ''),
+          href: `/collections/${module}`,
+        },
+      ],
+    },
+  };
+
+  let toolBars: any = false;
+  if (Array.isArray(toolBarRender)) {
+    toolBars = toolBarRender;
+  } else if (toolBarRender !== false) {
+    toolBars = [
+      <Button
+        key='create'
+        variant='solid'
+        color='primary'
+        href={`/collections/${module}/create`}
+      >
+        <PlusCircleFilled /> Create
+      </Button>,
+      <Button
+        key='import'
+        variant='solid'
+        color='orange'
+        href={`/imports/${module}?returnUrl=/collections/${module}`}
+      >
+        <FileExcelOutlined /> Import
+      </Button>,
+      <Button
+        key='export'
+        variant='solid'
+        color='volcano'
+        onClick={handleExport}
+      >
+        <FileExcelOutlined /> Export
+      </Button>,
+    ];
+  }
+
   if (!config?.layouts) return <PageLoading />;
 
   return (
@@ -240,32 +274,7 @@ export default function CollectionListComponent({
               }
             }}
             pagination={CollectionService.getTablePagination(config)}
-            toolBarRender={() => [
-              <Button
-                key='create'
-                variant='solid'
-                color='primary'
-                href={`/collections/${module}/create`}
-              >
-                <PlusCircleFilled /> Create
-              </Button>,
-              <Button
-                key='import'
-                variant='solid'
-                color='orange'
-                href={`/imports/${module}?returnUrl=/collections/${module}`}
-              >
-                <FileExcelOutlined /> Import
-              </Button>,
-              <Button
-                key='export'
-                variant='solid'
-                color='volcano'
-                onClick={handleExport}
-              >
-                <FileExcelOutlined /> Export
-              </Button>,
-            ]}
+            toolBarRender={() => toolBars}
           />
         </div>
 
