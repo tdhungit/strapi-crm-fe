@@ -194,6 +194,7 @@ export default function OneToManyPanel({
             relateField={field}
             onOpenChange={setOpenSelectModal}
             onFinish={onSelectedRecord}
+            defaultConfig={config}
           />
 
           <CollectionFormModal
@@ -204,6 +205,7 @@ export default function OneToManyPanel({
             relateField={field}
             onOpenChange={setOpenFormModal}
             onFinish={onSelectedRecord}
+            defaultConfig={config}
           />
         </>
       )}

@@ -164,7 +164,8 @@ export function updateEditLayoutColumns(
 
       if (
         fieldOptions.type === 'relation' &&
-        fieldOptions.relation === 'oneToMany'
+        fieldOptions.relation &&
+        ['oneToMany', 'manyToMany'].includes(fieldOptions.relation)
       ) {
         return;
       }
@@ -266,7 +267,8 @@ export function getEditLayoutPanels(
 
       if (
         fieldOptions.type === 'relation' &&
-        fieldOptions.relation === 'oneToMany' &&
+        fieldOptions.relation &&
+        ['oneToMany', 'manyToMany'].includes(fieldOptions.relation) &&
         fieldOptions.target
       ) {
         const contentType = MetadataService.getContentTypeByUid(

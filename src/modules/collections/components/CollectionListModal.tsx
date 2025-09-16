@@ -17,12 +17,14 @@ export default function CollectionListModal({
   relateField,
   onOpenChange,
   onFinish,
+  defaultConfig,
 }: {
   module: string;
   open: boolean;
   parentCollectionName?: string;
   parentRecord?: any;
   relateField?: any;
+  defaultConfig?: any;
   onOpenChange: (open: boolean) => void;
   onFinish?: (values: any, options: any) => void;
 }) {
@@ -39,35 +41,48 @@ export default function CollectionListModal({
     });
   };
 
+  const getColumns = async (module: string, newConfig?: any) => {
+    let currentConfig: any;
+    if (newConfig) {
+      currentConfig = newConfig;
+    } else {
+      const res = await MetadataService.getCollectionConfigurations(module);
+      currentConfig = res;
+    }
+
+    const cols: any = getListLayoutColumns(currentConfig);
+    cols.push({
+      title: 'Actions',
+      key: 'actions',
+      search: false,
+      render: (record: any) => (
+        <div>
+          <Button
+            onClick={() => onSelectRecord(record)}
+            variant='solid'
+            color='danger'
+            size='small'
+          >
+            <CheckOutlined />
+          </Button>
+        </div>
+      ),
+    });
+
+    return {
+      config: currentConfig,
+      columns: cols,
+    };
+  };
+
   useEffect(() => {
     if (module) {
-      MetadataService.getCollectionConfigurations(module).then((res) => {
-        setConfig(res);
-        // get columns
-        const cols: any = getListLayoutColumns(res);
-        // add actions column
-        cols.push({
-          title: 'Actions',
-          key: 'actions',
-          search: false,
-          render: (record: any) => (
-            <div>
-              <Button
-                onClick={() => onSelectRecord(record)}
-                variant='solid'
-                color='danger'
-                size='small'
-              >
-                <CheckOutlined />
-              </Button>
-            </div>
-          ),
-        });
-        // update columns
-        setColumns(cols);
+      getColumns(module, defaultConfig).then((res) => {
+        setConfig(res.config);
+        setColumns(res.columns);
       });
     }
-  }, [module]);
+  }, [module, defaultConfig]);
 
   return (
     <Modal

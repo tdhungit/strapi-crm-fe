@@ -1,4 +1,5 @@
 import { Collapse } from 'antd';
+import ManyToManyPanel from './ManyToManyPanel';
 import OneToManyPanel from './OneToManyPanel';
 
 export default function RecordPanels({
@@ -21,16 +22,21 @@ export default function RecordPanels({
             field={panel.field}
           />
         )}
+        {panel.type === 'manyToMany' && (
+          <ManyToManyPanel
+            module={panel.parentModule}
+            record={record}
+            relateModule={panel.module}
+            field={panel.field}
+          />
+        )}
       </>
     ),
   }));
 
   return (
     <div className='mt-4'>
-      <Collapse
-        items={collapseItems}
-        defaultActiveKey={panels.map((panel) => `panel-${panel.name}`)}
-      />
+      <Collapse items={collapseItems} />
     </div>
   );
 }

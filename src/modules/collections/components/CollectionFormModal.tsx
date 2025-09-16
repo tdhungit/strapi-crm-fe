@@ -17,6 +17,7 @@ export default function CollectionFormModal({
   relateField,
   onOpenChange,
   onFinish,
+  defaultConfig,
 }: {
   collectionName: string;
   open: boolean;
@@ -24,6 +25,7 @@ export default function CollectionFormModal({
   parentCollectionName?: string;
   parentRecord?: any;
   relateField?: any;
+  defaultConfig?: any;
   onOpenChange: (open: boolean) => void;
   onFinish: (values: any) => void;
 }) {
@@ -33,13 +35,18 @@ export default function CollectionFormModal({
   const [config, setConfig] = useState<any>({});
   const [data, setData] = useState<any>({});
 
+  const getConfig = async (collectionName: string) => {
+    if (defaultConfig) {
+      return defaultConfig;
+    }
+    return MetadataService.getCollectionConfigurations(collectionName);
+  };
+
   useEffect(() => {
     if (collectionName) {
-      MetadataService.getCollectionConfigurations(collectionName).then(
-        (res) => {
-          setConfig(res);
-        }
-      );
+      getConfig(collectionName).then((res) => {
+        setConfig(res);
+      });
     }
   }, [collectionName]);
 

@@ -1,5 +1,6 @@
 import { EditFilled } from '@ant-design/icons';
 import { PageContainer, ProDescriptions } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import { Button } from 'antd';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -23,12 +24,15 @@ export default function CollectionDetailComponent({
   id: string;
   [key: string]: any;
 }) {
-  const [title, setTitle] = useState<string>('');
-  const [record, setRecord] = useState<any>({});
   const [config, setConfig] = useState<CollectionConfigType>();
   const [columns, setColumns] = useState<any>([]);
   const [panels, setPanels] = useState<any>([]);
-  const [errorPage, setErrorPage] = useState<any>(false);
+
+  const { data: record, error } = useRequest(() => {
+    return ApiService.getClient()
+      .collection(module)
+      .findOne(id, { populate: '*' });
+  });
 
   useEffect(() => {
     if (module) {
@@ -44,16 +48,18 @@ export default function CollectionDetailComponent({
     }
   }, [module]);
 
-  if (!config?.layouts) return <PageLoading />;
+  if (!config?.layouts || !record) return <PageLoading />;
 
   if (!id) return <PageError message='Invalid ID' />;
 
-  if (errorPage) return <PageError message={'Permission denied'} />;
+  if (error) return <PageError message={'Permission denied'} />;
 
   return (
     <PageContainer
       header={{
-        title: title || `${module?.toUpperCase()}`,
+        title: config?.settings?.mainField
+          ? record?.data[config.settings.mainField]
+          : `${module?.toUpperCase()}`,
         breadcrumb: {
           items: [
             {
@@ -86,52 +92,22 @@ export default function CollectionDetailComponent({
       ]}
     >
       <div className='w-full bg-white p-4 rounded-lg'>
-        {columns.length > 0 && (
+        {record?.data && columns.length > 0 && (
           <ProDescriptions
             key={`${module}-${id || 0}`}
             title={null}
             column={2}
             bordered
-            request={async () => {
-              if (!module || !id) {
-                return {
-                  success: false,
-                  data: {},
-                };
-              }
-
-              try {
-                const res = await ApiService.getClient()
-                  .collection(module)
-                  .findOne(id, { populate: '*' });
-                setRecord(res?.data || {});
-
-                if (res?.data[config.settings?.mainField]) {
-                  setTitle(camelToTitle(res?.data[config.settings?.mainField]));
-                }
-
-                return Promise.resolve({
-                  success: true,
-                  data: res?.data || {},
-                });
-              } catch (error: any) {
-                setErrorPage(true);
-                console.log(error.message);
-                return {
-                  success: false,
-                  data: {},
-                };
-              }
-            }}
+            dataSource={record?.data}
             emptyText='No Data'
             columns={columns}
           />
         )}
       </div>
 
-      {panels.length > 0 && (
+      {record?.data && panels.length > 0 && (
         <div className='mt-4'>
-          <RecordPanels panels={panels} record={record} />
+          <RecordPanels panels={panels} record={record?.data} />
         </div>
       )}
     </PageContainer>
