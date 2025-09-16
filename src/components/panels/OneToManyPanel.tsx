@@ -102,7 +102,7 @@ export default function OneToManyPanel({
     });
   }
 
-  const onSelectedRecord = async (selectedRecord: any) => {
+  const saveSingleSelect = async (selectedRecord: any) => {
     message.loading('Saving...', 0);
     try {
       await CollectionService.addRelationRecord(
@@ -123,6 +123,38 @@ export default function OneToManyPanel({
       notification.error({
         message: error?.response?.data?.error?.message || 'Failed to save',
       });
+    }
+  };
+
+  const saveMultipleSelect = async (selectedRecordIds: any[]) => {
+    message.loading('Saving...', 0);
+    try {
+      await CollectionService.addRelationRecords(
+        relateModule,
+        field,
+        record.id,
+        selectedRecordIds as number[]
+      );
+      ref?.current?.reload();
+      message.destroy();
+      setOpenSelectModal(false);
+      setOpenFormModal(false);
+      notification.success({
+        message: 'Record added successfully',
+      });
+    } catch (error: any) {
+      message.destroy();
+      notification.error({
+        message: error?.response?.data?.error?.message || 'Failed to save',
+      });
+    }
+  };
+
+  const onSelectedRecord = async (selectedRecord: any, options: any) => {
+    if (options?.multiple) {
+      await saveMultipleSelect(selectedRecord);
+    } else {
+      await saveSingleSelect(selectedRecord);
     }
   };
 
@@ -204,7 +236,9 @@ export default function OneToManyPanel({
             parentRecord={record}
             relateField={field}
             onOpenChange={setOpenFormModal}
-            onFinish={onSelectedRecord}
+            onFinish={(values: any) =>
+              onSelectedRecord(values, { multiple: false })
+            }
             defaultConfig={config}
           />
         </>

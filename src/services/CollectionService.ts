@@ -120,6 +120,32 @@ class CollectionService {
         [field.mappedBy]: null,
       });
   }
+
+  async addRelationRecords(
+    collectionName: string,
+    field: any,
+    parentId: number,
+    recordIds?: number[],
+    filters?: any
+  ) {
+    if (!recordIds?.length && !filters) {
+      throw new Error('No records to update');
+    }
+
+    return await ApiService.request(
+      'put',
+      `/collections/${collectionName}/bulk-update`,
+      {
+        ids: recordIds,
+        filters,
+        data: {
+          [field.mappedBy]: {
+            connect: parentId,
+          },
+        },
+      }
+    );
+  }
 }
 
 export default CollectionService.getInstance();

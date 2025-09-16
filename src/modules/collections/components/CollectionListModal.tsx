@@ -1,7 +1,7 @@
-import { CheckOutlined } from '@ant-design/icons';
-import { ProTable } from '@ant-design/pro-components';
+import { PlusOutlined } from '@ant-design/icons';
+import { ProTable, type ActionType } from '@ant-design/pro-components';
 import { App, Button, Modal } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   getListLayoutColumns,
   strapiClientErrorMessage,
@@ -29,16 +29,34 @@ export default function CollectionListModal({
   onFinish?: (values: any, options: any) => void;
 }) {
   const { message } = App.useApp();
+  const actionRef = useRef<ActionType>(null);
 
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
+  const [selectedIds, setSelectedIds] = useState<any>([]);
 
   const onSelectRecord = (record: any) => {
     onFinish?.(record, {
       parentCollectionName: parentCollectionName,
       parentRecord: parentRecord,
       relateField: relateField,
+      multiple: false,
     });
+    onOpenChange(false);
+  };
+
+  const handleSelectRecord = (record: any) => {
+    onSelectRecord(record);
+  };
+
+  const handleFinish = () => {
+    onFinish?.(selectedIds, {
+      parentCollectionName: parentCollectionName,
+      parentRecord: parentRecord,
+      relateField: relateField,
+      multiple: true,
+    });
+    onOpenChange(false);
   };
 
   const getColumns = async (module: string, newConfig?: any) => {
@@ -51,6 +69,7 @@ export default function CollectionListModal({
     }
 
     const cols: any = getListLayoutColumns(currentConfig);
+    // action
     cols.push({
       title: 'Actions',
       key: 'actions',
@@ -58,12 +77,12 @@ export default function CollectionListModal({
       render: (record: any) => (
         <div>
           <Button
-            onClick={() => onSelectRecord(record)}
+            onClick={() => handleSelectRecord(record)}
             variant='solid'
-            color='danger'
+            color='cyan'
             size='small'
           >
-            <CheckOutlined />
+            <PlusOutlined />
           </Button>
         </div>
       ),
@@ -89,11 +108,12 @@ export default function CollectionListModal({
       title={module.toUpperCase()}
       open={open}
       onCancel={() => onOpenChange(false)}
-      onOk={() => {}}
+      onOk={() => handleFinish()}
       width={1000}
     >
       <ProTable
         key={`collection-list-modal-${module}`}
+        actionRef={actionRef}
         search={{
           searchText: 'Search',
         }}
@@ -120,9 +140,17 @@ export default function CollectionListModal({
             };
           }
         }}
-        rowKey='documentId'
+        rowKey='id'
         pagination={CollectionService.getTablePagination(config)}
         options={false}
+        rowSelection={{
+          // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+          // selectedRowKeys: selectedIds,
+          preserveSelectedRowKeys: true,
+          onChange: (selectedRowKeys: any) => {
+            setSelectedIds(selectedRowKeys);
+          },
+        }}
       />
     </Modal>
   );
