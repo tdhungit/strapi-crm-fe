@@ -102,28 +102,37 @@ class CollectionService {
 
   async addRelationRecord(
     collectionName: string,
-    field: any,
+    field: string,
     record: any,
-    parentId: number
+    parentRecord: any
   ) {
     await ApiService.getClient()
       .collection(collectionName)
       .update(record.documentId, {
-        [field.mappedBy]: parentId,
+        [field]: {
+          connect: parentRecord.id,
+        },
       });
   }
 
-  async removeRelationRecord(collectionName: string, field: any, record: any) {
+  async removeRelationRecord(
+    collectionName: string,
+    field: string,
+    record: any,
+    removeRecord: any
+  ) {
     await ApiService.getClient()
       .collection(collectionName)
       .update(record.documentId, {
-        [field.mappedBy]: null,
+        [field]: {
+          disconnect: removeRecord.id,
+        },
       });
   }
 
   async addRelationRecords(
     collectionName: string,
-    field: any,
+    field: string,
     parentId: number,
     recordIds?: number[],
     filters?: any
@@ -139,7 +148,7 @@ class CollectionService {
         ids: recordIds,
         filters,
         data: {
-          [field.mappedBy]: {
+          [field]: {
             connect: parentId,
           },
         },

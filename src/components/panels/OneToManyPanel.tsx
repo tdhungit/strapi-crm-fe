@@ -51,16 +51,16 @@ export default function OneToManyPanel({
       title: 'Actions',
       dataIndex: 'actions',
       valueType: 'option',
-      render: (_text: any, record: any) => [
+      render: (_text: any, selectedRecord: any) => [
         <a
           key={`panel-${relateModule}-btn-view`}
-          href={`/collections/${relateModule}/detail/${record.id}`}
+          href={`/collections/${relateModule}/detail/${selectedRecord.documentId}`}
         >
           <EyeFilled />
         </a>,
         <a
           key={`panel-${relateModule}-btn-edit`}
-          href={`/collections/${relateModule}/edit/${record.id}`}
+          href={`/collections/${relateModule}/edit/${selectedRecord.documentId}`}
         >
           <EditFilled />
         </a>,
@@ -79,7 +79,8 @@ export default function OneToManyPanel({
                 try {
                   await CollectionService.removeRelationRecord(
                     relateModule,
-                    field,
+                    field.mappedBy,
+                    selectedRecord,
                     record
                   );
                   message.destroy();
@@ -110,9 +111,9 @@ export default function OneToManyPanel({
     try {
       await CollectionService.addRelationRecord(
         relateModule,
-        field,
+        field.mappedBy,
         selectedRecord,
-        record.id
+        record
       );
       ref?.current?.reload();
       message.destroy();
@@ -134,7 +135,7 @@ export default function OneToManyPanel({
     try {
       await CollectionService.addRelationRecords(
         relateModule,
-        field,
+        field.mappedBy,
         record.id,
         selectedRecordIds as number[]
       );

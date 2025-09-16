@@ -43,6 +43,7 @@ export default function CollectionListModal({
       relateField: relateField,
       multiple: false,
     });
+    setSelectedIds([]);
     onOpenChange(false);
   };
 

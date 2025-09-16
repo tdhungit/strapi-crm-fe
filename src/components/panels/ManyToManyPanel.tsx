@@ -50,16 +50,16 @@ export default function ManyToManyPanel({
             title: 'Actions',
             dataIndex: 'actions',
             valueType: 'option',
-            render: (_text: any, record: any) => [
+            render: (_text: any, selectedRecord: any) => [
               <a
                 key={`panel-${relateModule}-btn-view`}
-                href={`/collections/${relateModule}/detail/${record.id}`}
+                href={`/collections/${relateModule}/detail/${selectedRecord.documentId}`}
               >
                 <EyeFilled />
               </a>,
               <a
                 key={`panel-${relateModule}-btn-edit`}
-                href={`/collections/${relateModule}/edit/${record.id}`}
+                href={`/collections/${relateModule}/edit/${selectedRecord.documentId}`}
               >
                 <EditFilled />
               </a>,
@@ -78,7 +78,8 @@ export default function ManyToManyPanel({
                       try {
                         await CollectionService.removeRelationRecord(
                           relateModule,
-                          field,
+                          field.inversedBy,
+                          selectedRecord,
                           record
                         );
                         message.destroy();
@@ -109,14 +110,14 @@ export default function ManyToManyPanel({
     }
   }, [relateModule]);
 
-  const onSelectedRecord = async (selectedRecord: any) => {
+  const saveSingleSelect = async (selectedRecord: any) => {
     message.loading('Saving...', 0);
     try {
       await CollectionService.addRelationRecord(
         relateModule,
-        field,
+        field.inversedBy,
         selectedRecord,
-        record.id
+        record
       );
       ref?.current?.reload();
       message.destroy();
@@ -130,6 +131,38 @@ export default function ManyToManyPanel({
       notification.error({
         message: error?.response?.data?.error?.message || 'Failed to save',
       });
+    }
+  };
+
+  const saveMultipleSelect = async (selectedRecordIds: any[]) => {
+    message.loading('Saving...', 0);
+    try {
+      await CollectionService.addRelationRecords(
+        relateModule,
+        field.inversedBy,
+        record.id,
+        selectedRecordIds as number[]
+      );
+      ref?.current?.reload();
+      message.destroy();
+      setOpenSelectModal(false);
+      setOpenFormModal(false);
+      notification.success({
+        message: 'Record added successfully',
+      });
+    } catch (error: any) {
+      message.destroy();
+      notification.error({
+        message: error?.response?.data?.error?.message || 'Failed to save',
+      });
+    }
+  };
+
+  const onSelectedRecord = async (selectedRecord: any, options: any) => {
+    if (options?.multiple) {
+      await saveMultipleSelect(selectedRecord);
+    } else {
+      await saveSingleSelect(selectedRecord);
     }
   };
 
@@ -209,7 +242,11 @@ export default function ManyToManyPanel({
             parentRecord={record}
             relateField={field}
             onOpenChange={setOpenFormModal}
-            onFinish={onSelectedRecord}
+            onFinish={(selectedRecord: any) => {
+              onSelectedRecord(selectedRecord, {
+                multiple: false,
+              });
+            }}
             defaultConfig={config}
           />
         </>
