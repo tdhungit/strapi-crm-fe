@@ -7,6 +7,7 @@ export interface ListRequestType {
 }
 
 export interface ContentTypeAttributeType {
+  name?: string;
   type: string;
   configurable?: boolean;
   required?: boolean;
@@ -36,7 +37,9 @@ export interface ContentTypeType {
   pluralName: string;
   displayName: string;
   description: string;
-  attributes: ContentTypeAttributeType;
+  attributes: {
+    [field: string]: ContentTypeAttributeType;
+  };
   settings: CollectionConfigSettingsType;
   isCRM?: boolean;
 }

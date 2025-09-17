@@ -80,6 +80,18 @@ class MetadataService {
       options: fieldOptions,
     };
   }
+
+  getContentTypeListFields(contentType: ContentTypeType) {
+    const fields = [];
+    for (const fieldName in contentType.attributes) {
+      const fieldOptions = contentType.attributes[fieldName];
+      fields.push({
+        name: fieldName,
+        ...fieldOptions,
+      });
+    }
+    return fields;
+  }
 }
 
 export default MetadataService.getInstance();
