@@ -13,11 +13,13 @@ import SendEmailSettings from './actions/SendEmailSettings';
 export default function CampaignActionSettingsModal({
   open,
   campaign,
+  actionId,
   onOpenChange,
   onFinished,
 }: {
   open: boolean;
   campaign: any;
+  actionId?: number | null;
   onOpenChange: (open: boolean) => void;
   onFinished?: () => void;
 }) {
@@ -78,6 +80,18 @@ export default function CampaignActionSettingsModal({
     }
   };
 
+  useEffect(() => {
+    if (actionId) {
+      const campaignAction = campaign.campaign_actions.find(
+        (action: any) => action.id === actionId
+      );
+      if (campaignAction) {
+        form.setFieldsValue(campaignAction);
+        setAction(campaignAction.name);
+      }
+    }
+  }, [actionId]);
+
   const handleSave = async (values: any) => {
     const isValid = await form.validateFields();
     if (!isValid) {
@@ -89,14 +103,32 @@ export default function CampaignActionSettingsModal({
 
     message.loading('Saving...', 0);
     try {
-      await ApiService.getClient()
-        .collection('campaign-actions')
-        .create({
-          campaign: campaign.id,
-          user: user.id,
-          action_status: 'Ready',
-          ...values,
-        });
+      if (actionId) {
+        const campaignAction = campaign.campaign_actions.find(
+          (action: any) => action.id === actionId
+        );
+
+        if (campaignAction) {
+          await ApiService.getClient()
+            .collection('campaign-actions')
+            .update(campaignAction.documentId, values);
+        } else {
+          message.destroy();
+          notification.error({
+            message: 'Campaign action not found',
+          });
+          return;
+        }
+      } else {
+        await ApiService.getClient()
+          .collection('campaign-actions')
+          .create({
+            campaign: campaign.id,
+            user: user.id,
+            action_status: 'Ready',
+            ...values,
+          });
+      }
       message.destroy();
       notification.success({
         message: 'Saved successfully',

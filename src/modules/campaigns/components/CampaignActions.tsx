@@ -16,6 +16,7 @@ export default function CampaignActions({
   onChange?: () => void;
 }) {
   const [openActionSettings, setOpenActionSettings] = useState(false);
+  const [selectedActionId, setSelectedActionId] = useState<number | null>(null);
 
   return (
     <div>
@@ -32,7 +33,10 @@ export default function CampaignActions({
             <Button
               type='primary'
               key='create'
-              onClick={() => setOpenActionSettings(true)}
+              onClick={() => {
+                setSelectedActionId(null);
+                setOpenActionSettings(true);
+              }}
             >
               <PlusCircleFilled /> Create Action
             </Button>,
@@ -68,13 +72,16 @@ export default function CampaignActions({
             title: 'Action Type',
             dataIndex: 'action_type',
             key: 'action_type',
-            render: () => {
+            render: (_, record: any) => {
               return (
                 <>
                   <Tag
                     color='orange'
                     className='cursor-pointer'
-                    onClick={() => setOpenActionSettings(true)}
+                    onClick={() => {
+                      setSelectedActionId(record.id);
+                      setOpenActionSettings(true);
+                    }}
                   >
                     <EditOutlined />
                   </Tag>
@@ -93,9 +100,10 @@ export default function CampaignActions({
       />
 
       <CampaignActionSettingsModal
+        campaign={campaign}
+        actionId={selectedActionId}
         open={openActionSettings}
         onOpenChange={setOpenActionSettings}
-        campaign={campaign}
         onFinished={onChange}
       />
     </div>
