@@ -326,6 +326,32 @@ export function getCollectionPopulatedList(
   return populate;
 }
 
+export function getCollectionPopulatedDetail(
+  config: CollectionConfigType
+): string[] {
+  const populate: string[] = [];
+
+  config.layouts.edit.forEach((line: any[]) => {
+    line.forEach((item: any) => {
+      const options = config.attributes[item.name];
+      if (options.type) {
+        if (options.type === 'component') {
+          populate.push(item.name);
+        } else if (options.type === 'relation') {
+          if (
+            options.relation === 'oneToOne' ||
+            options.relation === 'manyToOne'
+          ) {
+            populate.push(item.name);
+          }
+        }
+      }
+    });
+  });
+
+  return populate;
+}
+
 export function generateCollectionFilters(
   params: ParamsType & {
     search?: string;

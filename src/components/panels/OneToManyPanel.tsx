@@ -184,18 +184,35 @@ export default function OneToManyPanel({
               }}
               request={async (params, sort) => {
                 const apiModule = relateModule.replace(/_/g, '-');
-                return await CollectionService.getTableRequest(
-                  apiModule,
-                  params,
-                  sort,
-                  {
-                    filters: {
-                      [field.mappedBy]: record.id,
+                try {
+                  const res = await CollectionService.getTableRequest(
+                    apiModule,
+                    params,
+                    sort,
+                    {
+                      filters: {
+                        [field.mappedBy]: record.id,
+                      },
+                      populate: getCollectionPopulatedList(config),
                     },
-                    populate: getCollectionPopulatedList(config),
-                  },
-                  config
-                );
+                    config
+                  );
+                  return {
+                    data: res.data,
+                    success: true,
+                    total: res.meta.pagination.total,
+                  };
+                } catch (error: any) {
+                  notification.error({
+                    message:
+                      error?.response?.data?.error?.message || 'Failed to load',
+                  });
+                  return {
+                    data: [],
+                    success: false,
+                    total: 0,
+                  };
+                }
               }}
               rowKey='documentId'
               pagination={CollectionService.getTablePagination(config)}

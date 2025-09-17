@@ -185,20 +185,37 @@ export default function ManyToManyPanel({
             }}
             request={async (params, sort) => {
               const apiModule = relateModule.replace(/-/g, '_');
-              return await CollectionService.getTableRequest(
-                apiModule,
-                params,
-                sort,
-                {
-                  filters: {
-                    [relateField]: {
-                      id: record.id,
+              try {
+                const res = await CollectionService.getTableRequest(
+                  apiModule,
+                  params,
+                  sort,
+                  {
+                    filters: {
+                      [relateField]: {
+                        id: record.id,
+                      },
                     },
+                    populate: getCollectionPopulatedList(config),
                   },
-                  populate: getCollectionPopulatedList(config),
-                },
-                config
-              );
+                  config
+                );
+                return {
+                  data: res.data,
+                  success: true,
+                  total: res.meta.pagination.total,
+                };
+              } catch (error: any) {
+                notification.error({
+                  message:
+                    error?.response?.data?.error?.message || 'Failed to load',
+                });
+                return {
+                  data: [],
+                  success: false,
+                  total: 0,
+                };
+              }
             }}
             rowKey='documentId'
             pagination={CollectionService.getTablePagination(config)}
