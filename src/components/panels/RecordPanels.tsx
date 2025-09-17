@@ -1,6 +1,5 @@
 import { Collapse } from 'antd';
-import ManyToManyPanel from './ManyToManyPanel';
-import OneToManyPanel from './OneToManyPanel';
+import RecordPanel from './RecordPanel';
 
 export default function RecordPanels({
   panels,
@@ -14,22 +13,7 @@ export default function RecordPanels({
     label: panel.label ? panel.label.toUpperCase() : panel.name.toUpperCase(),
     children: (
       <>
-        {panel.type === 'oneToMany' && (
-          <OneToManyPanel
-            module={panel.parentModule}
-            record={record}
-            relateModule={panel.module}
-            field={panel.field}
-          />
-        )}
-        {panel.type === 'manyToMany' && (
-          <ManyToManyPanel
-            module={panel.parentModule}
-            record={record}
-            relateModule={panel.module}
-            field={panel.field}
-          />
-        )}
+        <RecordPanel panel={panel} record={record} />
       </>
     ),
   }));

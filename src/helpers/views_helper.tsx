@@ -275,14 +275,14 @@ export function getEditLayoutPanels(
           fieldOptions.target
         );
 
-        const module = contentType?.collectionName;
-
         panels.push({
           name: item.name,
           label: fieldOptions.label || item.name,
           type: fieldOptions.relation,
-          module: module || '',
-          parentModule: config.collectionName,
+          module: contentType?.collectionName || '',
+          moduleApi: contentType?.pluralName || '',
+          parentModule: config.collectionName || '',
+          parentModuleApi: config.pluralName || '',
           field: config.attributes?.[item.name] || {},
         });
       }

@@ -37,6 +37,7 @@ export interface CollectionConfigSettingsType {
 export interface CollectionConfigType {
   uid: string;
   collectionName: string;
+  pluralName?: string;
   attributes: {
     [field: string]: {
       type: string;
@@ -99,6 +100,8 @@ export interface PanelItemType {
   label: string;
   type: string;
   module: string;
+  moduleApi: string;
   parentModule: string;
+  parentModuleApi: string;
   field: any;
 }

@@ -1,3 +1,4 @@
+import ManyToManyPanel from './ManyToManyPanel';
 import OneToManyPanel from './OneToManyPanel';
 
 export default function RecordPanel({
@@ -11,6 +12,15 @@ export default function RecordPanel({
     case 'oneToMany':
       return (
         <OneToManyPanel
+          module={panel.parentModule}
+          record={record}
+          relateModule={panel.module}
+          field={panel.field}
+        />
+      );
+    case 'manyToMany':
+      return (
+        <ManyToManyPanel
           module={panel.parentModule}
           record={record}
           relateModule={panel.module}

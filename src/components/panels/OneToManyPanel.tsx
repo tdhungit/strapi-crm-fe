@@ -65,6 +65,7 @@ export default function OneToManyPanel({
           <EditFilled />
         </a>,
         <a
+          href='javascript:void(0)'
           key={`panel-${relateModule}-btn-delete`}
           onClick={() => {
             modal.confirm({
@@ -182,8 +183,9 @@ export default function OneToManyPanel({
                 span: 12,
               }}
               request={async (params, sort) => {
+                const apiModule = relateModule.replace(/_/g, '-');
                 return await CollectionService.getTableRequest(
-                  relateModule,
+                  apiModule,
                   params,
                   sort,
                   {
