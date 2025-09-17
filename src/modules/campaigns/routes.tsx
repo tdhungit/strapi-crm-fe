@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import CampaignDetail from './CampaignDetail';
+import CampaignProfile from './CampaignProfile';
 
 const routes = [
   {
@@ -10,6 +11,11 @@ const routes = [
     path: '/collections/campaigns/detail/:id',
     name: 'Campaign Detail',
     element: <CampaignDetail />,
+  },
+  {
+    path: '/collections/campaigns/profile/:id',
+    name: 'Campaign Profile',
+    element: <CampaignProfile />,
   },
 ];
 

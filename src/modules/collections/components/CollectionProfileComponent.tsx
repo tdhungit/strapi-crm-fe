@@ -21,9 +21,13 @@ import CollectionRecordLog from '../components/CollectionRecordLog';
 export default function CollectionProfileComponent({
   module,
   id,
+  extra,
+  excludePanels,
 }: {
   module: string;
   id: string;
+  extra?: React.ReactNode;
+  excludePanels?: string[];
   [key: string]: any;
 }) {
   const [config, setConfig] = useState<CollectionConfigType>();
@@ -49,7 +53,10 @@ export default function CollectionProfileComponent({
             // main field
             setMainField(cRes.settings?.mainField || 'name');
             // get tab items
-            const panels = getEditLayoutPanels(cRes);
+            const excludeList = excludePanels || [];
+            const pns = getEditLayoutPanels(cRes);
+            const panels = pns.filter((p) => !excludeList.includes(p.module));
+
             const newTabItems: TabsProps['items'] = [];
             if (cRes.uid && res?.data?.id) {
               newTabItems.push({
@@ -103,6 +110,7 @@ export default function CollectionProfileComponent({
           ],
         },
       }}
+      extra={extra}
     >
       <ProCard split='vertical'>
         <ProCard
