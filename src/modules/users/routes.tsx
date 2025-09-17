@@ -1,3 +1,4 @@
+import { Navigate } from 'react-router-dom';
 import UserDetail from './UserDetail';
 import UserForm from './UserForm';
 import UserList from './UserList';
@@ -28,6 +29,10 @@ const routes = [
     path: '/users/profile',
     element: <UserProfile />,
     name: 'Profile',
+  },
+  {
+    path: '/collections/users/*',
+    element: <Navigate to='/users' replace />,
   },
 ];
 

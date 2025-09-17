@@ -11,7 +11,7 @@ const UserList: React.FC = () => {
   const [columns, setColumns] = useState<any>([]);
 
   useEffect(() => {
-    MetadataService.getCollectionConfigurations('users').then((res) => {
+    MetadataService.getCollectionConfigurations('up_users').then((res) => {
       setConfig(res);
       const cols: any = getListLayoutColumns(res);
       // add actions column

@@ -17,7 +17,7 @@ export default function UserDetail() {
   const [record, setRecord] = useState<any>({});
 
   useEffect(() => {
-    MetadataService.getCollectionConfigurations('users').then((res) => {
+    MetadataService.getCollectionConfigurations('up_users').then((res) => {
       setConfig(res);
       const cols: any = getEditLayoutColumns(res);
       setColumns(cols);
