@@ -1,10 +1,20 @@
-import { PlusCircleFilled } from '@ant-design/icons';
+import {
+  EditOutlined,
+  PlayCircleOutlined,
+  PlusCircleFilled,
+} from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
-import { Button } from 'antd';
+import { Button, Tag } from 'antd';
 import { useState } from 'react';
 import CampaignActionSettingsModal from './CampaignActionSettingsModal';
 
-export default function CampaignActions({ campaign }: { campaign: any }) {
+export default function CampaignActions({
+  campaign,
+  onChange,
+}: {
+  campaign: any;
+  onChange?: () => void;
+}) {
   const [openActionSettings, setOpenActionSettings] = useState(false);
 
   return (
@@ -35,9 +45,49 @@ export default function CampaignActions({ campaign }: { campaign: any }) {
             key: 'name',
           },
           {
+            title: 'Field',
+            dataIndex: 'field_name',
+            key: 'field_name',
+          },
+          {
+            title: 'Target Field',
+            dataIndex: 'target_field_name',
+            key: 'target_field_name',
+          },
+          {
             title: 'Status',
             dataIndex: 'action_status',
             key: 'action_status',
+            render: (text: any) => {
+              return (
+                <Tag color={text === 'Ready' ? 'green' : 'red'}>{text}</Tag>
+              );
+            },
+          },
+          {
+            title: 'Action Type',
+            dataIndex: 'action_type',
+            key: 'action_type',
+            render: () => {
+              return (
+                <>
+                  <Tag
+                    color='orange'
+                    className='cursor-pointer'
+                    onClick={() => setOpenActionSettings(true)}
+                  >
+                    <EditOutlined />
+                  </Tag>
+                  <Tag
+                    color='red'
+                    className='cursor-pointer'
+                    onClick={() => {}}
+                  >
+                    <PlayCircleOutlined />
+                  </Tag>
+                </>
+              );
+            },
           },
         ]}
       />
@@ -45,6 +95,8 @@ export default function CampaignActions({ campaign }: { campaign: any }) {
       <CampaignActionSettingsModal
         open={openActionSettings}
         onOpenChange={setOpenActionSettings}
+        campaign={campaign}
+        onFinished={onChange}
       />
     </div>
   );

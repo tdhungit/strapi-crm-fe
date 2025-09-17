@@ -26,6 +26,7 @@ export default function CollectionDetailComponent({
   excludePanels,
   hook,
   populate,
+  refresh,
 }: {
   module: string;
   id: string;
@@ -33,6 +34,7 @@ export default function CollectionDetailComponent({
   excludePanels?: string[];
   hook?: (record: any) => React.ReactNode;
   populate?: string[];
+  refresh?: number;
   [key: string]: any;
 }) {
   const [config, setConfig] = useState<CollectionConfigType>();
@@ -40,6 +42,18 @@ export default function CollectionDetailComponent({
   const [panels, setPanels] = useState<any>([]);
   const [record, setRecord] = useState<any>();
   const [error, setError] = useState<any>();
+  const [populateFields, setPopulateFields] = useState<string[]>([]);
+
+  const fetchRecord = ({ queryPopulate }: { queryPopulate?: string[] }) => {
+    ApiService.getClient()
+      .collection(module)
+      .findOne(id, { populate: queryPopulate || populateFields })
+      .then((r) => setRecord(r))
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      });
+  };
 
   useEffect(() => {
     if (module) {
@@ -51,14 +65,8 @@ export default function CollectionDetailComponent({
           queryPopulate = [...queryPopulate, ...populate];
         }
 
-        ApiService.getClient()
-          .collection(module)
-          .findOne(id, { populate: queryPopulate })
-          .then((r) => setRecord(r))
-          .catch((err) => {
-            console.error(err);
-            setError(err.message);
-          });
+        setPopulateFields(queryPopulate);
+        fetchRecord({ queryPopulate });
 
         // Get Panels
         const pns: PanelItemType[] = getEditLayoutPanels(res);
@@ -72,6 +80,12 @@ export default function CollectionDetailComponent({
       });
     }
   }, [module]);
+
+  useEffect(() => {
+    if (refresh && refresh > 0) {
+      fetchRecord({});
+    }
+  }, [refresh]);
 
   const defaultActions: React.ReactNode = [
     <Link key={`${module}-edit-${id}`} to={`/collections/${module}/edit/${id}`}>

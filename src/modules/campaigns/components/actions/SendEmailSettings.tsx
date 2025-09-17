@@ -13,7 +13,7 @@ export default function SendEmailSettings() {
       <ProCard bordered>
         <ProFormSelect
           label='Email Template'
-          name={['actionSettings', 'emailTemplateId']}
+          name={['metadata', 'actionSettings', 'emailTemplateId']}
           showSearch={true}
           request={async (params) => {
             try {
@@ -37,19 +37,25 @@ export default function SendEmailSettings() {
               return [];
             }
           }}
+          rules={[
+            {
+              required: true,
+              message: 'Please select an email template',
+            },
+          ]}
         />
 
         <Row gutter={16}>
           <Col span={12}>
             <ProFormText
               label='From Email'
-              name={['actionSettings', 'fromEmail']}
+              name={['metadata', 'actionSettings', 'fromEmail']}
             />
           </Col>
           <Col span={12}>
             <ProFormText
               label='From Name'
-              name={['actionSettings', 'fromName']}
+              name={['metadata', 'actionSettings', 'fromName']}
             />
           </Col>
         </Row>
@@ -58,13 +64,13 @@ export default function SendEmailSettings() {
           <Col span={12}>
             <ProFormText
               label='Reply To Email'
-              name={['actionSettings', 'replyToEmail']}
+              name={['metadata', 'actionSettings', 'replyToEmail']}
             />
           </Col>
           <Col span={12}>
             <ProFormText
               label='Reply To Name'
-              name={['actionSettings', 'replyToName']}
+              name={['metadata', 'actionSettings', 'replyToName']}
             />
           </Col>
         </Row>

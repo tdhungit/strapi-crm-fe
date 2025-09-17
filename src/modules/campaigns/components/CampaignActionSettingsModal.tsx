@@ -1,21 +1,29 @@
 import { ModalForm, ProForm, ProFormSelect } from '@ant-design/pro-components';
-import { Col, Row } from 'antd';
+import { App, Col, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { camelToTitle } from '../../../helpers/views_helper';
 import ApiService from '../../../services/ApiService';
 import MetadataService from '../../../services/MetadataService';
+import type { RootState } from '../../../stores';
 import type { ContentTypeAttributeType } from '../../../types/content-types';
 import ActionSchedule from './actions/ActionSchedule';
 import SendEmailSettings from './actions/SendEmailSettings';
 
 export default function CampaignActionSettingsModal({
   open,
+  campaign,
   onOpenChange,
+  onFinished,
 }: {
   open: boolean;
+  campaign: any;
   onOpenChange: (open: boolean) => void;
+  onFinished?: () => void;
 }) {
   const [form] = ProForm.useForm();
+  const { message, notification } = App.useApp();
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const contentType = MetadataService.getContentTypeByUid(
     'api::campaign.campaign'
@@ -71,7 +79,37 @@ export default function CampaignActionSettingsModal({
   };
 
   const handleSave = async (values: any) => {
-    console.log('values', values);
+    const isValid = await form.validateFields();
+    if (!isValid) {
+      notification.error({
+        message: 'Form validation failed',
+      });
+      return;
+    }
+
+    message.loading('Saving...', 0);
+    try {
+      await ApiService.getClient()
+        .collection('campaign-actions')
+        .create({
+          campaign: campaign.id,
+          user: user.id,
+          action_status: 'Ready',
+          ...values,
+        });
+      message.destroy();
+      notification.success({
+        message: 'Saved successfully',
+      });
+      onOpenChange(false);
+      onFinished?.();
+    } catch (error: any) {
+      console.error(error);
+      message.destroy();
+      notification.error({
+        message: error?.response?.data?.error?.message || 'Failed to save',
+      });
+    }
   };
 
   return (
@@ -104,6 +142,7 @@ export default function CampaignActionSettingsModal({
         onChange={(value: string) => {
           setAction(value);
         }}
+        rules={[{ required: true, message: 'Please select an action' }]}
       />
 
       <Row gutter={16}>
@@ -123,6 +162,7 @@ export default function CampaignActionSettingsModal({
             onChange={(value: string) => {
               getRelationFields(value);
             }}
+            rules={[{ required: true, message: 'Please select a field' }]}
           />
         </Col>
 
@@ -139,6 +179,9 @@ export default function CampaignActionSettingsModal({
                   }))
                 : []
             }
+            rules={[
+              { required: true, message: 'Please select a target field' },
+            ]}
           />
         </Col>
       </Row>

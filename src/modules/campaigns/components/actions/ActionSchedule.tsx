@@ -22,6 +22,13 @@ export default function ActionSchedule() {
         onChange={(value: string) => {
           setScheduleType(value);
         }}
+        initialValue='elapsed_day'
+        rules={[
+          {
+            required: true,
+            message: 'Please select a schedule type',
+          },
+        ]}
       />
 
       <Row gutter={16}>
@@ -35,6 +42,7 @@ export default function ActionSchedule() {
           <ProFormDigit
             label='Hours'
             name={['schedule', 'hours']}
+            initialValue={0}
             min={0}
             max={23}
           />
@@ -44,6 +52,7 @@ export default function ActionSchedule() {
           <ProFormDigit
             label='Minutes'
             name={['schedule', 'minutes']}
+            initialValue={0}
             min={0}
             max={59}
           />
