@@ -86,47 +86,50 @@ export default function CollectionListComponent({
 
   useEffect(() => {
     if (module) {
-      MetadataService.getCollectionConfigurations(module).then((res) => {
-        setConfig(res);
-        // get columns
-        const cols = getListLayoutColumns(res, {
-          onClickMainField: (record: any) => {
-            setSelectRecordId(record.documentId);
-          },
-        });
-        // add actions column
-        cols.push({
-          title: 'Actions',
-          key: 'actions',
-          search: false,
-          render: (record: any) => (
-            <div>
-              <a
-                href={`/collections/${module}/detail/${record.documentId}`}
-                className='inline-block'
-              >
-                <EyeOutlined />
-              </a>
-              <a
-                href={`/collections/${module}/profile/${record.documentId}`}
-                className='inline-block ml-2'
-              >
-                <FundViewOutlined />
-              </a>
-              <a
-                href={`/collections/${module}/edit/${record.documentId}`}
-                className='inline-block ml-2'
-              >
-                <EditOutlined />
-              </a>
-            </div>
-          ),
-        });
-        // update columns
-        setColumns(cols);
-        // reload table
-        ref?.current?.reload();
-      });
+      const collectionName = module.replace(/-/g, '_');
+      MetadataService.getCollectionConfigurations(collectionName).then(
+        (res) => {
+          setConfig(res);
+          // get columns
+          const cols = getListLayoutColumns(res, {
+            onClickMainField: (record: any) => {
+              setSelectRecordId(record.documentId);
+            },
+          });
+          // add actions column
+          cols.push({
+            title: 'Actions',
+            key: 'actions',
+            search: false,
+            render: (record: any) => (
+              <div>
+                <a
+                  href={`/collections/${module}/detail/${record.documentId}`}
+                  className='inline-block'
+                >
+                  <EyeOutlined />
+                </a>
+                <a
+                  href={`/collections/${module}/profile/${record.documentId}`}
+                  className='inline-block ml-2'
+                >
+                  <FundViewOutlined />
+                </a>
+                <a
+                  href={`/collections/${module}/edit/${record.documentId}`}
+                  className='inline-block ml-2'
+                >
+                  <EditOutlined />
+                </a>
+              </div>
+            ),
+          });
+          // update columns
+          setColumns(cols);
+          // reload table
+          ref?.current?.reload();
+        }
+      );
     }
   }, [module]);
 

@@ -77,6 +77,8 @@ export default function CollectionProfileComponent({
     }
   }, [module, id]);
 
+  const apiModule = module.replace(/_/g, '-');
+
   if (!id) return <PageError message='Invalid ID' />;
 
   if (!config?.layouts) return <PageLoading />;
@@ -92,11 +94,11 @@ export default function CollectionProfileComponent({
             },
             {
               title: camelToTitle(module || ''),
-              href: `/collections/${module}`,
+              href: `/collections/${apiModule}`,
             },
             {
               title: camelToTitle('Detail'),
-              href: `/collections/${module}/detail/${id}`,
+              href: `/collections/${apiModule}/detail/${id}`,
             },
           ],
         },

@@ -42,6 +42,7 @@ export default function ManyToManyPanel({
   const [columns, setColumns] = useState<any>([]);
 
   const relateField = field?.inversedBy || field?.mappedBy;
+  const apiRelateModule = relateModule.replace(/_/g, '-');
 
   useEffect(() => {
     if (relateModule) {
@@ -55,13 +56,13 @@ export default function ManyToManyPanel({
             render: (_text: any, selectedRecord: any) => [
               <a
                 key={`panel-${relateModule}-btn-view`}
-                href={`/collections/${relateModule}/detail/${selectedRecord.documentId}`}
+                href={`/collections/${apiRelateModule}/detail/${selectedRecord.documentId}`}
               >
                 <EyeFilled />
               </a>,
               <a
                 key={`panel-${relateModule}-btn-edit`}
-                href={`/collections/${relateModule}/edit/${selectedRecord.documentId}`}
+                href={`/collections/${apiRelateModule}/edit/${selectedRecord.documentId}`}
               >
                 <EditFilled />
               </a>,

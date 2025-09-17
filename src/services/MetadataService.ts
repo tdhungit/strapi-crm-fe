@@ -44,7 +44,8 @@ class MetadataService {
     module: string,
     type: 'content_types' | 'components' = 'content_types'
   ): Promise<CollectionConfigType> {
-    const contentType = this.getContentTypeByModule(module);
+    const collectionName = module.replace(/-/g, '_');
+    const contentType = this.getContentTypeByModule(collectionName);
     const collectionUid = contentType?.uid;
 
     if (!collectionUid) {

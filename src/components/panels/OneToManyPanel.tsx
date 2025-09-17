@@ -44,6 +44,8 @@ export default function OneToManyPanel({
     return MetadataService.getCollectionConfigurations(relateModule);
   });
 
+  const apiRelateModule = relateModule.replace(/_/g, '-');
+
   let columns: ProColumns<any>[] = [];
   if (config) {
     columns = getListLayoutColumns(config);
@@ -54,13 +56,13 @@ export default function OneToManyPanel({
       render: (_text: any, selectedRecord: any) => [
         <a
           key={`panel-${relateModule}-btn-view`}
-          href={`/collections/${relateModule}/detail/${selectedRecord.documentId}`}
+          href={`/collections/${apiRelateModule}/detail/${selectedRecord.documentId}`}
         >
           <EyeFilled />
         </a>,
         <a
           key={`panel-${relateModule}-btn-edit`}
-          href={`/collections/${relateModule}/edit/${selectedRecord.documentId}`}
+          href={`/collections/${apiRelateModule}/edit/${selectedRecord.documentId}`}
         >
           <EditFilled />
         </a>,
