@@ -1,32 +1,52 @@
 export const defaultMenus: any = {
+  accounts: {
+    key: '/collections/accounts',
+    icon: 'bank',
+    label: 'Accounts',
+  },
+  contacts: {
+    key: '/collections/contacts',
+    icon: 'contacts',
+    label: 'Contacts',
+  },
+  leads: {
+    key: '/collections/leads',
+    icon: 'useradd',
+    label: 'Leads',
+  },
+  opportunities: {
+    key: '/collections/opportunities',
+    icon: 'money',
+    label: 'Opportunities',
+  },
+  campaigns: {
+    key: '/collections/campaigns',
+    icon: 'project',
+    label: 'Campaigns',
+  },
+  'email-templates': {
+    key: '/collections/email-templates',
+    icon: 'filepdf',
+    label: 'Email Templates',
+  },
+  notes: {
+    key: '/collections/notes',
+    icon: 'file',
+    label: 'Notes',
+  },
+  'email-histories': {
+    key: '/collections/email-histories',
+    icon: 'history',
+    label: 'Email Histories',
+  },
   users: {
-    key: '_users',
+    key: '/users',
     icon: 'users',
     label: 'Users',
-    children: [
-      {
-        key: '/users',
-        label: 'User List',
-      },
-      {
-        key: '/users/create',
-        label: 'Create User',
-      },
-    ],
   },
   settings: {
-    key: '_settings',
+    key: '/settings',
     label: 'Settings',
     icon: 'setting',
-    children: [
-      {
-        key: '/settings',
-        label: 'General Settings',
-      },
-      {
-        key: '/settings/menus',
-        label: 'Menu Settings',
-      },
-    ],
   },
 };

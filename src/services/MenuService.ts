@@ -31,6 +31,10 @@ class MenuService {
             break;
         }
       });
+    } else {
+      for (const m in defaultMenus) {
+        menus.push(defaultMenus[m]);
+      }
     }
 
     return {

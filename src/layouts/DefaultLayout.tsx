@@ -67,15 +67,15 @@ export default function DefaultLayout() {
         }
 
         const IconComponent = iconMap[item.icon] || FileTextOutlined;
-        let children: any;
-        if (item.children && item.children.length > 0) {
-          children = item.children as any;
-        }
+        // let children: any;
+        // if (item.children && item.children.length > 0) {
+        //   children = item.children as any;
+        // }
         items.push({
           key: item.key,
           icon: <IconComponent />,
           label: item.label,
-          children,
+          // children,
         });
       });
 
