@@ -46,6 +46,10 @@
   min-height: 200px;
 }
 
-.ant-pro-form-list-container {
+.custom-antd-pro-form .ant-pro-form-list-container {
   width: 100%;
+}
+
+.custom-antd-pro-form .ant-pro-form-list .ant-form-item {
+  /* margin-bottom: 0; */
 }
