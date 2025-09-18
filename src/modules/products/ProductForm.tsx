@@ -6,10 +6,12 @@ import {
   ProFormText,
 } from '@ant-design/pro-components';
 import { App, Col, Row } from 'antd';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import MediaChoose from '../../components/fields/media/MediaChoose';
 import RichtextInput from '../../components/fields/richtext/RichtextInput';
 import ApiService from '../../services/ApiService';
+import ProductService from './ProductService';
 
 export default function ProductForm() {
   const { id } = useParams();
@@ -17,36 +19,27 @@ export default function ProductForm() {
   const { message, notification } = App.useApp();
   const navigate = useNavigate();
 
-  const generateDataSave = (values: any) => {
-    const dataSave = { ...values };
-    delete dataSave.variants;
+  useEffect(() => {
+    if (id) {
+      ApiService.getClient()
+        .collection('products')
+        .findOne(id, {
+          populate: [
+            'product_variants.product_variant_attributes.product_attribute',
+          ],
+        })
+        .then((response) => {
+          const normalizedData = ProductService.denormalizerFormValues(
+            response.data
+          );
 
-    if (values.variants && values.variants.length > 0) {
-      const productVariants = values.variants.map((variant: any) => {
-        const variantData: any = {
-          name: variant.name,
-          sku: variant.sku,
-          variant_status: variant.variant_status,
-          photos: variant.photos,
-          product_variant_attributes: [],
-        };
-
-        if (variant.attributes && variant.attributes.length > 0) {
-          variant.attributes.forEach((attribute: any) => {
-            variantData.product_variant_attributes.push({
-              product_attribute: attribute.attribute.value,
-              attribute_value: attribute.value,
-            });
-          });
-        }
-
-        return variantData;
-      });
-
-      dataSave.product_variants = productVariants;
+          form.setFieldsValue(normalizedData);
+        });
     }
+  }, [id]);
 
-    return dataSave;
+  const generateDataSave = (values: any) => {
+    return ProductService.normalizerFormValues(values);
   };
 
   const handleSave = async (values: any) => {
@@ -58,11 +51,11 @@ export default function ProductForm() {
       if (id) {
         product = await ApiService.getClient()
           .collection('products')
-          .update(id, dataSave);
+          .update(id, dataSave as any);
       } else {
         product = await ApiService.getClient()
           .collection('products')
-          .create(dataSave);
+          .create(dataSave as any);
       }
 
       message.destroy();
@@ -70,8 +63,11 @@ export default function ProductForm() {
         message: 'Success',
         description: 'Product saved successfully',
       });
-
-      navigate(`/collections/products/detail/${product.data.documentId}`);
+      navigate(
+        `/collections/products/detail/${
+          product.data?.documentId || (product as any).documentId
+        }`
+      );
     } catch (error: any) {
       console.log(error);
       message.destroy();
