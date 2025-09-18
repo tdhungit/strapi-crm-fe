@@ -10,6 +10,7 @@ import PageLoading from '../../../components/PageLoading';
 import RecordPanel from '../../../components/panels/RecordPanel';
 import {
   camelToTitle,
+  getCollectionPopulatedDetail,
   getEditLayoutColumns,
   getEditLayoutPanels,
 } from '../../../helpers/views_helper';
@@ -23,66 +24,105 @@ export default function CollectionProfileComponent({
   id,
   extra,
   excludePanels,
+  beforeTabs,
+  afterTabs,
+  onChange,
+  populate,
 }: {
   module: string;
   id: string;
   extra?: React.ReactNode;
   excludePanels?: string[];
+  beforeTabs?: (record: any) => TabsProps['items'] | undefined;
+  afterTabs?: (record: any) => TabsProps['items'] | undefined;
+  populate?: string[];
+  onChange?: (record: any) => void;
   [key: string]: any;
 }) {
   const [config, setConfig] = useState<CollectionConfigType>();
   const [columns, setColumns] = useState<any>([]);
   const [tabItems, setTabItems] = useState<TabsProps['items']>([]);
   const [mainField, setMainField] = useState<string>('name');
-  const [record, setRecord] = useState<any>(); // TODO: typ]
+  const [record, setRecord] = useState<any>();
+  const [populateFields, setPopulateFields] = useState<string[]>([]);
+
+  const fetchRecord = ({ queryPopulate }: { queryPopulate?: string[] }) => {
+    ApiService.getClient()
+      .collection(module)
+      .findOne(id, { populate: queryPopulate || populateFields })
+      .then((r) => {
+        setRecord(r?.data);
+        onChange?.(r?.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   useEffect(() => {
     if (module && id) {
-      // fetch record
-      ApiService.getClient()
-        .collection(module)
-        .findOne(id, { populate: '*' })
-        .then((res) => {
-          setRecord(res?.data);
-
-          // layout metadata
-          MetadataService.getCollectionConfigurations(module).then((cRes) => {
-            setConfig(cRes);
-            // columns render
-            setColumns(getEditLayoutColumns(cRes));
-            // main field
-            setMainField(cRes.settings?.mainField || 'name');
-            // get tab items
-            const excludeList = excludePanels || [];
-            const pns = getEditLayoutPanels(cRes);
-            const panels = pns.filter((p) => !excludeList.includes(p.module));
-
-            const newTabItems: TabsProps['items'] = [];
-            if (cRes.uid && res?.data?.id) {
-              newTabItems.push({
-                key: 'logs',
-                label: 'Logs',
-                children: (
-                  <CollectionRecordLog
-                    collection={cRes.uid}
-                    id={res?.data?.id}
-                  />
-                ),
-              });
-            }
-            // add panels to tab
-            panels.forEach((panel) => {
-              newTabItems.push({
-                key: panel.name,
-                label: camelToTitle(panel.label),
-                children: <RecordPanel panel={panel} record={res?.data} />,
-              });
-            });
-            setTabItems(newTabItems);
-          });
-        });
+      // layout metadata
+      MetadataService.getCollectionConfigurations(module).then((cRes) => {
+        setConfig(cRes);
+        // columns render
+        setColumns(getEditLayoutColumns(cRes));
+        // main field
+        setMainField(cRes.settings?.mainField || 'name');
+      });
     }
   }, [module, id]);
+
+  useEffect(() => {
+    if (config?.layouts?.edit) {
+      let queryPopulate = getCollectionPopulatedDetail(config);
+      if (populate) {
+        queryPopulate = [...queryPopulate, ...populate];
+      }
+      // fetch record
+      fetchRecord({ queryPopulate });
+      setPopulateFields(queryPopulate);
+    }
+  }, [config]);
+
+  useEffect(() => {
+    if (record?.id && config?.layouts?.edit) {
+      // get tab items
+      const excludeList = excludePanels || [];
+      const pns = getEditLayoutPanels(config);
+      const panels = pns.filter((p) => !excludeList.includes(p.module));
+
+      const newTabItems: TabsProps['items'] = [];
+      if (config.uid && record?.id) {
+        newTabItems.push({
+          key: 'logs',
+          label: 'Logs',
+          children: (
+            <CollectionRecordLog collection={config.uid} id={record?.id} />
+          ),
+        });
+      }
+      // add panels to tab
+      panels.forEach((panel) => {
+        newTabItems.push({
+          key: panel.name,
+          label: camelToTitle(panel.label),
+          children: <RecordPanel panel={panel} record={record} />,
+        });
+      });
+
+      if (beforeTabs) {
+        const beforeItems = beforeTabs(record) || [];
+        newTabItems.unshift(...beforeItems);
+      }
+
+      if (afterTabs) {
+        const afterItems = afterTabs(record) || [];
+        newTabItems.push(...afterItems);
+      }
+
+      setTabItems(newTabItems);
+    }
+  }, [record, config]);
 
   const apiModule = module.replace(/_/g, '-');
 
