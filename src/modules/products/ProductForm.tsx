@@ -6,7 +6,7 @@ import {
   ProFormText,
 } from '@ant-design/pro-components';
 import { App, Col, Row } from 'antd';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import MediaChoose from '../../components/fields/media/MediaChoose';
 import RichtextInput from '../../components/fields/richtext/RichtextInput';
 import ApiService from '../../services/ApiService';
@@ -15,31 +15,37 @@ export default function ProductForm() {
   const { id } = useParams();
   const [form] = ProForm.useForm();
   const { message, notification } = App.useApp();
+  const navigate = useNavigate();
 
   const generateDataSave = (values: any) => {
     const dataSave = { ...values };
     delete dataSave.variants;
 
-    const productVariants = values.variants.map((variant: any) => {
-      const variantData: any = {
-        name: variant.name,
-        sku: variant.sku,
-        variant_status: variant.variant_status,
-        photos: variant.photos,
-        product_variant_attributes: [],
-      };
+    if (values.variants && values.variants.length > 0) {
+      const productVariants = values.variants.map((variant: any) => {
+        const variantData: any = {
+          name: variant.name,
+          sku: variant.sku,
+          variant_status: variant.variant_status,
+          photos: variant.photos,
+          product_variant_attributes: [],
+        };
 
-      variant.attributes.forEach((attribute: any) => {
-        variantData.product_variant_attributes.push({
-          product_attribute: attribute.attribute.value,
-          attribute_value: attribute.value,
-        });
+        if (variant.attributes && variant.attributes.length > 0) {
+          variant.attributes.forEach((attribute: any) => {
+            variantData.product_variant_attributes.push({
+              product_attribute: attribute.attribute.value,
+              attribute_value: attribute.value,
+            });
+          });
+        }
+
+        return variantData;
       });
 
-      return variantData;
-    });
+      dataSave.product_variants = productVariants;
+    }
 
-    dataSave.product_variants = productVariants;
     return dataSave;
   };
 
@@ -48,18 +54,24 @@ export default function ProductForm() {
 
     try {
       message.loading('Saving...', 0);
+      let product;
       if (id) {
-        await ApiService.getClient()
+        product = await ApiService.getClient()
           .collection('products')
           .update(id, dataSave);
       } else {
-        await ApiService.getClient().collection('products').create(dataSave);
+        product = await ApiService.getClient()
+          .collection('products')
+          .create(dataSave);
       }
+
       message.destroy();
       notification.success({
         message: 'Success',
         description: 'Product saved successfully',
       });
+
+      navigate(`/collections/products/detail/${product.data.documentId}`);
     } catch (error: any) {
       console.log(error);
       message.destroy();

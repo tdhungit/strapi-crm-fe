@@ -45,9 +45,14 @@ export default function CollectionDetailComponent({
   const [populateFields, setPopulateFields] = useState<string[]>([]);
 
   const fetchRecord = ({ queryPopulate }: { queryPopulate?: string[] }) => {
+    let queryParams = {};
+    const populate = queryPopulate || populateFields;
+    if (populate.length > 0) {
+      queryParams = { populate };
+    }
     ApiService.getClient()
       .collection(module)
-      .findOne(id, { populate: queryPopulate || populateFields })
+      .findOne(id, queryParams)
       .then((r) => setRecord(r))
       .catch((err) => {
         console.error(err);
