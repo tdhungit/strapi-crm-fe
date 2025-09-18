@@ -5,7 +5,7 @@ import {
   ProFormSelect,
   ProFormText,
 } from '@ant-design/pro-components';
-import { Col, Row } from 'antd';
+import { App, Col, Row } from 'antd';
 import { useParams } from 'react-router-dom';
 import MediaChoose from '../../components/fields/media/MediaChoose';
 import RichtextInput from '../../components/fields/richtext/RichtextInput';
@@ -13,10 +13,10 @@ import ApiService from '../../services/ApiService';
 
 export default function ProductForm() {
   const { id } = useParams();
-
   const [form] = ProForm.useForm();
+  const { message, notification } = App.useApp();
 
-  const clearDataSave = (values: any) => {
+  const generateDataSave = (values: any) => {
     const dataSave = { ...values };
     delete dataSave.variants;
 
@@ -44,8 +44,30 @@ export default function ProductForm() {
   };
 
   const handleSave = async (values: any) => {
-    const dataSave = clearDataSave(values);
-    console.log({ values, dataSave });
+    const dataSave = generateDataSave(values);
+
+    try {
+      message.loading('Saving...', 0);
+      if (id) {
+        await ApiService.getClient()
+          .collection('products')
+          .update(id, dataSave);
+      } else {
+        await ApiService.getClient().collection('products').create(dataSave);
+      }
+      message.destroy();
+      notification.success({
+        message: 'Success',
+        description: 'Product saved successfully',
+      });
+    } catch (error: any) {
+      console.log(error);
+      message.destroy();
+      notification.error({
+        message: 'Error',
+        description: error?.error?.message || 'Failed to save',
+      });
+    }
   };
 
   return (
