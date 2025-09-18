@@ -176,7 +176,9 @@ export function updateEditLayoutColumns(
       });
     });
 
-    cols.push(lines);
+    if (lines.length > 0) {
+      cols.push(lines);
+    }
   });
 
   return cols;
@@ -238,7 +240,7 @@ export function renderEditLayoutRows(
     <Row
       key={`line-${lineIndex}`}
       gutter={[16, 16]}
-      className='mb-4'
+      className=''
       style={{ width: '100%' }}
     >
       {line.map((item) => {

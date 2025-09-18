@@ -6,5 +6,7 @@ export const availableCollections = [
   'campaigns',
   'email-templates',
   'notes',
-  'email-histories',
+  'mail-histories',
+  'products',
+  'product-attributes',
 ];

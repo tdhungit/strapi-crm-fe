@@ -3,13 +3,13 @@ import { App, Button, Form } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageLoading from '../../../components/PageLoading';
+import { normalizeRecord } from '../../../helpers/collection_helper';
 import {
   capitalizeFirstLetter,
   renderEditLayoutRows,
 } from '../../../helpers/views_helper';
 import ApiService from '../../../services/ApiService';
 import MetadataService from '../../../services/MetadataService';
-import { normalizeRecord } from '../../../helpers/collection_helper';
 
 export default function CollectionFormComponent({
   module,
@@ -59,9 +59,13 @@ export default function CollectionFormComponent({
       message.loading('Saving...');
       const normalizedValues = normalizeRecord(values, config);
       if (id) {
-        await ApiService.getClient().collection(module).update(id, normalizedValues);
+        await ApiService.getClient()
+          .collection(module)
+          .update(id, normalizedValues);
       } else {
-        await ApiService.getClient().collection(module).create(normalizedValues);
+        await ApiService.getClient()
+          .collection(module)
+          .create(normalizedValues);
       }
       message.destroy();
       notification.success({
@@ -111,7 +115,7 @@ export default function CollectionFormComponent({
         },
       }}
     >
-      <div className='w-full bg-white mt-4 p-4 rounded-lg'>
+      <div className='w-full bg-white p-4 rounded-md'>
         <Form
           key={`${module}-${id || 0}`}
           form={form}

@@ -34,10 +34,20 @@ export const defaultMenus: any = {
     icon: 'file',
     label: 'Notes',
   },
-  'email-histories': {
-    key: '/collections/email-histories',
+  'mail-histories': {
+    key: '/collections/mail-histories',
     icon: 'history',
-    label: 'Email Histories',
+    label: 'Mail Histories',
+  },
+  products: {
+    key: '/collections/products',
+    icon: 'shoppingcart',
+    label: 'Products',
+  },
+  'product-attributes': {
+    key: '/collections/product-attributes',
+    icon: 'tags',
+    label: 'Product Attributes',
   },
   users: {
     key: '/users',
