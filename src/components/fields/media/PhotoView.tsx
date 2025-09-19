@@ -4,10 +4,12 @@ export default function PhotoView({
   photo,
   width,
   height,
+  style,
 }: {
   photo: any;
-  width?: number;
-  height?: number;
+  width?: any;
+  height?: any;
+  style?: any;
 }) {
   return (
     <div>
@@ -20,6 +22,7 @@ export default function PhotoView({
         alt={photo.name}
         width={width || 80}
         height={height || 80}
+        style={style}
       />
     </div>
   );
