@@ -21,6 +21,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RankingView from '../../components/fields/ranking/RankingView';
+import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import CollectionFormModal from '../collections/components/CollectionFormModal';
 
@@ -612,6 +613,7 @@ export default function KanbanView() {
               title: 'Kanban View',
             },
           ],
+          itemRender: breadcrumbItemRender,
         },
       }}
       extra={[

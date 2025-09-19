@@ -22,6 +22,7 @@ import { Button, Col, List, Row, Spin, Typography } from 'antd';
 import { Card } from 'antd/lib';
 import { useEffect, useState } from 'react';
 import { defaultMenus } from '../../config/menus';
+import { breadcrumbItemRender } from '../../helpers/views_helper';
 import MenuService from '../../services/MenuService';
 import MenuModalForm from './components/MenuModalForm';
 
@@ -424,6 +425,7 @@ export default function MenuSettings() {
               href: '/settings/menus',
             },
           ],
+          itemRender: breadcrumbItemRender,
         },
       }}
     >

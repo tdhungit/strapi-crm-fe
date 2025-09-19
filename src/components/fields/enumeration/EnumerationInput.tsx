@@ -14,11 +14,12 @@ export default function EnumerationInput(props: Props) {
   useEffect(() => {
     if (props.value) {
       setValue(props.value);
+      props.onChange?.(props.value);
     } else if (props.type.default) {
       setValue(props.type.default);
+      props.onChange?.(props.type.default);
     }
-    props.onChange?.(value);
-  }, [props]);
+  }, [props.value]);
 
   useEffect(() => {
     if (props?.type?.enum) {

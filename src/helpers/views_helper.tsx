@@ -1,6 +1,7 @@
 import type { ParamsType, ProColumns } from '@ant-design/pro-components';
 import { Col, Row, type FormInstance } from 'antd';
 import type { SortOrder } from 'antd/lib/table/interface';
+import { Link } from 'react-router-dom';
 import DetailView from '../components/fields/DetailView';
 import FormInput from '../components/fields/FormInput';
 import RelationInput from '../components/fields/relation/RelationInput';
@@ -460,4 +461,11 @@ export function strapiClientErrorMessage(err: any): string {
   }
 
   return message;
+}
+
+export function breadcrumbItemRender(route: any) {
+  if (!route.path && !route.href) {
+    return <span className='font-semibold'>{route.title}</span>;
+  }
+  return <Link to={route.path || route.href}>{route.title}</Link>;
 }

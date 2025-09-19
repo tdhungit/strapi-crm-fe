@@ -7,6 +7,7 @@ import PageError from '../../../components/PageError';
 import PageLoading from '../../../components/PageLoading';
 import RecordPanels from '../../../components/panels/RecordPanels';
 import {
+  breadcrumbItemRender,
   camelToTitle,
   getCollectionPopulatedDetail,
   getEditLayoutColumns,
@@ -132,6 +133,7 @@ export default function CollectionDetailComponent({
               title: 'Detail',
             },
           ],
+          itemRender: breadcrumbItemRender,
         },
       }}
       extra={extra}

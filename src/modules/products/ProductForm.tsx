@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import MediaChoose from '../../components/fields/media/MediaChoose';
 import RichtextInput from '../../components/fields/richtext/RichtextInput';
+import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import ProductService from './ProductService';
 
@@ -104,6 +105,7 @@ export default function ProductForm() {
               title: id ? 'Edit' : 'Create',
             },
           ],
+          itemRender: breadcrumbItemRender,
         },
       }}
     >

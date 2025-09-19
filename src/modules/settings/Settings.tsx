@@ -8,6 +8,7 @@ import { PageContainer } from '@ant-design/pro-components';
 import { Typography } from 'antd';
 import { Avatar, Card, Col, Divider, Row, Space } from 'antd/lib';
 import { useNavigate } from 'react-router-dom';
+import { breadcrumbItemRender } from '../../helpers/views_helper';
 
 const { Title, Text } = Typography;
 
@@ -72,6 +73,7 @@ export default function Settings() {
               href: '/settings',
             },
           ],
+          itemRender: breadcrumbItemRender,
         },
       }}
       content={

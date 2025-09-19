@@ -2,6 +2,7 @@ import { PageContainer, ProDescriptions } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PhotosView from '../../components/fields/media/PhotosView';
+import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import { type ProductType } from './ProductService';
 
@@ -43,6 +44,7 @@ export default function ProductDetail() {
               title: product?.name,
             },
           ],
+          itemRender: breadcrumbItemRender,
         },
       }}
     >

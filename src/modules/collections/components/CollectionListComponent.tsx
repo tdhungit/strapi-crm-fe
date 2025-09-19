@@ -15,8 +15,10 @@ import {
 import { App, Button } from 'antd';
 import { Flex } from 'antd/lib';
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import PageLoading from '../../../components/PageLoading';
 import {
+  breadcrumbItemRender,
   capitalizeFirstLetter,
   getCollectionPopulatedList,
   getListLayoutColumns,
@@ -103,24 +105,24 @@ export default function CollectionListComponent({
             search: false,
             render: (record: any) => (
               <div>
-                <a
-                  href={`/collections/${module}/detail/${record.documentId}`}
+                <Link
+                  to={`/collections/${module}/detail/${record.documentId}`}
                   className='inline-block'
                 >
                   <EyeOutlined />
-                </a>
-                <a
-                  href={`/collections/${module}/profile/${record.documentId}`}
+                </Link>
+                <Link
+                  to={`/collections/${module}/profile/${record.documentId}`}
                   className='inline-block ml-2'
                 >
                   <FundViewOutlined />
-                </a>
-                <a
-                  href={`/collections/${module}/edit/${record.documentId}`}
+                </Link>
+                <Link
+                  to={`/collections/${module}/edit/${record.documentId}`}
                   className='inline-block ml-2'
                 >
                   <EditOutlined />
-                </a>
+                </Link>
               </div>
             ),
           });
@@ -181,9 +183,9 @@ export default function CollectionListComponent({
         },
         {
           title: capitalizeFirstLetter(module || ''),
-          href: `/collections/${module}`,
         },
       ],
+      itemRender: breadcrumbItemRender,
     },
   };
 

@@ -18,7 +18,7 @@ import {
   Typography,
 } from 'antd';
 import { useEffect, useState } from 'react';
-import { camelToTitle } from '../../helpers/views_helper';
+import { breadcrumbItemRender, camelToTitle } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 import { getWidgets } from '../collections/widgets';
@@ -235,6 +235,7 @@ export default function ModuleWidgetSettings() {
               href: '/settings/module-widgets',
             },
           ],
+          itemRender: breadcrumbItemRender,
         },
       }}
       content={

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import PageLoading from '../../../components/PageLoading';
 import { normalizeRecord } from '../../../helpers/collection_helper';
 import {
+  breadcrumbItemRender,
   capitalizeFirstLetter,
   renderEditLayoutRows,
 } from '../../../helpers/views_helper';
@@ -112,6 +113,7 @@ export default function CollectionFormComponent({
               title: id ? 'Edit' : 'Create',
             },
           ],
+          itemRender: breadcrumbItemRender,
         },
       }}
     >

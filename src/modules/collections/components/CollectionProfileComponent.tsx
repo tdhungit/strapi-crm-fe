@@ -9,6 +9,7 @@ import PageError from '../../../components/PageError';
 import PageLoading from '../../../components/PageLoading';
 import RecordPanel from '../../../components/panels/RecordPanel';
 import {
+  breadcrumbItemRender,
   camelToTitle,
   getCollectionPopulatedDetail,
   getEditLayoutColumns,
@@ -148,6 +149,7 @@ export default function CollectionProfileComponent({
               href: `/collections/${apiModule}/detail/${id}`,
             },
           ],
+          itemRender: breadcrumbItemRender,
         },
       }}
       extra={extra}

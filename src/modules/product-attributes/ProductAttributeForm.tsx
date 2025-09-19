@@ -7,6 +7,7 @@ import {
 import { App } from 'antd';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 
 export default function ProductAttributeForm() {
@@ -68,6 +69,7 @@ export default function ProductAttributeForm() {
               title: id ? 'Edit' : 'Create',
             },
           ],
+          itemRender: breadcrumbItemRender,
         },
       }}
     >
