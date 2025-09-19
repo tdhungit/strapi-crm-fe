@@ -1,4 +1,5 @@
 import { Image } from 'antd';
+import { getMediaUrl } from '../../../helpers/views_helper';
 
 export default function PhotoView({
   photo,
@@ -14,11 +15,7 @@ export default function PhotoView({
   return (
     <div>
       <Image
-        src={
-          photo.url.startsWith('http')
-            ? photo.url
-            : import.meta.env.VITE_MEDIA_URL + photo.url
-        }
+        src={getMediaUrl(photo)}
         alt={photo.name}
         width={width || 80}
         height={height || 80}

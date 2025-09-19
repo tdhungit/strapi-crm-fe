@@ -469,3 +469,9 @@ export function breadcrumbItemRender(route: any) {
   }
   return <Link to={route.path || route.href}>{route.title}</Link>;
 }
+
+export function getMediaUrl(media: any) {
+  return media.url.startsWith('http')
+    ? media.url
+    : import.meta.env.VITE_MEDIA_URL + media.url;
+}

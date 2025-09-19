@@ -1,7 +1,7 @@
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { ProList } from '@ant-design/pro-components';
 import { Alert, Button, Tag } from 'antd';
-import PhotosView from '../../../components/fields/media/PhotosView';
+import PhotosCarousel from '../../../components/fields/media/PhotosCarousel';
 import type { ProductType } from '../ProductService';
 
 export default function ProductVariantsTable({
@@ -64,10 +64,12 @@ export default function ProductVariantsTable({
         extra: {
           render: (_dom: any, entity: any) => {
             return (
-              <div className='flex gap-2'>
-                {entity.photos.length > 0 && (
-                  <PhotosView photos={entity.photos} width={150} height={150} />
-                )}
+              <div style={{ width: 220, flexShrink: 0 }}>
+                <PhotosCarousel
+                  photos={entity.photos}
+                  width={220}
+                  height={100}
+                />
               </div>
             );
           },
