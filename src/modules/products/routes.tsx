@@ -1,3 +1,4 @@
+import ProductDetail from './ProductDetail';
 import ProductForm from './ProductForm';
 
 const routes = [
@@ -8,6 +9,10 @@ const routes = [
   {
     path: '/collections/products/edit/:id',
     element: <ProductForm />,
+  },
+  {
+    path: '/collections/products/detail/:id',
+    element: <ProductDetail />,
   },
 ];
 

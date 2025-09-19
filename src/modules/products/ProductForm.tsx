@@ -92,6 +92,14 @@ export default function ProductForm() {
               title: 'Products',
               href: '/collections/products',
             },
+            ...(id
+              ? [
+                  {
+                    title: 'Detail',
+                    href: `/collections/products/detail/${id}`,
+                  },
+                ]
+              : []),
             {
               title: id ? 'Edit' : 'Create',
             },

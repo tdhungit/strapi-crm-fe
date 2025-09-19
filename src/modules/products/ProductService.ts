@@ -14,7 +14,7 @@ interface ProductFormVariantType {
   attributes: ProductFormAttributeType[];
 }
 
-interface ProductFormType {
+export interface ProductFormType {
   name?: string;
   unit?: string;
   photos?: string[];
@@ -51,7 +51,7 @@ interface ProductVariantType {
   product_variant_attributes?: ProductVariantAttributeType[];
 }
 
-interface ProductType {
+export interface ProductType {
   id?: number;
   documentId?: string;
   name?: string;
