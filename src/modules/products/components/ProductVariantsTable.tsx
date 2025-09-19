@@ -1,4 +1,4 @@
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { ProList } from '@ant-design/pro-components';
 import { Alert, Button, Tag } from 'antd';
 import { useState } from 'react';
@@ -62,19 +62,51 @@ export default function ProductVariantsTable({
                   {entity.product_prices.length === 0 && (
                     <Alert message='No prices' type='warning' />
                   )}
-                  {entity.product_prices.length > 0 &&
-                    entity.product_prices.map((price: any) => (
-                      <Tag
-                        key={price.id}
-                        color='green'
-                        onClick={() => {
-                          setSelectedPrice(price);
-                          setOpen(true);
-                        }}
-                      >
-                        {price.price}
-                      </Tag>
-                    ))}
+                  {entity.product_prices.length > 0 && (
+                    <table className='w-full text-sm text-left rtl:text-right text-gray-500'>
+                      <thead className='text-xs text-gray-700 uppercase'>
+                        <tr className='bg-gray-50'>
+                          <th scope='col' className='px-6 py-2'>
+                            Price
+                          </th>
+                          <th scope='col' className='px-6 py-2'>
+                            Price Type
+                          </th>
+                          <th scope='col' className='px-6 py-2'>
+                            Price Status
+                          </th>
+                          <th scope='col' className='px-6 py-2'>
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {entity.product_prices.map((price: any) => (
+                          <tr
+                            key={price.id}
+                            className='bg-white border-b border-gray-200'
+                          >
+                            <td className='px-6 py-2'>{price.price}</td>
+                            <td className='px-6 py-2'>{price.price_type}</td>
+                            <td className='px-6 py-2'>{price.price_status}</td>
+                            <td className='px-6 py-2'>
+                              <Button
+                                variant='text'
+                                color='orange'
+                                onClick={() => {
+                                  setVariant(entity);
+                                  setOpen(true);
+                                  setSelectedPrice(price);
+                                }}
+                              >
+                                <EditOutlined />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </>
               );
             },
