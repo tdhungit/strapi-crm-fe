@@ -20,22 +20,26 @@ export default function ProductForm() {
   const { message, notification } = App.useApp();
   const navigate = useNavigate();
 
+  const fetchData = (id: string) => {
+    ApiService.getClient()
+      .collection('products')
+      .findOne(id, {
+        populate: [
+          'product_variants.product_variant_attributes.product_attribute',
+        ],
+      })
+      .then((response) => {
+        const normalizedData = ProductService.denormalizerFormValues(
+          response.data
+        );
+
+        form.setFieldsValue(normalizedData);
+      });
+  };
+
   useEffect(() => {
     if (id) {
-      ApiService.getClient()
-        .collection('products')
-        .findOne(id, {
-          populate: [
-            'product_variants.product_variant_attributes.product_attribute',
-          ],
-        })
-        .then((response) => {
-          const normalizedData = ProductService.denormalizerFormValues(
-            response.data
-          );
-
-          form.setFieldsValue(normalizedData);
-        });
+      fetchData(id);
     }
   }, [id]);
 

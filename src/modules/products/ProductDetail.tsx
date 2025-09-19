@@ -15,19 +15,23 @@ export default function ProductDetail() {
 
   const [product, setProduct] = useState<ProductType | null>(null);
 
+  const fetchData = (id: string) => {
+    ApiService.getClient()
+      .collection('products')
+      .findOne(id, {
+        populate: [
+          'product_variants.product_variant_attributes.product_attribute',
+          'product_variants.product_prices',
+        ],
+      })
+      .then((response) => {
+        setProduct(response.data);
+      });
+  };
+
   useEffect(() => {
     if (id) {
-      ApiService.getClient()
-        .collection('products')
-        .findOne(id, {
-          populate: [
-            'product_variants.product_variant_attributes.product_attribute',
-            'product_variants.product_prices',
-          ],
-        })
-        .then((response) => {
-          setProduct(response.data);
-        });
+      fetchData(id);
     }
   }, [id]);
 
@@ -106,7 +110,10 @@ export default function ProductDetail() {
 
       {product && (
         <div className='w-full bg-white py-2 rounded-md mt-4'>
-          <ProductVariantsTable product={product} />
+          <ProductVariantsTable
+            product={product}
+            onChange={() => fetchData(product.documentId as string)}
+          />
         </div>
       )}
     </PageContainer>
