@@ -76,6 +76,12 @@ export default function ProductVariantsTable({
                             Price Status
                           </th>
                           <th scope='col' className='px-6 py-2'>
+                            Start Date
+                          </th>
+                          <th scope='col' className='px-6 py-2'>
+                            End Date
+                          </th>
+                          <th scope='col' className='px-6 py-2'>
                             Actions
                           </th>
                         </tr>
@@ -86,10 +92,12 @@ export default function ProductVariantsTable({
                             key={price.id}
                             className='bg-white border-b border-gray-200'
                           >
-                            <td className='px-6 py-2'>{price.price}</td>
-                            <td className='px-6 py-2'>{price.price_type}</td>
-                            <td className='px-6 py-2'>{price.price_status}</td>
-                            <td className='px-6 py-2'>
+                            <td className='px-6 py-1'>{price.price}</td>
+                            <td className='px-6 py-1'>{price.price_type}</td>
+                            <td className='px-6 py-1'>{price.price_status}</td>
+                            <td className='px-6 py-1'>{price.start_date}</td>
+                            <td className='px-6 py-1'>{price.end_date}</td>
+                            <td className='px-6 py-1'>
                               <Button
                                 variant='text'
                                 color='orange'

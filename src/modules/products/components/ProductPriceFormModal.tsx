@@ -6,6 +6,7 @@ import {
   ProFormSelect,
 } from '@ant-design/pro-components';
 import { App, Col, Row } from 'antd';
+import { useEffect } from 'react';
 import ApiService from '../../../services/ApiService';
 
 export default function ProductPriceFormModal({
@@ -24,20 +25,39 @@ export default function ProductPriceFormModal({
   const [form] = ProForm.useForm();
   const { message, notification } = App.useApp();
 
+  useEffect(() => {
+    if (price) {
+      form.setFieldsValue(price);
+    }
+  }, [price]);
+
   const handleSave = async (values: any) => {
     message.loading('Saving...');
-    ApiService.getClient()
-      .collection('product-prices')
-      .create({
-        ...values,
-        product_variant: variant.id,
-      })
+
+    let result;
+    if (price?.documentId) {
+      result = ApiService.getClient()
+        .collection('product-prices')
+        .update(price.documentId, {
+          ...values,
+          product_variant: variant.id,
+        });
+    } else {
+      result = ApiService.getClient()
+        .collection('product-prices')
+        .create({
+          ...values,
+          product_variant: variant.id,
+        });
+    }
+
+    result
       .then((response) => {
         notification.success({
           message: 'Success',
           description: 'Price saved successfully',
         });
-        onFinish?.(response.data);
+        onFinish?.(response.data || response);
         onOpenChange(false);
       })
       .catch((error) => {
@@ -55,7 +75,7 @@ export default function ProductPriceFormModal({
 
   return (
     <ModalForm
-      title={price ? 'Edit Price' : 'Add Price'}
+      title={price?.id ? 'Edit Price' : 'Add Price'}
       open={open}
       onOpenChange={onOpenChange}
       form={form}
