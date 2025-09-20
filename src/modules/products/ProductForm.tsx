@@ -160,11 +160,11 @@ export default function ProductForm() {
                         options={[
                           {
                             label: 'Active',
-                            value: 'active',
+                            value: 'Active',
                           },
                           {
                             label: 'Inactive',
-                            value: 'inactive',
+                            value: 'Inactive',
                           },
                         ]}
                       />

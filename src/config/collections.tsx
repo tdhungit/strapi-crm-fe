@@ -9,4 +9,7 @@ export const availableCollections = [
   'mail-histories',
   'products',
   'product-attributes',
+  'warehouses',
+  'purchase-orders',
+  'sale-orders',
 ];

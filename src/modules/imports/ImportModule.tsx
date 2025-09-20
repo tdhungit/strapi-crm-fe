@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { capitalizeFirstLetter } from '../../helpers/views_helper';
+import { breadcrumbItemRender, camelToTitle } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 
@@ -302,13 +302,14 @@ export default function ImportModule() {
               href: '/home',
             },
             {
-              title: capitalizeFirstLetter(collectionName || ''),
+              title: camelToTitle(collectionName || ''),
               href: `/collections/${collectionName}`,
             },
             {
               title: 'Import',
             },
           ],
+          itemRender: breadcrumbItemRender,
         },
       }}
     >

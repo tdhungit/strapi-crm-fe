@@ -15,11 +15,11 @@ import {
 import { App, Button } from 'antd';
 import { Flex } from 'antd/lib';
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PageLoading from '../../../components/PageLoading';
 import {
   breadcrumbItemRender,
-  capitalizeFirstLetter,
+  camelToTitle,
   getCollectionPopulatedList,
   getListLayoutColumns,
   strapiClientErrorMessage,
@@ -45,6 +45,7 @@ export default function CollectionListComponent({
   extra?: React.ReactNode[];
   toolBarRender?: boolean | React.ReactNode[];
 }) {
+  const navigate = useNavigate();
   const { message } = App.useApp();
   const ref = useRef<any>(null);
 
@@ -174,7 +175,7 @@ export default function CollectionListComponent({
   const defaultHeader: Partial<PageHeaderProps> & {
     children?: React.ReactNode;
   } = {
-    title: `${module?.toUpperCase()}`,
+    title: `${camelToTitle(module || '')}`,
     breadcrumb: {
       items: [
         {
@@ -182,7 +183,7 @@ export default function CollectionListComponent({
           href: '/home',
         },
         {
-          title: capitalizeFirstLetter(module || ''),
+          title: camelToTitle(module || ''),
         },
       ],
       itemRender: breadcrumbItemRender,
@@ -198,7 +199,7 @@ export default function CollectionListComponent({
         key='create'
         variant='solid'
         color='primary'
-        href={`/collections/${module}/create`}
+        onClick={() => navigate(`/collections/${module}/create`)}
       >
         <PlusCircleFilled /> Create
       </Button>,
@@ -206,7 +207,9 @@ export default function CollectionListComponent({
         key='import'
         variant='solid'
         color='orange'
-        href={`/imports/${module}?returnUrl=/collections/${module}`}
+        onClick={() =>
+          navigate(`/imports/${module}?returnUrl=/collections/${module}`)
+        }
       >
         <FileExcelOutlined /> Import
       </Button>,

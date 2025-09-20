@@ -6,7 +6,7 @@ import PageLoading from '../../../components/PageLoading';
 import { normalizeRecord } from '../../../helpers/collection_helper';
 import {
   breadcrumbItemRender,
-  capitalizeFirstLetter,
+  camelToTitle,
   renderEditLayoutRows,
 } from '../../../helpers/views_helper';
 import ApiService from '../../../services/ApiService';
@@ -100,15 +100,17 @@ export default function CollectionFormComponent({
               href: '/home',
             },
             {
-              title: capitalizeFirstLetter(module || ''),
+              title: camelToTitle(module || ''),
               href: `/collections/${module}`,
             },
-            id
-              ? {
-                  title: 'Detail',
-                  href: `/collections/${module}/detail/${id}`,
-                }
-              : {},
+            ...(id
+              ? [
+                  {
+                    title: 'Detail',
+                    href: `/collections/${module}/detail/${id}`,
+                  },
+                ]
+              : []),
             {
               title: id ? 'Edit' : 'Create',
             },
