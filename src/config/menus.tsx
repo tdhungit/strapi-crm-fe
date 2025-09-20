@@ -49,11 +49,6 @@ export const defaultMenus: any = {
     icon: 'tags',
     label: 'Product Attributes',
   },
-  'product-prices': {
-    key: '/collections/product-prices',
-    icon: 'shoppingcart',
-    label: 'Product Prices',
-  },
   'purchase-orders': {
     key: '/collections/purchase-orders',
     icon: 'shoppingcart',

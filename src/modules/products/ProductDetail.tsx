@@ -42,6 +42,10 @@ export default function ProductDetail() {
         breadcrumb: {
           items: [
             {
+              title: 'Home',
+              href: '/home',
+            },
+            {
               title: 'Products',
               href: '/collections/products',
             },

@@ -1,5 +1,6 @@
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
+import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 
 export default function ProductPriceList() {
@@ -160,7 +161,27 @@ export default function ProductPriceList() {
 
   return (
     <>
-      <PageContainer title='Product Price List'>
+      <PageContainer
+        title='Product Prices'
+        header={{
+          breadcrumb: {
+            items: [
+              {
+                title: 'Home',
+                href: '/home',
+              },
+              {
+                title: 'Products',
+                href: '/collections/products',
+              },
+              {
+                title: 'Product Prices',
+              },
+            ],
+            itemRender: breadcrumbItemRender,
+          },
+        }}
+      >
         {records && (
           <ProTable
             bordered
