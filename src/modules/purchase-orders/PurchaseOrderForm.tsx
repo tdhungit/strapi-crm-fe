@@ -1,7 +1,9 @@
 import {
   PageContainer,
   ProForm,
-  ProFormText,
+  ProFormDatePicker,
+  ProFormDigit,
+  ProFormList,
 } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 import { useParams } from 'react-router-dom';
@@ -49,9 +51,54 @@ export default function PurchaseOrderForm() {
                 </ProForm.Item>
               </Col>
               <Col span={12}>
-                <ProFormText name='description' label='Description' />
+                <ProFormDatePicker name='purchase_date' label='Order Date' />
               </Col>
             </Row>
+
+            <ProFormList
+              name='products'
+              label='Products'
+              creatorButtonProps={{
+                creatorButtonText: 'Add New Product',
+                style: {
+                  marginBottom: 16,
+                },
+              }}
+            >
+              {() => (
+                <div className='w-full pl-4'>
+                  <Row gutter={16}>
+                    <Col span={8}>
+                      <ProForm.Item name='product' label='Product'>
+                        <RelationChoose module='products' onlyList />
+                      </ProForm.Item>
+                    </Col>
+                    <Col span={4}>
+                      <ProForm.Item name='warehouse' label='Warehouse'>
+                        <RelationChoose module='warehouses' onlyList />
+                      </ProForm.Item>
+                    </Col>
+                    <Col span={3}>
+                      <ProFormDigit name='quantity' label='Quantity' />
+                    </Col>
+                    <Col span={3}>
+                      <ProFormDigit
+                        name='unit_price'
+                        label='Price'
+                        disabled
+                        placeholder=''
+                      />
+                    </Col>
+                    <Col span={3}>
+                      <ProFormDigit name='discount' label='Discount' />
+                    </Col>
+                    <Col span={3}>
+                      <ProFormDigit name='tax' label='Tax' />
+                    </Col>
+                  </Row>
+                </div>
+              )}
+            </ProFormList>
           </ProForm>
         </div>
       </PageContainer>

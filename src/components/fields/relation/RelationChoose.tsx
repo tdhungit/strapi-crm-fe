@@ -7,10 +7,12 @@ import CollectionListModal from '../../../modules/collections/components/Collect
 export default function RelationChoose({
   module,
   value: defaultValue,
+  onlyList,
   onChange,
 }: {
   module: string;
   value?: any;
+  onlyList?: boolean;
   onChange?: (value: any) => void;
 }) {
   const [value, setValue] = useState(defaultValue);
@@ -35,11 +37,13 @@ export default function RelationChoose({
     <>
       <Space.Compact style={{ width: '100%' }}>
         <Input value={value?.name || value} placeholder='Select' readOnly />
-        <Button
-          type='default'
-          icon={<PlusOutlined />}
-          onClick={() => setFormOpen(true)}
-        ></Button>
+        {!onlyList && (
+          <Button
+            type='default'
+            icon={<PlusOutlined />}
+            onClick={() => setFormOpen(true)}
+          ></Button>
+        )}
         <Button
           type='default'
           icon={<SelectOutlined />}
@@ -55,12 +59,14 @@ export default function RelationChoose({
         onFinish={handleSelectRecord}
       />
 
-      <CollectionFormModal
-        module={module}
-        open={formOpen}
-        onOpenChange={(isOpen) => setFormOpen(isOpen)}
-        onFinish={handleSelectRecord}
-      />
+      {!onlyList && (
+        <CollectionFormModal
+          module={module}
+          open={formOpen}
+          onOpenChange={(isOpen) => setFormOpen(isOpen)}
+          onFinish={handleSelectRecord}
+        />
+      )}
     </>
   );
 }

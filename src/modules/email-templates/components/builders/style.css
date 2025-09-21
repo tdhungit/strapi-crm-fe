@@ -74,3 +74,7 @@
   top: -5px !important;
   color: red !important;
 }
+
+.ant-picker.ant-picker-outlined {
+  width: 100%;
+}
