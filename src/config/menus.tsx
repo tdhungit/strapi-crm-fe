@@ -49,10 +49,20 @@ export const defaultMenus: any = {
     icon: 'tags',
     label: 'Product Attributes',
   },
+  suppliers: {
+    key: '/collections/suppliers',
+    icon: 'shoppingcart',
+    label: 'Suppliers',
+  },
   'purchase-orders': {
     key: '/collections/purchase-orders',
     icon: 'shoppingcart',
     label: 'Purchase Orders',
+  },
+  'sale-orders': {
+    key: '/collections/sale-orders',
+    icon: 'shoppingcart',
+    label: 'Sale Orders',
   },
   warehouses: {
     key: '/collections/warehouses',

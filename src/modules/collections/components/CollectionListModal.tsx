@@ -19,6 +19,7 @@ export default function CollectionListModal({
   onOpenChange,
   onFinish,
   defaultConfig,
+  single,
 }: {
   module: string;
   open: boolean;
@@ -26,6 +27,7 @@ export default function CollectionListModal({
   parentRecord?: any;
   relateField?: any;
   defaultConfig?: any;
+  single?: boolean;
   onOpenChange: (open: boolean) => void;
   onFinish?: (values: any, options: any) => void;
 }) {
@@ -150,14 +152,18 @@ export default function CollectionListModal({
         rowKey='id'
         pagination={CollectionService.getTablePagination(config)}
         options={false}
-        rowSelection={{
-          // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
-          selectedRowKeys: selectedIds,
-          preserveSelectedRowKeys: true,
-          onChange: (selectedRowKeys: any) => {
-            setSelectedIds(selectedRowKeys);
-          },
-        }}
+        rowSelection={
+          single
+            ? false
+            : {
+                // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+                selectedRowKeys: selectedIds,
+                preserveSelectedRowKeys: true,
+                onChange: (selectedRowKeys: any) => {
+                  setSelectedIds(selectedRowKeys);
+                },
+              }
+        }
       />
     </Modal>
   );

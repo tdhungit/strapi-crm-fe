@@ -12,4 +12,5 @@ export const availableCollections = [
   'warehouses',
   'purchase-orders',
   'sale-orders',
+  'suppliers',
 ];

@@ -9,6 +9,7 @@ import ApiService from '../../../services/ApiService';
 import MetadataService from '../../../services/MetadataService';
 
 export default function CollectionFormModal({
+  module,
   collectionName,
   open,
   id,
@@ -19,15 +20,16 @@ export default function CollectionFormModal({
   onFinish,
   defaultConfig,
 }: {
-  collectionName: string;
+  module?: string;
+  collectionName?: string;
   open: boolean;
   id?: string;
   parentCollectionName?: string;
   parentRecord?: any;
   relateField?: any;
   defaultConfig?: any;
-  onOpenChange: (open: boolean) => void;
-  onFinish: (values: any) => void;
+  onOpenChange?: (open: boolean) => void;
+  onFinish?: (values: any) => void;
 }) {
   const { message, notification } = App.useApp();
   const [form] = Form.useForm();
@@ -41,6 +43,10 @@ export default function CollectionFormModal({
     }
     return MetadataService.getCollectionConfigurations(collectionName);
   };
+
+  if (module && !collectionName) {
+    collectionName = module;
+  }
 
   useEffect(() => {
     if (collectionName) {
@@ -85,6 +91,10 @@ export default function CollectionFormModal({
   }, [parentCollectionName, parentRecord, relateField]);
 
   const onSave = async (values: any) => {
+    if (!collectionName) {
+      return;
+    }
+
     try {
       message.loading('Saving...');
       let newRecord;
@@ -113,7 +123,9 @@ export default function CollectionFormModal({
 
   return (
     <ModalForm
-      title={`${id ? 'Edit' : 'Add'} ${capitalizeFirstLetter(collectionName)}`}
+      title={`${id ? 'Edit' : 'Add'} ${capitalizeFirstLetter(
+        collectionName || ''
+      )}`}
       open={open}
       onOpenChange={onOpenChange}
       onFinish={onSave}
