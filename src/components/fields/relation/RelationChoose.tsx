@@ -21,7 +21,7 @@ export default function RelationChoose({
 
   useEffect(() => {
     if (defaultValue) {
-      setValue(value);
+      setValue(defaultValue);
     }
   }, [defaultValue]);
 
@@ -36,7 +36,11 @@ export default function RelationChoose({
   return (
     <>
       <Space.Compact style={{ width: '100%' }}>
-        <Input value={value?.name || value} placeholder='Select' readOnly />
+        <Input
+          value={value?.name || value?.id || ''}
+          placeholder='Select'
+          readOnly
+        />
         {!onlyList && (
           <Button
             type='default'

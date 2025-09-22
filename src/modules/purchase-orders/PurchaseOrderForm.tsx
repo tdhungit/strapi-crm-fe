@@ -8,7 +8,7 @@ import {
 import { App, Col, Row } from 'antd';
 import { Divider } from 'antd/lib';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AssignUserInput from '../../components/fields/assign-user/AssignUserInput';
 import DiscountInput from '../../components/fields/discount/DiscountInput';
 import RelationChoose from '../../components/fields/relation/RelationChoose';
@@ -19,7 +19,8 @@ import ApiService from '../../services/ApiService';
 export default function PurchaseOrderForm() {
   const { id } = useParams();
   const [form] = ProForm.useForm();
-  const { notification } = App.useApp();
+  const { notification, message } = App.useApp();
+  const navigate = useNavigate();
 
   const [totals, setTotals] = useState({
     subtotal: 0,
@@ -99,6 +100,42 @@ export default function PurchaseOrderForm() {
     calculateTotals();
   }, []);
 
+  useEffect(() => {
+    const denormalizeData = (po: any) => {
+      const data = {
+        items: [],
+        ...po,
+      };
+
+      const items = po.purchase_order_details.map((item: any) => {
+        return {
+          ...item,
+        };
+      });
+
+      data.items = items;
+
+      // console.log(data);
+
+      return data;
+    };
+
+    if (id) {
+      ApiService.getClient()
+        .collection('purchase-orders')
+        .findOne(id, {
+          populate: [
+            'purchase_order_details.product_variant',
+            'purchase_order_details.warehouse',
+            'supplier',
+          ],
+        })
+        .then((res) => {
+          form.setFieldsValue(denormalizeData(res.data));
+        });
+    }
+  }, [id]);
+
   // Watch for form changes and recalculate totals
   const handleFormChange = () => {
     setTimeout(() => {
@@ -106,8 +143,72 @@ export default function PurchaseOrderForm() {
     }, 100);
   };
 
+  const normalizeData = (data: any) => {
+    const normalizedData: any = {
+      purchase_date: data.purchase_date,
+      assigned_user: data.assigned_user.value,
+      supplier: data.supplier.id,
+      discount_type: data.order_discount.type,
+      discount_amount: data.order_discount.amount,
+      tax_type: 'percentage',
+      tax_amount: data.order_tax.amount,
+      subtotal: data.subtotal,
+      total_discount: data.total_discount,
+      total_tax: data.total_tax,
+      total_amount: data.total_amount,
+    };
+
+    const items = data.items.map((item: any) => {
+      return {
+        product_variant: item.product_variant.id,
+        warehouse: item.warehouse.id,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        discount_type: item.discount?.type || 'percentage',
+        discount_amount: item.discount?.amount || 0,
+        tax_type: 'percentage',
+        tax_amount: item.tax?.amount || 0,
+        subtotal: item.subtotal,
+      };
+    });
+
+    normalizedData.items = items;
+    return normalizedData;
+  };
+
   const handleSave = (values: any) => {
-    console.log(values);
+    message.loading('Creating Purchase Order...', 0);
+    const normalizedData = normalizeData(values);
+
+    let service;
+    if (id) {
+      service = ApiService.getClient()
+        .collection('purchase-orders')
+        .update(id, normalizedData);
+    } else {
+      service = ApiService.getClient()
+        .collection('purchase-orders')
+        .create(normalizedData);
+    }
+
+    service
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Purchase Order created successfully',
+        });
+        navigate('/collections/purchase-orders');
+      })
+      .catch((err) => {
+        console.log(err);
+        notification.error({
+          message: 'Error',
+          description: 'Failed to create Purchase Order',
+        });
+      })
+      .finally(() => {
+        message.destroy();
+      });
   };
 
   return (
@@ -125,9 +226,16 @@ export default function PurchaseOrderForm() {
                 path: '/collections/purchase-orders',
                 title: 'Purchase Orders',
               },
+              ...(id
+                ? [
+                    {
+                      path: `/collections/purchase-orders/detail/${id}`,
+                      title: 'Detail',
+                    },
+                  ]
+                : []),
               {
-                path: '/collections/purchase-orders/create',
-                title: 'Create',
+                title: id ? 'Edit' : 'Create',
               },
             ],
             itemRender: breadcrumbItemRender,
@@ -308,7 +416,7 @@ export default function PurchaseOrderForm() {
 
             <Divider />
 
-            <div className='bg-gray-50 p-4 rounded-md'>
+            <div className='bg-gray-50 p-4 rounded-md mb-4'>
               <Row gutter={16}>
                 <Col span={8}>
                   <Row gutter={8}>
