@@ -29,11 +29,18 @@ export default function RelationInput(props: {
   }, [item]);
 
   useEffect(() => {
-    if (initialValues?.id || initialValues?.initValue) {
-      const newValue = {
-        label: initialValues.initLabel || initialValues[keyLabel],
-        value: initialValues.initValue || initialValues.id,
-      };
+    const id = initialValues?.id || initialValues?.initValue;
+    if (id && id !== value?.value) {
+      let newValue;
+      if (!value) {
+        newValue = {
+          label: initialValues.initLabel || initialValues[keyLabel],
+          value: initialValues.initValue || initialValues.id,
+        };
+      } else {
+        newValue = value;
+      }
+
       setValue(newValue);
       onChange?.(newValue);
     }

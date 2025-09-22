@@ -7,6 +7,7 @@ import {
 } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 import { useParams } from 'react-router-dom';
+import AssignUserInput from '../../components/fields/assign-user/AssignUserInput';
 import DiscountInput from '../../components/fields/discount/DiscountInput';
 import RelationChoose from '../../components/fields/relation/RelationChoose';
 import TaxInput from '../../components/fields/tax/TaxInput';
@@ -55,6 +56,22 @@ export default function PurchaseOrderForm() {
               <Col span={12}>
                 <ProFormDatePicker name='purchase_date' label='Order Date' />
               </Col>
+            </Row>
+
+            <Row gutter={16}>
+              <Col span={12}>
+                <ProForm.Item name='assigned_user' label='Assigned User'>
+                  <AssignUserInput
+                    item={{
+                      options: {
+                        target: 'plugin::users-permissions.user',
+                        mainField: 'username',
+                      },
+                    }}
+                  />
+                </ProForm.Item>
+              </Col>
+              <Col span={12}></Col>
             </Row>
 
             <ProFormList

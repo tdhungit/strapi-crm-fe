@@ -12,8 +12,11 @@ export default function AssignUserInput({
 }: {
   initialValues?: any;
   value?: any;
-  item: any;
-  data: any;
+  item: {
+    options: { target: string; mainField: string; [key: string]: any };
+    [key: string]: any;
+  };
+  data?: any;
   disable?: boolean;
   onChange?: (value: any) => void;
 }) {

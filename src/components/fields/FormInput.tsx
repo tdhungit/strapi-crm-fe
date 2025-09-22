@@ -65,7 +65,7 @@ export default function FormInput({
         input = (
           <AssignUserInput
             initialValues={data[item.name]}
-            item={item}
+            item={item as any}
             data={data}
             onChange={(value: any) => {
               form.setFieldValue(item.name, value.value);
@@ -76,7 +76,7 @@ export default function FormInput({
         input = (
           <RelationInput
             initialValues={data[item.name]}
-            item={item}
+            item={item as any}
             data={data}
             onChange={(value: any) => {
               form.setFieldValue(item.name, value.value);
