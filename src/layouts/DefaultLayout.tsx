@@ -104,6 +104,12 @@ export default function DefaultLayout() {
         collapsedWidth={60}
         style={{
           background: '#003300',
+          height: '100vh',
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          zIndex: 100,
         }}
       >
         <div className='m-0 p-0 bg-transparent'>
@@ -151,21 +157,35 @@ export default function DefaultLayout() {
             </div>
           </a>
         </div>
-        <Menu
-          defaultSelectedKeys={['1']}
-          mode='inline'
-          items={menuItems}
-          onClick={(item: any) => navigate(item.key, { replace: true })}
+        <div
           style={{
-            background: '#003300',
-            color: '#ffffff',
+            height: 'calc(100vh - 64px)', // Subtract header height
+            overflowY: 'auto',
+            overflowX: 'hidden',
           }}
-          theme='dark'
-          className='custom-menu'
-        />
+        >
+          <Menu
+            defaultSelectedKeys={['1']}
+            mode='inline'
+            items={menuItems}
+            onClick={(item: any) => navigate(item.key, { replace: true })}
+            style={{
+              background: '#003300',
+              color: '#ffffff',
+              border: 'none',
+            }}
+            theme='dark'
+            className='custom-menu'
+          />
+        </div>
       </Sider>
 
-      <Layout>
+      <Layout
+        style={{
+          marginLeft: collapsed ? 60 : 260,
+          transition: 'margin-left 0.2s',
+        }}
+      >
         <Header
           style={{
             padding: 0,
