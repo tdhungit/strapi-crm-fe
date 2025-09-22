@@ -60,7 +60,7 @@ export default function TaxInput({
       <Select
         value={tax.value ? tax.value.toString() : undefined}
         onChange={handleValueChange}
-        placeholder='Tax'
+        placeholder='0'
         options={TAX_RATES.map((rate) => ({
           value: rate.toString(),
           label: `${rate}`,

@@ -84,6 +84,7 @@ export default function DiscountInput({
         value={discount.value || ''}
         onChange={handleValueChange}
         step={discount.type === 'percentage' ? 1 : 0.01}
+        placeholder='0'
         className='w-full'
       />
     </Space.Compact>

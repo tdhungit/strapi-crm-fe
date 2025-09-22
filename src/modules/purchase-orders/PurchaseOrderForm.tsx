@@ -5,7 +5,7 @@ import {
   ProFormDigit,
   ProFormList,
 } from '@ant-design/pro-components';
-import { Col, Row } from 'antd';
+import { App, Col, Row } from 'antd';
 import { Divider } from 'antd/lib';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -14,10 +14,13 @@ import DiscountInput from '../../components/fields/discount/DiscountInput';
 import RelationChoose from '../../components/fields/relation/RelationChoose';
 import TaxInput from '../../components/fields/tax/TaxInput';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
+import ApiService from '../../services/ApiService';
 
 export default function PurchaseOrderForm() {
   const { id } = useParams();
   const [form] = ProForm.useForm();
+  const { notification } = App.useApp();
+
   const [totals, setTotals] = useState({
     subtotal: 0,
     discount: 0,
@@ -173,13 +176,76 @@ export default function PurchaseOrderForm() {
                   marginBottom: 16,
                 },
               }}
+              actionGuard={{
+                beforeAddRow: () => {
+                  if (
+                    !form.getFieldValue('purchase_date') ||
+                    !form.getFieldValue('supplier')
+                  ) {
+                    notification.error({
+                      message: 'Error',
+                      description: 'Please select a purchase date and supplier',
+                    });
+                    return false;
+                  }
+
+                  const items = form.getFieldValue('items');
+                  if (items.length > 0) {
+                    let error = false;
+                    for (let i = 0; i < items.length; i++) {
+                      if (
+                        !items[i].product_variant ||
+                        !items[i].warehouse ||
+                        !items[i].quantity ||
+                        !items[i].unit_price
+                      ) {
+                        error = true;
+                        break;
+                      }
+                    }
+                    if (error) {
+                      notification.error({
+                        message: 'Error',
+                        description: 'Please fill all required fields',
+                      });
+                      return false;
+                    }
+                  }
+
+                  return true;
+                },
+              }}
             >
               {(_field, index) => (
                 <div className='w-full pl-4'>
                   <Row gutter={16}>
                     <Col span={7}>
-                      <ProForm.Item name='product' label='Product'>
-                        <RelationChoose module='products' onlyList />
+                      <ProForm.Item name='product_variant' label='Product'>
+                        <RelationChoose
+                          module='product-variants'
+                          onlyList
+                          onChange={(value) => {
+                            ApiService.request(
+                              'get',
+                              `/product-variants/${value.id}/price`,
+                              {
+                                date: form.getFieldValue('purchase_date'),
+                              }
+                            ).then((res) => {
+                              if (res?.price?.price) {
+                                const items = form.getFieldValue('items');
+                                items[index].unit_price = res.price.price;
+                                if (
+                                  !items[index].quantity ||
+                                  items[index].quantity <= 0
+                                ) {
+                                  items[index].quantity = 1;
+                                }
+                                form.setFieldValue('items', items);
+                              }
+                            });
+                          }}
+                        />
                       </ProForm.Item>
                     </Col>
                     <Col span={4}>
