@@ -51,31 +51,21 @@ export default function TaxInput({
   };
 
   return (
-    <Space.Compact style={{ width: '100%' }}>
-      <div
-        style={{
-          width: '32px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#f5f5f5',
-          border: '1px solid #d9d9d9',
-          borderRight: 'none',
-          borderTopLeftRadius: '6px',
-          borderBottomLeftRadius: '6px',
-        }}
-      >
-        <PercentageOutlined />
-      </div>
+    <Space.Compact className='w-full'>
+      <Select
+        options={[{ value: 'percentage', label: <PercentageOutlined /> }]}
+        value='percentage'
+        style={{ width: 60 }}
+      />
       <Select
         value={tax.value ? tax.value.toString() : undefined}
         onChange={handleValueChange}
-        style={{ width: '100%' }}
         placeholder='Tax'
         options={TAX_RATES.map((rate) => ({
           value: rate.toString(),
           label: `${rate}`,
         }))}
+        className='w-full'
       />
     </Space.Compact>
   );

@@ -70,7 +70,7 @@ export default function DiscountInput({
   };
 
   return (
-    <Space.Compact>
+    <Space.Compact className='w-full'>
       <Select
         value={discount.type}
         options={options}
@@ -83,8 +83,8 @@ export default function DiscountInput({
         max={discount.type === 'percentage' ? 100 : undefined}
         value={discount.value || ''}
         onChange={handleValueChange}
-        style={{ width: '100%' }}
         step={discount.type === 'percentage' ? 1 : 0.01}
+        className='w-full'
       />
     </Space.Compact>
   );
