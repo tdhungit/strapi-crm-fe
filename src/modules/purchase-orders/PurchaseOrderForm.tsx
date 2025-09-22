@@ -7,7 +7,9 @@ import {
 } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 import { useParams } from 'react-router-dom';
+import DiscountInput from '../../components/fields/discount/DiscountInput';
 import RelationChoose from '../../components/fields/relation/RelationChoose';
+import TaxInput from '../../components/fields/tax/TaxInput';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
 
 export default function PurchaseOrderForm() {
@@ -56,8 +58,8 @@ export default function PurchaseOrderForm() {
             </Row>
 
             <ProFormList
-              name='products'
-              label='Products'
+              name='items'
+              label='Details'
               creatorButtonProps={{
                 creatorButtonText: 'Add New Product',
                 style: {
@@ -65,7 +67,7 @@ export default function PurchaseOrderForm() {
                 },
               }}
             >
-              {() => (
+              {(_field, index) => (
                 <div className='w-full pl-4'>
                   <Row gutter={16}>
                     <Col span={8}>
@@ -79,21 +81,38 @@ export default function PurchaseOrderForm() {
                       </ProForm.Item>
                     </Col>
                     <Col span={3}>
-                      <ProFormDigit name='quantity' label='Quantity' />
+                      <ProFormDigit
+                        name='quantity'
+                        label='Quantity'
+                        placeholder='Quantity'
+                      />
                     </Col>
                     <Col span={3}>
                       <ProFormDigit
                         name='unit_price'
                         label='Price'
-                        disabled
-                        placeholder=''
+                        placeholder='Unit Price'
                       />
                     </Col>
                     <Col span={3}>
-                      <ProFormDigit name='discount' label='Discount' />
+                      <ProForm.Item name='discount' label='Discount'>
+                        <DiscountInput
+                          amount={
+                            form.getFieldValue('items')?.[index]?.unit_price ||
+                            0
+                          }
+                        />
+                      </ProForm.Item>
                     </Col>
                     <Col span={3}>
-                      <ProFormDigit name='tax' label='Tax' />
+                      <ProForm.Item name='tax' label='Tax'>
+                        <TaxInput
+                          amount={
+                            form.getFieldValue('items')?.[index]?.unit_price ||
+                            0
+                          }
+                        />
+                      </ProForm.Item>
                     </Col>
                   </Row>
                 </div>
