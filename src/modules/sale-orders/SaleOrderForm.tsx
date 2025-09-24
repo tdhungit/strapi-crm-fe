@@ -5,8 +5,7 @@ import {
   ProFormDigit,
   ProFormList,
 } from '@ant-design/pro-components';
-import { App, Col, Row } from 'antd';
-import { Divider } from 'antd/lib';
+import { App, Col, Divider, Row } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AssignUserInput from '../../components/fields/assign-user/AssignUserInput';
@@ -16,14 +15,11 @@ import TaxInput from '../../components/fields/tax/TaxInput';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 
-export default function PurchaseOrderForm() {
+export default function SaleOrderForm() {
   const { id } = useParams();
   const [form] = ProForm.useForm();
-  const { notification, message } = App.useApp();
+  const { message, notification } = App.useApp();
   const navigate = useNavigate();
-
-  const [canAddItems, setCanAddItems] = useState(false);
-  const [canAddNewItem, setCanAddNewItem] = useState(true);
 
   const [totals, setTotals] = useState({
     subtotal: 0,
@@ -31,6 +27,9 @@ export default function PurchaseOrderForm() {
     tax: 0,
     total_amount: 0,
   });
+
+  const [canAddItems, setCanAddItems] = useState(false);
+  const [canAddNewItem, setCanAddNewItem] = useState(true);
 
   const calculateTotals = () => {
     const items = form.getFieldValue('items') || [];
@@ -70,8 +69,8 @@ export default function PurchaseOrderForm() {
     form.setFieldValue('items', updatedItems);
 
     // Get order-level discount and tax
-    const orderDiscount = form.getFieldValue('order_discount') || 0;
-    const orderTax = form.getFieldValue('order_tax') || 0;
+    const orderDiscount = form.getFieldValue('discount') || 0;
+    const orderTax = form.getFieldValue('tax') || 0;
 
     const totalDiscount =
       itemsDiscount +
@@ -99,52 +98,15 @@ export default function PurchaseOrderForm() {
     });
   };
 
-  useEffect(() => {
-    calculateTotals();
-  }, []);
-
-  useEffect(() => {
-    const denormalizeData = (po: any) => {
-      const data = {
-        items: [],
-        ...po,
-      };
-
-      const items = po.purchase_order_details.map((item: any) => {
-        return {
-          ...item,
-        };
-      });
-
-      data.items = items;
-
-      // console.log(data);
-
-      return data;
-    };
-
-    if (id) {
-      ApiService.getClient()
-        .collection('purchase-orders')
-        .findOne(id, {
-          populate: [
-            'purchase_order_details.product_variant',
-            'purchase_order_details.warehouse',
-            'supplier',
-          ],
-        })
-        .then((res) => {
-          form.setFieldsValue(denormalizeData(res.data));
-        });
-    }
-  }, [id]);
-
   // Check if required fields are filled
   const checkRequiredFields = () => {
-    const supplier = form.getFieldValue('supplier');
-    const orderDate = form.getFieldValue('purchase_date');
+    const account = form.getFieldValue('account');
+    const contact = form.getFieldValue('contact');
+    const orderDate = form.getFieldValue('order_date');
 
-    const hasRequiredFields = supplier && orderDate;
+    // Require either account OR contact, plus order date
+    const hasCustomer = account || contact;
+    const hasRequiredFields = hasCustomer && orderDate;
     setCanAddItems(hasRequiredFields);
   };
 
@@ -184,34 +146,31 @@ export default function PurchaseOrderForm() {
 
   const normalizeData = (data: any) => {
     const normalizedData: any = {
-      purchase_date: data.purchase_date,
+      sale_date: data.order_date,
       assigned_user: data.assigned_user?.value || null,
-      supplier: data.supplier?.id || null,
-      discount_type: data.order_discount?.type || 'percentage',
-      discount_amount: data.order_discount?.amount || 0,
-      tax_type: 'percentage',
-      tax_amount: data.order_tax?.amount || 0,
+      account: data.account?.id || null,
+      contact: data.contact?.id || null,
       subtotal: data.subtotal,
+      discount_type: data.discount?.type || 'percentage',
+      discount_value: data.discount?.amount || 0,
+      tax_type: 'percentage',
+      tax_value: data.tax?.amount || 0,
+      total_amount: data.total_amount,
       total_discount: data.total_discount,
       total_tax: data.total_tax,
-      total_amount: data.total_amount,
-    };
-
-    const items = data.items.map((item: any) => {
-      return {
+      items: data.items.map((item: any) => ({
         product_variant: item.product_variant?.id || null,
         warehouse: item.warehouse?.id || null,
         quantity: item.quantity,
         unit_price: item.unit_price,
-        discount_type: item.discount?.type || 'percentage',
         discount_amount: item.discount?.amount || 0,
-        tax_type: 'percentage',
         tax_amount: item.tax?.amount || 0,
+        discount_type: item.discount?.type || 'percentage',
+        tax_type: 'percentage',
         subtotal: item.subtotal,
-      };
-    });
+      })),
+    };
 
-    normalizedData.items = items;
     return normalizedData;
   };
 
@@ -222,27 +181,31 @@ export default function PurchaseOrderForm() {
     let service;
     if (id) {
       service = ApiService.getClient()
-        .collection('purchase-orders')
+        .collection('sale-orders')
         .update(id, normalizedData);
     } else {
       service = ApiService.getClient()
-        .collection('purchase-orders')
+        .collection('sale-orders')
         .create(normalizedData);
     }
 
     service
-      .then(() => {
+      .then((res: any) => {
         notification.success({
-          message: 'Success',
-          description: 'Purchase Order created successfully',
+          message: 'Sale Order created successfully',
+          description: 'Sale Order created successfully',
         });
-        navigate('/collections/purchase-orders');
+        navigate(
+          `/collections/sale-orders/detail/${
+            res.data?.documentId || res.documentId
+          }`
+        );
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.log(err);
         notification.error({
-          message: 'Error',
-          description: 'Failed to create Purchase Order',
+          message: 'Failed to create Sale Order',
+          description: 'Failed to create Sale Order',
         });
       })
       .finally(() => {
@@ -254,7 +217,7 @@ export default function PurchaseOrderForm() {
     <>
       <PageContainer
         header={{
-          title: id ? 'Edit Purchase Order' : 'Create Purchase Order',
+          title: id ? 'Edit Sale Order' : 'Create Sale Order',
           breadcrumb: {
             routes: [
               {
@@ -262,19 +225,12 @@ export default function PurchaseOrderForm() {
                 title: 'Home',
               },
               {
-                path: '/collections/purchase-orders',
-                title: 'Purchase Orders',
+                path: '/collections/sale-orders',
+                title: 'Sale Orders',
               },
-              ...(id
-                ? [
-                    {
-                      path: `/collections/purchase-orders/detail/${id}`,
-                      title: 'Detail',
-                    },
-                  ]
-                : []),
               {
-                title: id ? 'Edit' : 'Create',
+                path: '/collections/sale-orders/create',
+                title: 'Create',
               },
             ],
             itemRender: breadcrumbItemRender,
@@ -287,36 +243,38 @@ export default function PurchaseOrderForm() {
             onFinish={handleSave}
             onValuesChange={handleFormChange}
           >
+            {/* Customer Information */}
             <Row gutter={16}>
               <Col span={12}>
                 <ProForm.Item
-                  name='supplier'
-                  label='Supplier'
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please select a supplier',
-                    },
-                  ]}
+                  name='account'
+                  label='Account'
+                  tooltip='Select either an Account or Contact (not both required)'
                 >
-                  <RelationChoose module='suppliers' />
+                  <RelationChoose module='accounts' />
                 </ProForm.Item>
               </Col>
               <Col span={12}>
-                <ProFormDatePicker
-                  name='purchase_date'
-                  label='Order Date'
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please select a purchase date',
-                    },
-                  ]}
-                />
+                <ProForm.Item
+                  name='contact'
+                  label='Contact'
+                  tooltip='Select either an Account or Contact (not both required)'
+                >
+                  <RelationChoose module='contacts' />
+                </ProForm.Item>
               </Col>
             </Row>
 
             <Row gutter={16}>
+              <Col span={12}>
+                <ProFormDatePicker
+                  name='order_date'
+                  label='Order Date'
+                  rules={[
+                    { required: true, message: 'Please select order date' },
+                  ]}
+                />
+              </Col>
               <Col span={12}>
                 <ProForm.Item name='assigned_user' label='Assigned User'>
                   <AssignUserInput
@@ -329,64 +287,31 @@ export default function PurchaseOrderForm() {
                   />
                 </ProForm.Item>
               </Col>
-              <Col span={12}></Col>
             </Row>
 
+            {/* Order Details */}
             <ProFormList
               name='items'
-              label='Details'
+              label='Order Details'
               creatorButtonProps={{
-                creatorButtonText: 'Add New Product',
+                creatorButtonText: 'Add Product',
                 style: {
                   marginBottom: 16,
                 },
                 disabled: !canAddItems || !canAddNewItem,
-              }}
-              actionGuard={{
-                beforeAddRow: () => {
-                  if (
-                    !form.getFieldValue('purchase_date') ||
-                    !form.getFieldValue('supplier')
-                  ) {
-                    notification.error({
-                      message: 'Error',
-                      description: 'Please select a purchase date and supplier',
-                    });
-                    return false;
-                  }
-
-                  const items = form.getFieldValue('items');
-                  if (items.length > 0) {
-                    let error = false;
-                    for (let i = 0; i < items.length; i++) {
-                      if (
-                        !items[i].product_variant ||
-                        !items[i].warehouse ||
-                        !items[i].quantity ||
-                        !items[i].unit_price
-                      ) {
-                        error = true;
-                        break;
-                      }
-                    }
-                    if (error) {
-                      notification.error({
-                        message: 'Error',
-                        description: 'Please fill all required fields',
-                      });
-                      return false;
-                    }
-                  }
-
-                  return true;
-                },
               }}
             >
               {(_field, index) => (
                 <div className='w-full pl-4'>
                   <Row gutter={16}>
                     <Col span={7}>
-                      <ProForm.Item name='product_variant' label='Product'>
+                      <ProForm.Item
+                        name='product_variant'
+                        label='Product'
+                        rules={[
+                          { required: true, message: 'Product is required' },
+                        ]}
+                      >
                         <RelationChoose
                           module='product-variants'
                           onlyList
@@ -395,7 +320,7 @@ export default function PurchaseOrderForm() {
                               'get',
                               `/product-variants/${value.id}/price`,
                               {
-                                date: form.getFieldValue('purchase_date'),
+                                date: form.getFieldValue('order_date'),
                               }
                             ).then((res) => {
                               if (res?.price?.price) {
@@ -415,7 +340,13 @@ export default function PurchaseOrderForm() {
                       </ProForm.Item>
                     </Col>
                     <Col span={4}>
-                      <ProForm.Item name='warehouse' label='Warehouse'>
+                      <ProForm.Item
+                        name='warehouse'
+                        label='Warehouse'
+                        rules={[
+                          { required: true, message: 'Warehouse is required' },
+                        ]}
+                      >
                         <RelationChoose module='warehouses' onlyList />
                       </ProForm.Item>
                     </Col>
@@ -423,14 +354,28 @@ export default function PurchaseOrderForm() {
                       <ProFormDigit
                         name='quantity'
                         label='Quantity'
-                        placeholder='Quantity'
+                        placeholder='Qty'
+                        rules={[
+                          { required: true, message: 'Quantity is required' },
+                          {
+                            type: 'number',
+                            min: 1,
+                            message: 'Quantity must be greater than 0',
+                          },
+                        ]}
                       />
                     </Col>
                     <Col span={3}>
                       <ProFormDigit
                         name='unit_price'
-                        label='Price'
-                        placeholder='Unit Price'
+                        label='Unit Price'
+                        placeholder='Price'
+                        fieldProps={{
+                          formatter: (value) =>
+                            `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ','),
+                          parser: (value) =>
+                            Number(value!.replace(/\$\s?|(,*)/g, '')),
+                        }}
                       />
                     </Col>
                     <Col span={3}>
@@ -474,20 +419,18 @@ export default function PurchaseOrderForm() {
 
             <Divider />
 
+            {/* Order Summary */}
             <div className='bg-gray-50 p-4 rounded-md mb-4'>
               <Row gutter={16}>
                 <Col span={8}>
                   <Row gutter={8}>
                     <Col span={24}>
-                      <ProForm.Item
-                        name='order_discount'
-                        label='Order Discount'
-                      >
+                      <ProForm.Item name='discount' label='Order Discount'>
                         <DiscountInput amount={totals.subtotal} />
                       </ProForm.Item>
                     </Col>
                     <Col span={24}>
-                      <ProForm.Item name='order_tax' label='Order Tax'>
+                      <ProForm.Item name='tax' label='Order Tax'>
                         <TaxInput amount={totals.subtotal} />
                       </ProForm.Item>
                     </Col>
