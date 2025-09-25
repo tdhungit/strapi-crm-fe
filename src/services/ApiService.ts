@@ -14,7 +14,7 @@ class ApiService {
 
     this.client = strapi({
       baseURL: this.baseUrl + '/api',
-      auth: this.token,
+      auth: this.token || undefined,
     });
   }
 
