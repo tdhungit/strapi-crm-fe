@@ -1,5 +1,8 @@
+import { CheckOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import {
+  App,
+  Button,
   Card,
   Col,
   Descriptions,
@@ -11,7 +14,7 @@ import {
   Typography,
 } from 'antd';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { breadcrumbItemRender, getMediaUrl } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 
@@ -19,7 +22,11 @@ const { Title, Text } = Typography;
 
 export default function SaleOrderDetail() {
   const { id } = useParams();
+  const { message, notification } = App.useApp();
+  const navigate = useNavigate();
+
   const [so, setSo] = useState<any>(null);
+  const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -37,7 +44,7 @@ export default function SaleOrderDetail() {
       .then((res) => {
         setSo(res.data);
       });
-  }, [id]);
+  }, [id, refresh]);
 
   const getStatusColor = (status: string) => {
     const colors: { [key: string]: string } = {
@@ -53,6 +60,40 @@ export default function SaleOrderDetail() {
 
   const formatCurrency = (amount: number) => {
     return `$${amount?.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+  };
+
+  const changeStatus = (status: string) => {
+    if (!id) return;
+
+    message.loading('Updating status...', 0);
+    let service;
+    if (status === 'Completed') {
+      service = ApiService.request('PUT', `/sale-orders/${id}/complete`);
+    } else {
+      service = ApiService.request('PUT', `/sale-orders/${id}/status`, {
+        status,
+      });
+    }
+
+    service
+      .then(() => {
+        notification.success({
+          message: 'Status updated successfully',
+          description:
+            'The status of the sale order has been updated successfully.',
+        });
+        setRefresh((prev) => prev + 1);
+      })
+      .catch((err) => {
+        console.log(err);
+        notification.error({
+          message: 'Failed to update status',
+          description: 'The status of the sale order could not be updated.',
+        });
+      })
+      .finally(() => {
+        message.destroy();
+      });
   };
 
   const columns = [
@@ -171,6 +212,62 @@ export default function SaleOrderDetail() {
             itemRender: breadcrumbItemRender,
           },
         }}
+        extra={
+          <>
+            {(so?.order_status === 'New' || so?.order_status === 'Pending') && (
+              <>
+                <Button
+                  variant='solid'
+                  color='green'
+                  icon={<CheckOutlined />}
+                  onClick={() => changeStatus('Approved')}
+                >
+                  Approved
+                </Button>
+                <Button
+                  variant='solid'
+                  color='red'
+                  icon={<CloseOutlined />}
+                  onClick={() => changeStatus('Rejected')}
+                >
+                  Reject
+                </Button>
+                <Button
+                  variant='solid'
+                  color='orange'
+                  icon={<EditOutlined />}
+                  onClick={() =>
+                    navigate(`/collections/sale-orders/edit/${id}`)
+                  }
+                >
+                  Edit
+                </Button>
+              </>
+            )}
+            {so?.order_status === 'Approved' && (
+              <Button
+                variant='solid'
+                color='blue'
+                icon={<CheckOutlined />}
+                onClick={() => changeStatus('Completed')}
+              >
+                Completed
+              </Button>
+            )}
+            {so?.order_status === 'Completed' && (
+              <span className='block-inline flex items-center gap-2 px-2 py-1 border border-green-500 rounded bg-green-50 text-green-500'>
+                <CheckOutlined />
+                Completed
+              </span>
+            )}
+            {so?.order_status === 'Rejected' && (
+              <span className='block-inline flex items-center gap-2 px-2 py-1 border border-red-500 rounded bg-red-50 text-red-500'>
+                <CloseOutlined />
+                Rejected
+              </span>
+            )}
+          </>
+        }
       >
         <div className='space-y-6'>
           {/* Header Information */}

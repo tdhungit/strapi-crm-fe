@@ -41,7 +41,7 @@ export const defaultMenus: any = {
   },
   products: {
     key: '/collections/products',
-    icon: 'shoppingcart',
+    icon: 'barcode',
     label: 'Products',
   },
   'product-attributes': {
