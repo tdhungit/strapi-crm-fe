@@ -37,6 +37,7 @@ export default function CollectionListComponent({
   toolBarRender,
   recordActionRender,
   hasProfile,
+  noEdit,
 }: {
   module: string;
   header?:
@@ -47,6 +48,7 @@ export default function CollectionListComponent({
   toolBarRender?: boolean | React.ReactNode[];
   recordActionRender?: (dom: React.ReactNode, record: any) => React.ReactNode;
   hasProfile?: boolean;
+  noEdit?: boolean;
   [key: string]: any;
 }) {
   const navigate = useNavigate();
@@ -122,12 +124,14 @@ export default function CollectionListComponent({
                     <FundViewOutlined />
                   </Link>
                 )}
-                <Link
-                  to={`/collections/${module}/edit/${record.documentId}`}
-                  className='inline-block ml-2'
-                >
-                  <EditOutlined />
-                </Link>
+                {!noEdit && (
+                  <Link
+                    to={`/collections/${module}/edit/${record.documentId}`}
+                    className='inline-block ml-2'
+                  >
+                    <EditOutlined />
+                  </Link>
+                )}
               </div>
             ));
 

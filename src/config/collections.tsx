@@ -13,4 +13,5 @@ export const availableCollections = [
   'purchase-orders',
   'sale-orders',
   'suppliers',
+  'inventories',
 ];

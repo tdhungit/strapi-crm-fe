@@ -1,5 +1,6 @@
+import { CheckOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { Image, Typography } from 'antd';
+import { App, Button, Image, Typography } from 'antd';
 import { Card, Col, Descriptions, Divider, Row, Table, Tag } from 'antd/lib';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -10,8 +11,10 @@ const { Title, Text } = Typography;
 
 export default function PurchaseOrderDetail() {
   const { id } = useParams();
+  const { notification, message } = App.useApp();
 
   const [po, setPo] = useState<any>(null);
+  const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -28,7 +31,7 @@ export default function PurchaseOrderDetail() {
       .then((res) => {
         setPo(res.data);
       });
-  }, [id]);
+  }, [id, refresh]);
 
   const getStatusColor = (status: string) => {
     const colors: { [key: string]: string } = {
@@ -43,6 +46,38 @@ export default function PurchaseOrderDetail() {
 
   const formatCurrency = (amount: number) => {
     return `$${amount?.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+  };
+
+  const changeStatus = (status: string) => {
+    if (!id) return;
+
+    message.loading('Updating status...', 0);
+    let service;
+
+    if (status === 'Completed') {
+      service = ApiService.request('PUT', `/purchase-orders/${id}/complete`);
+    } else {
+      service = ApiService.request('PUT', `/purchase-orders/${id}/status`, {
+        status,
+      });
+    }
+
+    service
+      .then(() => {
+        notification.success({
+          message: 'Status updated successfully',
+        });
+        setRefresh((prev) => prev + 1);
+      })
+      .catch((err) => {
+        console.error(err);
+        notification.error({
+          message: 'Failed to update status',
+        });
+      })
+      .finally(() => {
+        message.destroy();
+      });
   };
 
   const columns = [
@@ -161,6 +196,55 @@ export default function PurchaseOrderDetail() {
             itemRender: breadcrumbItemRender,
           },
         }}
+        extra={
+          <>
+            {(po.order_status === 'New' || po.order_status === 'Pending') && (
+              <>
+                <Button
+                  variant='solid'
+                  color='green'
+                  icon={<CheckOutlined />}
+                  onClick={() => changeStatus('Approved')}
+                >
+                  Approve
+                </Button>
+                <Button
+                  variant='solid'
+                  color='red'
+                  icon={<CloseOutlined />}
+                  onClick={() => changeStatus('Rejected')}
+                >
+                  Reject
+                </Button>
+                <Button variant='solid' color='orange' icon={<EditOutlined />}>
+                  Edit
+                </Button>
+              </>
+            )}
+            {po.order_status === 'Approved' && (
+              <Button
+                variant='solid'
+                color='green'
+                icon={<CheckOutlined />}
+                onClick={() => changeStatus('Completed')}
+              >
+                Completed
+              </Button>
+            )}
+            {po.order_status === 'Rejected' && (
+              <span className='block-inline flex items-center gap-2 px-2 py-1 border border-red-500 rounded bg-red-50 text-red-500'>
+                <CloseOutlined />
+                Rejected
+              </span>
+            )}
+            {po.order_status === 'Completed' && (
+              <span className='block-inline flex items-center gap-2 px-2 py-1 border border-green-500 rounded bg-green-50 text-green-500'>
+                <CheckOutlined />
+                Completed
+              </span>
+            )}
+          </>
+        }
       >
         <div className='space-y-6'>
           {/* Header Information */}

@@ -31,7 +31,7 @@ export const defaultMenus: any = {
   },
   notes: {
     key: '/collections/notes',
-    icon: 'file',
+    icon: 'fileadd',
     label: 'Notes',
   },
   'mail-histories': {
@@ -51,7 +51,7 @@ export const defaultMenus: any = {
   },
   suppliers: {
     key: '/collections/suppliers',
-    icon: 'shoppingcart',
+    icon: 'contactsbook',
     label: 'Suppliers',
   },
   'purchase-orders': {
@@ -61,12 +61,17 @@ export const defaultMenus: any = {
   },
   'sale-orders': {
     key: '/collections/sale-orders',
-    icon: 'shoppingcart',
+    icon: 'shop',
     label: 'Sale Orders',
+  },
+  inventories: {
+    key: '/collections/inventories',
+    icon: 'folderopen',
+    label: 'Inventories',
   },
   warehouses: {
     key: '/collections/warehouses',
-    icon: 'warehouse',
+    icon: 'appstore',
     label: 'Warehouses',
   },
   users: {
