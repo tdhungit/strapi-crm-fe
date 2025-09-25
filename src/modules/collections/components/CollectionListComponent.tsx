@@ -11,6 +11,7 @@ import {
   PageContainer,
   ProTable,
   type PageHeaderProps,
+  type ProColumnType,
 } from '@ant-design/pro-components';
 import { App, Button } from 'antd';
 import { Flex } from 'antd/lib';
@@ -38,6 +39,7 @@ export default function CollectionListComponent({
   recordActionRender,
   hasProfile,
   noEdit,
+  updateColumns,
 }: {
   module: string;
   header?:
@@ -49,6 +51,7 @@ export default function CollectionListComponent({
   recordActionRender?: (dom: React.ReactNode, record: any) => React.ReactNode;
   hasProfile?: boolean;
   noEdit?: boolean;
+  updateColumns?: (columns: ProColumnType<any>[]) => ProColumnType<any>[];
   [key: string]: any;
 }) {
   const navigate = useNavigate();
@@ -100,7 +103,7 @@ export default function CollectionListComponent({
         (res) => {
           setConfig(res);
           // get columns
-          const cols = getListLayoutColumns(res, {
+          let cols = getListLayoutColumns(res, {
             onClickMainField: (record: any) => {
               setSelectRecordId(record.documentId);
             },
@@ -143,6 +146,11 @@ export default function CollectionListComponent({
           });
 
           // update columns
+          if (updateColumns) {
+            cols = updateColumns(cols);
+          }
+
+          // save columns
           setColumns(cols);
 
           // reload table

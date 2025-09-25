@@ -1,7 +1,12 @@
 import SaleOrderDetail from './SaleOrderDetail';
 import SaleOrderForm from './SaleOrderForm';
+import SaleOrderList from './SaleOrderList';
 
 const routes = [
+  {
+    path: '/collections/sale-orders',
+    element: <SaleOrderList />,
+  },
   {
     path: '/collections/sale-orders/create',
     element: <SaleOrderForm />,

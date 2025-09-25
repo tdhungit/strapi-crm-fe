@@ -159,7 +159,7 @@ export default function DefaultLayout() {
         </div>
         <div
           style={{
-            height: 'calc(100vh - 64px)', // Subtract header height
+            height: 'calc(100vh - 111px)', // Subtract header height
             overflowY: 'auto',
             overflowX: 'hidden',
           }}

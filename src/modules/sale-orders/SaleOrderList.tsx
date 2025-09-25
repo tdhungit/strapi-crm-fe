@@ -1,22 +1,21 @@
 import { FileExcelOutlined, PlusCircleFilled } from '@ant-design/icons';
 import { App, Button } from 'antd';
-import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CollectionListComponent from '../collections/components/CollectionListComponent';
 
-export default function PurchaseOrderList() {
+export default function SaleOrderList() {
   const navigate = useNavigate();
   const { message } = App.useApp();
 
   return (
     <CollectionListComponent
-      module='purchase-orders'
+      module='sale-orders'
       toolBarRender={[
         <Button
           key='create'
           variant='solid'
           color='primary'
-          onClick={() => navigate(`/collections/purchase-orders/create`)}
+          onClick={() => navigate(`/collections/sale-orders/create`)}
         >
           <PlusCircleFilled /> Create
         </Button>,

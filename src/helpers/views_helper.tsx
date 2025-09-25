@@ -47,11 +47,13 @@ export function updateListLayoutFieldRender(
 
   const fieldTypes = config.attributes?.[field] || {};
   fieldTypes.name = field;
-  col.render = (_text: any, record: any) => (
-    <>
-      <DetailView item={fieldTypes} data={record} />
-    </>
-  );
+  if (!col.valueType) {
+    col.render = (_text: any, record: any) => (
+      <>
+        <DetailView item={fieldTypes} data={record} />
+      </>
+    );
+  }
 
   return col;
 }
