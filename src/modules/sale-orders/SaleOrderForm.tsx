@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AssignUserInput from '../../components/fields/assign-user/AssignUserInput';
 import DiscountInput from '../../components/fields/discount/DiscountInput';
+import ProductVariantChoose from '../../components/fields/relation/ProductVariantChoose';
 import RelationChoose from '../../components/fields/relation/RelationChoose';
 import TaxInput from '../../components/fields/tax/TaxInput';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
@@ -342,120 +343,144 @@ export default function SaleOrderForm() {
                 disabled: !canAddItems || !canAddNewItem,
               }}
             >
-              {(_field, index) => (
-                <div className='w-full pl-4'>
-                  <Row gutter={16}>
-                    <Col span={7}>
-                      <ProForm.Item
-                        name='product_variant'
-                        label='Product'
-                        rules={[
-                          { required: true, message: 'Product is required' },
-                        ]}
-                      >
-                        <RelationChoose
-                          module='product-variants'
-                          onlyList
-                          onChange={(value) => {
-                            ApiService.request(
-                              'get',
-                              `/product-variants/${value.id}/price`,
-                              {
-                                date: form.getFieldValue('order_date'),
-                              }
-                            ).then((res) => {
-                              if (res?.price?.price) {
-                                const items = form.getFieldValue('items');
-                                items[index].unit_price = res.price.price;
-                                if (
-                                  !items[index].quantity ||
-                                  items[index].quantity <= 0
-                                ) {
-                                  items[index].quantity = 1;
+              {(_field, index) => {
+                const currentItem = form.getFieldValue('items')?.[index];
+                const hasWarehouse = currentItem?.warehouse;
+
+                return (
+                  <div className='w-full pl-4'>
+                    <Row gutter={16}>
+                      <Col span={4}>
+                        <ProForm.Item
+                          name='warehouse'
+                          label='Warehouse'
+                          rules={[
+                            {
+                              required: true,
+                              message: 'Warehouse is required',
+                            },
+                          ]}
+                        >
+                          <RelationChoose module='warehouses' onlyList />
+                        </ProForm.Item>
+                      </Col>
+                      <Col span={7}>
+                        <ProForm.Item
+                          name='product_variant'
+                          label='Product'
+                          rules={[
+                            { required: true, message: 'Product is required' },
+                          ]}
+                          tooltip={
+                            !hasWarehouse
+                              ? 'Please select a warehouse first'
+                              : ''
+                          }
+                        >
+                          <ProductVariantChoose
+                            warehouse={currentItem?.warehouse}
+                            priceDate={form.getFieldValue('order_date')}
+                            priceType='Sale'
+                            disabled={!hasWarehouse}
+                            placeholder={hasWarehouse ? 'Select product' : ''}
+                            onChange={(value) => {
+                              ApiService.request(
+                                'get',
+                                `/product-variants/${value.id}/price`,
+                                {
+                                  date: form
+                                    .getFieldValue('order_date')
+                                    .format('YYYY-MM-DD'),
                                 }
-                                form.setFieldValue('items', items);
-                              }
-                            });
+                              ).then((res) => {
+                                if (res?.price?.price) {
+                                  const items = form.getFieldValue('items');
+                                  items[index].unit_price = res.price.price;
+                                  if (
+                                    !items[index].quantity ||
+                                    items[index].quantity <= 0
+                                  ) {
+                                    items[index].quantity = 1;
+                                  }
+                                  form.setFieldValue('items', items);
+                                }
+                              });
+                            }}
+                          />
+                        </ProForm.Item>
+                      </Col>
+                      <Col span={2}>
+                        <ProFormDigit
+                          name='quantity'
+                          label='Quantity'
+                          placeholder='Qty'
+                          rules={[
+                            { required: true, message: 'Quantity is required' },
+                            {
+                              type: 'number',
+                              min: 1,
+                              message: 'Quantity must be greater than 0',
+                            },
+                          ]}
+                        />
+                      </Col>
+                      <Col span={3}>
+                        <ProFormDigit
+                          name='unit_price'
+                          label='Unit Price'
+                          placeholder='Price'
+                          fieldProps={{
+                            formatter: (value) =>
+                              `$ ${value}`.replace(
+                                /\B(?=(\d{3})+(?!\d))/g,
+                                ','
+                              ),
+                            parser: (value) =>
+                              Number(value!.replace(/\$\s?|(,*)/g, '')),
                           }}
                         />
-                      </ProForm.Item>
-                    </Col>
-                    <Col span={4}>
-                      <ProForm.Item
-                        name='warehouse'
-                        label='Warehouse'
-                        rules={[
-                          { required: true, message: 'Warehouse is required' },
-                        ]}
-                      >
-                        <RelationChoose module='warehouses' onlyList />
-                      </ProForm.Item>
-                    </Col>
-                    <Col span={2}>
-                      <ProFormDigit
-                        name='quantity'
-                        label='Quantity'
-                        placeholder='Qty'
-                        rules={[
-                          { required: true, message: 'Quantity is required' },
-                          {
-                            type: 'number',
-                            min: 1,
-                            message: 'Quantity must be greater than 0',
-                          },
-                        ]}
-                      />
-                    </Col>
-                    <Col span={3}>
-                      <ProFormDigit
-                        name='unit_price'
-                        label='Unit Price'
-                        placeholder='Price'
-                        fieldProps={{
-                          formatter: (value) =>
-                            `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ','),
-                          parser: (value) =>
-                            Number(value!.replace(/\$\s?|(,*)/g, '')),
-                        }}
-                      />
-                    </Col>
-                    <Col span={3}>
-                      <ProForm.Item name='discount' label='Discount'>
-                        <DiscountInput
-                          amount={
-                            form.getFieldValue('items')?.[index]?.unit_price ||
-                            0
-                          }
+                      </Col>
+                      <Col span={3}>
+                        <ProForm.Item name='discount' label='Discount'>
+                          <DiscountInput
+                            amount={
+                              form.getFieldValue('items')?.[index]
+                                ?.unit_price || 0
+                            }
+                          />
+                        </ProForm.Item>
+                      </Col>
+                      <Col span={3}>
+                        <ProForm.Item name='tax' label='Tax'>
+                          <TaxInput
+                            amount={
+                              form.getFieldValue('items')?.[index]
+                                ?.unit_price || 0
+                            }
+                          />
+                        </ProForm.Item>
+                      </Col>
+                      <Col span={2}>
+                        <ProFormDigit
+                          name='subtotal'
+                          label='Subtotal'
+                          placeholder='Subtotal'
+                          readonly
+                          fieldProps={{
+                            formatter: (value) =>
+                              `$ ${value}`.replace(
+                                /\B(?=(\d{3})+(?!\d))/g,
+                                ','
+                              ),
+                            parser: (value) =>
+                              Number(value!.replace(/\$\s?|(,*)/g, '')),
+                          }}
                         />
-                      </ProForm.Item>
-                    </Col>
-                    <Col span={3}>
-                      <ProForm.Item name='tax' label='Tax'>
-                        <TaxInput
-                          amount={
-                            form.getFieldValue('items')?.[index]?.unit_price ||
-                            0
-                          }
-                        />
-                      </ProForm.Item>
-                    </Col>
-                    <Col span={2}>
-                      <ProFormDigit
-                        name='subtotal'
-                        label='Subtotal'
-                        placeholder='Subtotal'
-                        readonly
-                        fieldProps={{
-                          formatter: (value) =>
-                            `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ','),
-                          parser: (value) =>
-                            Number(value!.replace(/\$\s?|(,*)/g, '')),
-                        }}
-                      />
-                    </Col>
-                  </Row>
-                </div>
-              )}
+                      </Col>
+                    </Row>
+                  </div>
+                );
+              }}
             </ProFormList>
 
             <Divider />

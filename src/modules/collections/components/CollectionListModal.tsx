@@ -3,6 +3,7 @@ import { ProTable, type ActionType } from '@ant-design/pro-components';
 import { App, Button, Modal } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import {
+  camelToTitle,
   getCollectionPopulatedList,
   getListLayoutColumns,
   strapiClientErrorMessage,
@@ -110,7 +111,7 @@ export default function CollectionListModal({
 
   return (
     <Modal
-      title={module.toUpperCase()}
+      title={camelToTitle(module)}
       open={open}
       onCancel={() => onOpenChange(false)}
       onOk={() => handleFinish()}

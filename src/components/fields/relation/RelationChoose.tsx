@@ -3,19 +3,25 @@ import { Button, Input, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import CollectionFormModal from '../../../modules/collections/components/CollectionFormModal';
 import CollectionListModal from '../../../modules/collections/components/CollectionListModal';
+import MetadataService from '../../../services/MetadataService';
 
 export default function RelationChoose({
   module,
   value: defaultValue,
   onlyList,
   onChange,
+  placeholder,
+  disabled,
 }: {
   module: string;
   value?: any;
   onlyList?: boolean;
   onChange?: (value: any) => void;
+  placeholder?: string;
+  disabled?: boolean;
 }) {
   const [value, setValue] = useState(defaultValue);
+  const [mainField, setMainField] = useState('name');
   const [open, setOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
 
@@ -25,7 +31,12 @@ export default function RelationChoose({
     }
   }, [defaultValue]);
 
-  useEffect(() => {}, [module]);
+  useEffect(() => {
+    const contentType = MetadataService.getContentTypeByModule(module);
+    if (contentType) {
+      setMainField(contentType.settings?.mainField || 'name');
+    }
+  }, [module]);
 
   const handleSelectRecord = (record: any) => {
     setValue(record);
@@ -37,21 +48,24 @@ export default function RelationChoose({
     <>
       <Space.Compact style={{ width: '100%' }}>
         <Input
-          value={value?.name || value?.id || ''}
-          placeholder='Select'
+          value={value?.name || value?.[mainField] || ''}
+          placeholder={placeholder || 'Select'}
           readOnly
+          disabled={disabled}
         />
         {!onlyList && (
           <Button
             type='default'
             icon={<PlusOutlined />}
             onClick={() => setFormOpen(true)}
+            disabled={disabled}
           ></Button>
         )}
         <Button
           type='default'
           icon={<SelectOutlined />}
           onClick={() => setOpen(true)}
+          disabled={disabled}
         ></Button>
       </Space.Compact>
 
