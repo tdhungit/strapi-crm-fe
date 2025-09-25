@@ -9,6 +9,7 @@ export default function OpportunityList() {
   return (
     <CollectionListComponent
       module='opportunities'
+      hasProfile
       extra={[
         <Button key='kanban' onClick={() => navigate('/opportunities/kanban')}>
           <ProjectFilled />

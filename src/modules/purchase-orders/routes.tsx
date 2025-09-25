@@ -1,6 +1,5 @@
 import PurchaseOrderDetail from './PurchaseOrderDetail';
 import PurchaseOrderForm from './PurchaseOrderForm';
-
 const routes = [
   {
     path: '/collections/purchase-orders/create',

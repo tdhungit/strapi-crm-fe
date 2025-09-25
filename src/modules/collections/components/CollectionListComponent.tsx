@@ -36,16 +36,18 @@ export default function CollectionListComponent({
   extra,
   toolBarRender,
   recordActionRender,
+  hasProfile,
 }: {
   module: string;
   header?:
     | Partial<PageHeaderProps> & {
         children?: React.ReactNode;
       };
-  [key: string]: any;
   extra?: React.ReactNode[];
   toolBarRender?: boolean | React.ReactNode[];
   recordActionRender?: (dom: React.ReactNode, record: any) => React.ReactNode;
+  hasProfile?: boolean;
+  [key: string]: any;
 }) {
   const navigate = useNavigate();
   const { message } = App.useApp();
@@ -112,12 +114,14 @@ export default function CollectionListComponent({
                 >
                   <EyeOutlined />
                 </Link>
-                <Link
-                  to={`/collections/${module}/profile/${record.documentId}`}
-                  className='inline-block ml-2'
-                >
-                  <FundViewOutlined />
-                </Link>
+                {hasProfile && (
+                  <Link
+                    to={`/collections/${module}/profile/${record.documentId}`}
+                    className='inline-block ml-2'
+                  >
+                    <FundViewOutlined />
+                  </Link>
+                )}
                 <Link
                   to={`/collections/${module}/edit/${record.documentId}`}
                   className='inline-block ml-2'
