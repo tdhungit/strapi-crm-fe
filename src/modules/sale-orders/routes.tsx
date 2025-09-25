@@ -1,3 +1,4 @@
+import SaleOrderDetail from './SaleOrderDetail';
 import SaleOrderForm from './SaleOrderForm';
 
 const routes = [
@@ -8,6 +9,10 @@ const routes = [
   {
     path: '/collections/sale-orders/edit/:id',
     element: <SaleOrderForm />,
+  },
+  {
+    path: '/collections/sale-orders/detail/:id',
+    element: <SaleOrderDetail />,
   },
 ];
 

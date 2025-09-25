@@ -216,7 +216,7 @@ export default function PurchaseOrderForm() {
   };
 
   const handleSave = (values: any) => {
-    message.loading('Creating Purchase Order...', 0);
+    message.loading('Saving Purchase Order...', 0);
     const normalizedData = normalizeData(values);
 
     let service;
@@ -234,7 +234,7 @@ export default function PurchaseOrderForm() {
       .then(() => {
         notification.success({
           message: 'Success',
-          description: 'Purchase Order created successfully',
+          description: 'Purchase Order saved successfully',
         });
         navigate('/collections/purchase-orders');
       })
@@ -242,7 +242,7 @@ export default function PurchaseOrderForm() {
         console.log(err);
         notification.error({
           message: 'Error',
-          description: 'Failed to create Purchase Order',
+          description: 'Failed to save Purchase Order',
         });
       })
       .finally(() => {

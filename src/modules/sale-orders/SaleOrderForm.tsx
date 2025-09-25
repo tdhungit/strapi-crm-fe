@@ -31,6 +31,42 @@ export default function SaleOrderForm() {
   const [canAddItems, setCanAddItems] = useState(false);
   const [canAddNewItem, setCanAddNewItem] = useState(true);
 
+  useEffect(() => {
+    if (!id) return;
+
+    const denormalizeData = (so: any) => {
+      const data = {
+        items: [],
+        ...so,
+        order_date: so.sale_date,
+      };
+
+      const items = so.sale_order_details.map((item: any) => {
+        return {
+          ...item,
+        };
+      });
+
+      data.items = items;
+
+      return data;
+    };
+
+    ApiService.getClient()
+      .collection('sale-orders')
+      .findOne(id, {
+        populate: [
+          'sale_order_details.product_variant',
+          'sale_order_details.warehouse',
+          'account',
+          'contact',
+        ],
+      })
+      .then((res) => {
+        form.setFieldsValue(denormalizeData(res.data));
+      });
+  }, [id]);
+
   const calculateTotals = () => {
     const items = form.getFieldValue('items') || [];
     let subtotal = 0;
@@ -152,12 +188,10 @@ export default function SaleOrderForm() {
       contact: data.contact?.id || null,
       subtotal: data.subtotal,
       discount_type: data.discount?.type || 'percentage',
-      discount_value: data.discount?.amount || 0,
+      discount_amount: data.discount?.amount || 0,
       tax_type: 'percentage',
-      tax_value: data.tax?.amount || 0,
+      tax_amount: data.tax?.amount || 0,
       total_amount: data.total_amount,
-      total_discount: data.total_discount,
-      total_tax: data.total_tax,
       items: data.items.map((item: any) => ({
         product_variant: item.product_variant?.id || null,
         warehouse: item.warehouse?.id || null,
@@ -175,7 +209,7 @@ export default function SaleOrderForm() {
   };
 
   const handleSave = (values: any) => {
-    message.loading('Creating Purchase Order...', 0);
+    message.loading('Saving Sale Order...', 0);
     const normalizedData = normalizeData(values);
 
     let service;
@@ -192,8 +226,8 @@ export default function SaleOrderForm() {
     service
       .then((res: any) => {
         notification.success({
-          message: 'Sale Order created successfully',
-          description: 'Sale Order created successfully',
+          message: 'Sale Order saved successfully',
+          description: 'Sale Order saved successfully',
         });
         navigate(
           `/collections/sale-orders/detail/${
@@ -204,8 +238,8 @@ export default function SaleOrderForm() {
       .catch((err: any) => {
         console.log(err);
         notification.error({
-          message: 'Failed to create Sale Order',
-          description: 'Failed to create Sale Order',
+          message: 'Failed to save Sale Order',
+          description: 'Failed to save Sale Order',
         });
       })
       .finally(() => {
@@ -228,9 +262,16 @@ export default function SaleOrderForm() {
                 path: '/collections/sale-orders',
                 title: 'Sale Orders',
               },
+              ...(!id
+                ? []
+                : [
+                    {
+                      path: `/collections/sale-orders/detail/${id}`,
+                      title: 'Detail',
+                    },
+                  ]),
               {
-                path: '/collections/sale-orders/create',
-                title: 'Create',
+                title: id ? 'Edit' : 'Create',
               },
             ],
             itemRender: breadcrumbItemRender,

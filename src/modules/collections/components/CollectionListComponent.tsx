@@ -35,6 +35,7 @@ export default function CollectionListComponent({
   header,
   extra,
   toolBarRender,
+  recordActionRender,
 }: {
   module: string;
   header?:
@@ -44,6 +45,7 @@ export default function CollectionListComponent({
   [key: string]: any;
   extra?: React.ReactNode[];
   toolBarRender?: boolean | React.ReactNode[];
+  recordActionRender?: (dom: React.ReactNode, record: any) => React.ReactNode;
 }) {
   const navigate = useNavigate();
   const { message } = App.useApp();
@@ -100,11 +102,9 @@ export default function CollectionListComponent({
             },
           });
           // add actions column
-          cols.push({
-            title: 'Actions',
-            key: 'actions',
-            search: false,
-            render: (record: any) => (
+          const actionRender =
+            recordActionRender ||
+            ((_dom: React.ReactNode, record: any) => (
               <div>
                 <Link
                   to={`/collections/${module}/detail/${record.documentId}`}
@@ -125,10 +125,18 @@ export default function CollectionListComponent({
                   <EditOutlined />
                 </Link>
               </div>
-            ),
+            ));
+
+          cols.push({
+            title: 'Actions',
+            key: 'actions',
+            search: false,
+            render: actionRender,
           });
+
           // update columns
           setColumns(cols);
+
           // reload table
           ref?.current?.reload();
         }
