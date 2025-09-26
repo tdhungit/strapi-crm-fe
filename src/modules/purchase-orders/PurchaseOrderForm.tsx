@@ -236,12 +236,16 @@ export default function PurchaseOrderForm() {
     }
 
     service
-      .then(() => {
+      .then((res: any) => {
         notification.success({
           message: 'Success',
           description: 'Purchase Order saved successfully',
         });
-        navigate('/collections/purchase-orders');
+        navigate(
+          `/collections/purchase-orders/detail/${
+            res.data?.documentId || res.documentId
+          }`
+        );
       })
       .catch((err) => {
         console.log(err);

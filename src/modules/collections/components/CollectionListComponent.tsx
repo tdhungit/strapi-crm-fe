@@ -28,6 +28,7 @@ import {
 import ApiService from '../../../services/ApiService';
 import CollectionService from '../../../services/CollectionService';
 import MetadataService from '../../../services/MetadataService';
+import type { ListLayoutOptions } from '../../../types/layouts';
 import CollectionDetailDrawer from './CollectionDetailDrawer';
 import CollectionWidgets from './CollectionWidgets';
 
@@ -41,6 +42,8 @@ export default function CollectionListComponent({
   noEdit,
   updateColumns,
   drawerComponent,
+  populate,
+  mainField,
 }: {
   module: string;
   header?:
@@ -52,8 +55,13 @@ export default function CollectionListComponent({
   recordActionRender?: (dom: React.ReactNode, record: any) => React.ReactNode;
   hasProfile?: boolean;
   noEdit?: boolean;
-  updateColumns?: (columns: ProColumnType<any>[]) => ProColumnType<any>[];
+  updateColumns?: (
+    columns: ProColumnType<any>[],
+    options?: ListLayoutOptions
+  ) => ProColumnType<any>[];
   drawerComponent?: React.ComponentType<any>;
+  populate?: string[];
+  mainField?: string;
   [key: string]: any;
 }) {
   const navigate = useNavigate();
@@ -70,6 +78,13 @@ export default function CollectionListComponent({
     const saved = localStorage.getItem(`collection-${module}-panel-collapsed`);
     return saved ? JSON.parse(saved) : false;
   });
+
+  const layoutOptions: ListLayoutOptions = {
+    onClickMainField: (record: any) => {
+      setSelectRecordId(record.documentId);
+    },
+    mainField,
+  };
 
   // Save collapsed state to localStorage whenever it changes
   const handleCollapse = (collapsed: boolean) => {
@@ -105,11 +120,7 @@ export default function CollectionListComponent({
         (res) => {
           setConfig(res);
           // get columns
-          let cols = getListLayoutColumns(res, {
-            onClickMainField: (record: any) => {
-              setSelectRecordId(record.documentId);
-            },
-          });
+          let cols = getListLayoutColumns(res, layoutOptions);
           // add actions column
           const actionRender =
             recordActionRender ||
@@ -149,7 +160,7 @@ export default function CollectionListComponent({
 
           // update columns
           if (updateColumns) {
-            cols = updateColumns(cols);
+            cols = updateColumns(cols, layoutOptions);
           }
 
           // save columns
@@ -284,12 +295,16 @@ export default function CollectionListComponent({
             request={async (params, sort) => {
               setParams(params);
               try {
+                const populateFields = getCollectionPopulatedList(config);
+                if (populate) {
+                  populateFields.push(...populate);
+                }
                 const res = await CollectionService.getTableRequest(
                   module,
                   params,
                   sort,
                   {
-                    populate: getCollectionPopulatedList(config),
+                    populate: populateFields,
                   },
                   config
                 );

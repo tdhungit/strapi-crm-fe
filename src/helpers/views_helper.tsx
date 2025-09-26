@@ -31,8 +31,9 @@ export function updateListLayoutFieldRender(
   }
 
   if (options.onClickMainField) {
-    if (config.settings?.mainField) {
-      if (field === config.settings?.mainField) {
+    const mainField = options.mainField || config.settings?.mainField;
+    if (mainField) {
+      if (field === mainField) {
         col.render = (text: any, record: any) => (
           <span
             className='cursor-pointer font-semibold'

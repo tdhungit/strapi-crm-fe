@@ -93,6 +93,7 @@ export interface ListLayoutOptions {
     [field: string]: ListColumnViewOptions;
   };
   onClickMainField?: (record: any) => void;
+  mainField?: string;
 }
 
 export interface PanelItemType {
