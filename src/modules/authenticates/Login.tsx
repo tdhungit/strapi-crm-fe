@@ -1,11 +1,11 @@
 import { LockOutlined, LoginOutlined, UserOutlined } from '@ant-design/icons';
 import {
+  App,
   Button,
   Card,
   Divider,
   Form,
   Input,
-  message,
   Space,
   Typography,
 } from 'antd';
@@ -18,6 +18,7 @@ const { Title, Text } = Typography;
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { message } = App.useApp();
 
   useEffect(() => {
     // Check if user is already authenticated

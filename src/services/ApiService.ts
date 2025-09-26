@@ -30,7 +30,8 @@ class ApiService {
   }
 
   getToken(): string {
-    return this.token;
+    const token = this.token || localStorage.getItem('authToken') || '';
+    return token;
   }
 
   getClient() {
