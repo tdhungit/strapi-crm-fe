@@ -66,15 +66,9 @@ export default function SaleOrderDetail() {
     if (!id) return;
 
     message.loading('Updating status...', 0);
-    let service;
-    if (status === 'Completed') {
-      service = ApiService.request('PUT', `/sale-orders/${id}/complete`);
-    } else {
-      service = ApiService.request('PUT', `/sale-orders/${id}/status`, {
-        status,
-      });
-    }
-
+    const service = ApiService.request('PUT', `/sale-orders/${id}/status`, {
+      status,
+    });
     service
       .then(() => {
         notification.success({
@@ -88,7 +82,9 @@ export default function SaleOrderDetail() {
         console.log(err);
         notification.error({
           message: 'Failed to update status',
-          description: 'The status of the sale order could not be updated.',
+          description:
+            err?.response?.data?.error?.message ||
+            'The status of the sale order could not be updated.',
         });
       })
       .finally(() => {
