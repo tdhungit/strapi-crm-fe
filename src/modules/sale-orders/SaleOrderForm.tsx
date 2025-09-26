@@ -64,6 +64,11 @@ export default function SaleOrderForm() {
         ],
       })
       .then((res) => {
+        if (['Completed', 'Rejected'].includes(res.data.order_status)) {
+          message.error('Order is completed or rejected');
+          navigate(`/collections/sale-orders/detail/${id}`);
+          return;
+        }
         form.setFieldsValue(denormalizeData(res.data));
       });
   }, [id]);

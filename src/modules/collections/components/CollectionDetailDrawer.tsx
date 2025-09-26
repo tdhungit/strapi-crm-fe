@@ -5,21 +5,23 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   camelToTitle,
+  getCollectionPopulatedDetail,
   getEditLayoutColumns,
 } from '../../../helpers/views_helper';
 import ApiService from '../../../services/ApiService';
 import MetadataService from '../../../services/MetadataService';
 
-interface Props {
+export interface CollectionDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   collectionName: string;
   id: string;
   width?: number;
+  detailPath?: string;
   editPath?: string;
 }
 
-export default function CollectionDetailDrawer(props: Props) {
+export default function CollectionDetailDrawer(props: CollectionDrawerProps) {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState<string>('');
@@ -35,9 +37,14 @@ export default function CollectionDetailDrawer(props: Props) {
           const cols: any = getEditLayoutColumns(config);
           setColumns(cols);
           // get record data
+          const params: any = {};
+          const populate = getCollectionPopulatedDetail(config);
+          if (populate.length > 0) {
+            params.populate = populate;
+          }
           ApiService.getClient()
             .collection(props.collectionName)
-            .findOne(props.id, { populate: '*' })
+            .findOne(props.id, params)
             .then((res: any) => {
               setRecord(res.data);
               if (config.settings?.mainField) {
@@ -65,7 +72,7 @@ export default function CollectionDetailDrawer(props: Props) {
             onClick={() => {
               props.onOpenChange(false);
               navigate(
-                props.editPath ||
+                props.detailPath ||
                   `/collections/${props.collectionName}/detail/${props.id}`
               );
             }}

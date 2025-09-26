@@ -3,6 +3,7 @@ import { App, Button } from 'antd';
 import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CollectionListComponent from '../collections/components/CollectionListComponent';
+import PurchaseOrderDrawer from './components/PurchaseOrderDrawer';
 
 export default function PurchaseOrderList() {
   const navigate = useNavigate();
@@ -71,6 +72,7 @@ export default function PurchaseOrderList() {
           return col;
         });
       }}
+      drawerComponent={PurchaseOrderDrawer}
     />
   );
 }

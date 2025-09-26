@@ -1,6 +1,7 @@
 import type { ParamsType, ProColumns } from '@ant-design/pro-components';
 import { Col, Row, type FormInstance } from 'antd';
 import type { SortOrder } from 'antd/lib/table/interface';
+import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
 import DetailView from '../components/fields/DetailView';
 import FormInput from '../components/fields/FormInput';
@@ -476,4 +477,16 @@ export function getMediaUrl(media: any) {
   return media.url.startsWith('http')
     ? media.url
     : import.meta.env.VITE_MEDIA_URL + media.url;
+}
+
+export function dateDisplay(date: string) {
+  return dayjs(date).format('YYYY-MM-DD');
+}
+
+export function timeDisplay(date: string) {
+  return dayjs(date).format('HH:mm');
+}
+
+export function datetimeDisplay(date: string) {
+  return dayjs(date).format('YYYY-MM-DD HH:mm');
 }

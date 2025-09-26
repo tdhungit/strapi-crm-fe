@@ -40,6 +40,7 @@ export default function CollectionListComponent({
   hasProfile,
   noEdit,
   updateColumns,
+  drawerComponent,
 }: {
   module: string;
   header?:
@@ -52,6 +53,7 @@ export default function CollectionListComponent({
   hasProfile?: boolean;
   noEdit?: boolean;
   updateColumns?: (columns: ProColumnType<any>[]) => ProColumnType<any>[];
+  drawerComponent?: React.ComponentType<any>;
   [key: string]: any;
 }) {
   const navigate = useNavigate();
@@ -248,6 +250,8 @@ export default function CollectionListComponent({
     ];
   }
 
+  const DrawerComponent = drawerComponent || CollectionDetailDrawer;
+
   if (!config?.layouts) return <PageLoading />;
 
   return (
@@ -323,7 +327,7 @@ export default function CollectionListComponent({
       </Flex>
 
       {module && selectRecordId && (
-        <CollectionDetailDrawer
+        <DrawerComponent
           open={isOpenDrawer}
           onOpenChange={(open) => {
             setIsOpenDrawer(open);

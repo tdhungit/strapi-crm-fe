@@ -40,7 +40,10 @@ export default function ProductVariantsPricesModal({
     if (priceDate) {
       setTableParams((prev: any) => ({
         ...prev,
-        priceDate: priceDate.format('YYYY-MM-DD'),
+        priceDate:
+          typeof priceDate === 'string'
+            ? priceDate
+            : priceDate?.format('YYYY-MM-DD'),
       }));
     }
   }, [warehouse, priceDate]);
