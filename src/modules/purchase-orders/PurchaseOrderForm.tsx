@@ -256,7 +256,7 @@ export default function PurchaseOrderForm() {
         header={{
           title: id ? 'Edit Purchase Order' : 'Create Purchase Order',
           breadcrumb: {
-            routes: [
+            items: [
               {
                 path: '/home',
                 title: 'Home',
@@ -431,6 +431,12 @@ export default function PurchaseOrderForm() {
                         name='unit_price'
                         label='Price'
                         placeholder='Unit Price'
+                        fieldProps={{
+                          formatter: (value) =>
+                            `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ','),
+                          parser: (value) =>
+                            Number(value!.replace(/\$\s?|(,*)/g, '')),
+                        }}
                       />
                     </Col>
                     <Col span={3}>

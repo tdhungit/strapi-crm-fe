@@ -254,7 +254,7 @@ export default function SaleOrderForm() {
         header={{
           title: id ? 'Edit Sale Order' : 'Create Sale Order',
           breadcrumb: {
-            routes: [
+            items: [
               {
                 path: '/home',
                 title: 'Home',
@@ -396,12 +396,7 @@ export default function SaleOrderForm() {
                                 if (res?.price?.price) {
                                   const items = form.getFieldValue('items');
                                   items[index].unit_price = res.price.price;
-                                  if (
-                                    !items[index].quantity ||
-                                    items[index].quantity <= 0
-                                  ) {
-                                    items[index].quantity = 1;
-                                  }
+                                  items[index].quantity = 1;
                                   form.setFieldValue('items', items);
                                 }
                               });
@@ -422,6 +417,15 @@ export default function SaleOrderForm() {
                               message: 'Quantity must be greater than 0',
                             },
                           ]}
+                          onChange={(value: number) => {
+                            const variant = currentItem?.product_variant;
+                            if (variant?.stock_quantity < value) {
+                              message.error('Not enough stock');
+                              const items = form.getFieldValue('items');
+                              items[index].quantity = variant.stock_quantity;
+                              form.setFieldValue('items', items);
+                            }
+                          }}
                         />
                       </Col>
                       <Col span={3}>

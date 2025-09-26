@@ -96,7 +96,11 @@ export default function ProductVariantsPricesModal({
                   color='primary'
                   icon={<PlusOutlined />}
                   onClick={() => {
-                    onSelect?.(record.product_variant);
+                    onSelect?.({
+                      ...record.product_variant,
+                      stock_quantity: record.stock_quantity,
+                      warehouse: record.warehouse,
+                    });
                     onOpenChange(false);
                   }}
                 />
