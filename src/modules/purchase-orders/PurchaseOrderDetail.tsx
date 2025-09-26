@@ -52,15 +52,9 @@ export default function PurchaseOrderDetail() {
     if (!id) return;
 
     message.loading('Updating status...', 0);
-    let service;
-
-    if (status === 'Completed') {
-      service = ApiService.request('PUT', `/purchase-orders/${id}/complete`);
-    } else {
-      service = ApiService.request('PUT', `/purchase-orders/${id}/status`, {
-        status,
-      });
-    }
+    const service = ApiService.request('PUT', `/purchase-orders/${id}/status`, {
+      status,
+    });
 
     service
       .then(() => {
