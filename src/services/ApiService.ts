@@ -5,17 +5,11 @@ class ApiService {
   private static instance: ApiService;
   private baseUrl: string;
   private token: string = '';
-  private client: StrapiClient;
 
   private constructor() {
     // Initialize with environment variable or default
     this.baseUrl = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
     this.setToken();
-
-    this.client = strapi({
-      baseURL: this.baseUrl + '/api',
-      auth: this.token || undefined,
-    });
   }
 
   public static getInstance(): ApiService {
@@ -25,6 +19,13 @@ class ApiService {
     return ApiService.instance;
   }
 
+  getClient(): StrapiClient {
+    return strapi({
+      baseURL: this.baseUrl + '/api',
+      auth: this.getToken() || undefined,
+    });
+  }
+
   setToken() {
     this.token = localStorage.getItem('authToken') || '';
   }
@@ -32,10 +33,6 @@ class ApiService {
   getToken(): string {
     const token = this.token || localStorage.getItem('authToken') || '';
     return token;
-  }
-
-  getClient() {
-    return this.client;
   }
 
   async request(method: string, url: string, data?: any, headers: any = {}) {

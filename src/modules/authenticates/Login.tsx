@@ -59,11 +59,13 @@ const Login: React.FC = () => {
           width: '100%',
           maxWidth: 420,
           boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-          borderRadius: '16px',
+          borderRadius: '8px',
           border: 'none',
         }}
-        bodyStyle={{
-          padding: '40px 32px',
+        styles={{
+          body: {
+            padding: '40px 32px',
+          },
         }}
       >
         <Space direction='vertical' size='large' style={{ width: '100%' }}>
@@ -90,7 +92,7 @@ const Login: React.FC = () => {
             </Text>
           </div>
 
-          <Divider style={{ margin: '24px 0' }} />
+          <Divider style={{ margin: '0' }} />
 
           <Form
             name='login'
