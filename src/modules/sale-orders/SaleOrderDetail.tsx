@@ -39,6 +39,8 @@ export default function SaleOrderDetail() {
           'sale_order_details.warehouse',
           'account',
           'contact',
+          'warehouse',
+          'assigned_user',
         ],
       })
       .then((res) => {
@@ -283,6 +285,12 @@ export default function SaleOrderDetail() {
                     <Tag color={getStatusColor(so.order_status)}>
                       {so.order_status}
                     </Tag>
+                  </Descriptions.Item>
+                  <Descriptions.Item label='Warehouse'>
+                    {so.warehouse?.name}
+                  </Descriptions.Item>
+                  <Descriptions.Item label='Assigned User'>
+                    {so.assigned_user?.username}
                   </Descriptions.Item>
                 </Descriptions>
               </Col>

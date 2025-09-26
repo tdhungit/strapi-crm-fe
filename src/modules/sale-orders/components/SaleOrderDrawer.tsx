@@ -23,6 +23,7 @@ export default function SaleOrderDrawer({
             'contact',
             'assigned_user',
             'sale_order_details.product_variant',
+            'warehouse',
           ],
         })
         .then((res: any) => {

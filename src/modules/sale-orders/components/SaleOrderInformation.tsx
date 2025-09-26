@@ -126,6 +126,12 @@ export default function SaleOrderInformation({ record }: { record: any }) {
                   {record.order_status}
                 </Tag>
               </Descriptions.Item>
+              <Descriptions.Item label='Warehouse'>
+                {record.warehouse?.name}
+              </Descriptions.Item>
+              <Descriptions.Item label='Assigned User'>
+                {record.assigned_user?.username}
+              </Descriptions.Item>
             </Descriptions>
           </Col>
           <Col span={8}>

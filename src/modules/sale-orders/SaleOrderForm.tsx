@@ -61,6 +61,8 @@ export default function SaleOrderForm() {
           'sale_order_details.warehouse',
           'account',
           'contact',
+          'warehouse',
+          'assigned_user',
         ],
       })
       .then((res) => {
@@ -192,6 +194,7 @@ export default function SaleOrderForm() {
       assigned_user: data.assigned_user?.value || null,
       account: data.account?.id || null,
       contact: data.contact?.id || null,
+      warehouse: data.warehouse?.id || null,
       subtotal: data.subtotal,
       discount_type: data.discount?.type || 'percentage',
       discount_amount: data.discount?.amount || 0,
@@ -200,7 +203,7 @@ export default function SaleOrderForm() {
       total_amount: data.total_amount,
       items: data.items.map((item: any) => ({
         product_variant: item.product_variant?.id || null,
-        warehouse: item.warehouse?.id || null,
+        warehouse: item.warehouse?.id || data.warehouse?.id || null,
         quantity: item.quantity,
         unit_price: item.unit_price,
         discount_amount: item.discount?.amount || 0,
@@ -313,7 +316,7 @@ export default function SaleOrderForm() {
             </Row>
 
             <Row gutter={16}>
-              <Col span={12}>
+              <Col span={8}>
                 <ProFormDatePicker
                   name='order_date'
                   label='Order Date'
@@ -322,7 +325,18 @@ export default function SaleOrderForm() {
                   ]}
                 />
               </Col>
-              <Col span={12}>
+              <Col span={8}>
+                <ProForm.Item
+                  name='warehouse'
+                  label='Warehouse'
+                  rules={[
+                    { required: true, message: 'Please select warehouse' },
+                  ]}
+                >
+                  <RelationChoose module='warehouses' onlyList />
+                </ProForm.Item>
+              </Col>
+              <Col span={8}>
                 <ProForm.Item name='assigned_user' label='Assigned User'>
                   <AssignUserInput
                     item={{
