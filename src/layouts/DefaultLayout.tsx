@@ -5,6 +5,7 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  QrcodeOutlined,
   SettingOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -195,16 +196,31 @@ export default function DefaultLayout() {
             alignItems: 'center',
           }}
         >
-          <Button
-            type='text'
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: '16px',
-              width: 64,
-              height: 64,
-            }}
-          />
+          <div>
+            <Button
+              type='text'
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{
+                fontSize: '16px',
+                width: 64,
+                height: 64,
+              }}
+            />
+            <Button
+              type='text'
+              icon={<QrcodeOutlined />}
+              onClick={() => navigate('/pos')}
+              style={{
+                fontSize: '16px',
+                width: 64,
+                height: 64,
+              }}
+            >
+              POS
+            </Button>
+          </div>
+
           <div style={{ marginRight: 16 }}>
             <Dropdown
               menu={{
@@ -264,9 +280,11 @@ export default function DefaultLayout() {
             </Dropdown>
           </div>
         </Header>
+
         <Content>
           <Outlet />
         </Content>
+
         <Footer className='bg-white border-t border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.06)] h-[48px] flex items-center justify-center p-0 mt-auto'>
           <div className='w-full h-[48px] flex justify-between items-center transition-all duration-200'>
             <div className='flex items-center ml-[-10px]'>
