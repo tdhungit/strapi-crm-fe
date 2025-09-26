@@ -2,6 +2,7 @@ import { FileExcelOutlined, PlusCircleFilled } from '@ant-design/icons';
 import { App, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import CollectionListComponent from '../collections/components/CollectionListComponent';
+import SaleOrderDrawer from './components/SaleOrderDrawer';
 
 export default function SaleOrderList() {
   const navigate = useNavigate();
@@ -70,6 +71,7 @@ export default function SaleOrderList() {
           return col;
         });
       }}
+      drawerComponent={SaleOrderDrawer}
     />
   );
 }
