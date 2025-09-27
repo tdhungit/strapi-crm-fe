@@ -17,6 +17,7 @@ import {
   Divider,
   Image,
   Input,
+  Modal,
   Row,
   Select,
   Space,
@@ -242,7 +243,7 @@ export default function POS() {
     form.resetFields();
   };
 
-  const processOrder = async () => {
+  const showOrderConfirmation = () => {
     if (!customer) {
       message.error('Please select a customer');
       return;
@@ -253,6 +254,44 @@ export default function POS() {
       return;
     }
 
+    const customerName =
+      customer.name ||
+      `${customer.firstName || ''} ${customer.lastName || ''}`.trim();
+
+    Modal.confirm({
+      title: 'Confirm Order',
+      icon: <CheckOutlined />,
+      content: (
+        <div className='space-y-3'>
+          <div>
+            <Text strong>Customer: </Text>
+            <Text>{customerName}</Text>
+          </div>
+          <div>
+            <Text strong>Items: </Text>
+            <Text>{cart.length} product(s)</Text>
+          </div>
+          <div>
+            <Text strong>Total Amount: </Text>
+            <Text className='text-green-600 font-bold text-lg'>
+              ${totals.total_amount.toFixed(2)}
+            </Text>
+          </div>
+          <Divider className='my-2' />
+          <div className='text-sm text-gray-600'>
+            Are you sure you want to place this order?
+          </div>
+        </div>
+      ),
+      okText: 'Place Order',
+      cancelText: 'Cancel',
+      okType: 'primary',
+      onOk: processOrder,
+      width: 400,
+    });
+  };
+
+  const processOrder = async () => {
     const orderData = {
       sale_date: new Date().toISOString().split('T')[0],
       account: customer.type === 'account' ? customer.id : null,
@@ -605,11 +644,11 @@ export default function POS() {
                 type='primary'
                 size='large'
                 icon={<CheckOutlined />}
-                onClick={processOrder}
+                onClick={showOrderConfirmation}
                 disabled={cart.length === 0 || !customer}
                 className='w-full'
               >
-                Process Order
+                Place Order
               </Button>
             </Space>
           </Col>
