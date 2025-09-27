@@ -3,10 +3,12 @@ import {
   ClearOutlined,
   DeleteOutlined,
   HomeOutlined,
+  MinusOutlined,
+  PlusOutlined,
   ShoppingCartOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { PageContainer, ProForm } from '@ant-design/pro-components';
+import { PageContainer, ProForm, ProList } from '@ant-design/pro-components';
 import {
   App,
   Button,
@@ -15,11 +17,9 @@ import {
   Divider,
   Image,
   Input,
-  InputNumber,
   Row,
   Select,
   Space,
-  Table,
   Tag,
   Typography,
 } from 'antd';
@@ -74,6 +74,13 @@ export default function POS() {
     calculateTotals();
   }, [cart]);
 
+  // Handle form changes to recalculate totals
+  const handleFormChange = () => {
+    setTimeout(() => {
+      calculateTotals();
+    }, 100);
+  };
+
   const loadWarehouses = async () => {
     try {
       const res = await ApiService.getClient().collection('warehouses').find();
@@ -89,11 +96,18 @@ export default function POS() {
   const loadProducts = async () => {
     try {
       const res = await ApiService.getClient()
-        .collection('product-variants')
+        .collection('inventories')
         .find({
           filters: {
-            variant_status: 'Active',
+            product_variant: {
+              variant_status: 'Active',
+            },
+            stock_quantity: {
+              $gt: 0,
+            },
+            warehouse: selectedWarehouse?.id || undefined,
           },
+          populate: ['product_variant.product', 'warehouse'],
         });
       setProducts(res.data);
     } catch (error) {
@@ -288,78 +302,13 @@ export default function POS() {
 
   const filteredProducts = products.filter(
     (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+      product.product_variant.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      product.product_variant.sku
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
-
-  const cartColumns = [
-    {
-      title: 'Product',
-      dataIndex: 'product_variant',
-      key: 'product',
-      render: (product: any) => (
-        <div className='flex items-center gap-2'>
-          {product.photos?.[0] && (
-            <Image
-              width={40}
-              height={40}
-              src={getMediaUrl(product.photos[0])}
-              alt={product.name}
-              className='rounded'
-            />
-          )}
-          <div>
-            <div className='font-medium text-sm'>{product.name}</div>
-            <Text type='secondary' className='text-xs'>
-              SKU: {product.sku}
-            </Text>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: 'Qty',
-      dataIndex: 'quantity',
-      key: 'quantity',
-      width: 80,
-      render: (quantity: number, record: CartItem, index: number) => (
-        <InputNumber
-          min={1}
-          value={quantity}
-          size='small'
-          onChange={(value) => updateCartItem(index, 'quantity', value || 1)}
-        />
-      ),
-    },
-    {
-      title: 'Price',
-      dataIndex: 'unit_price',
-      key: 'unit_price',
-      width: 100,
-      render: (price: number) => `$${price.toFixed(2)}`,
-    },
-    {
-      title: 'Subtotal',
-      dataIndex: 'subtotal',
-      key: 'subtotal',
-      width: 100,
-      render: (subtotal: number) => <Text strong>${subtotal.toFixed(2)}</Text>,
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      width: 60,
-      render: (_: any, record: CartItem, index: number) => (
-        <Button
-          type='text'
-          danger
-          size='small'
-          icon={<DeleteOutlined />}
-          onClick={() => removeFromCart(index)}
-        />
-      ),
-    },
-  ];
 
   return (
     <PageContainer
@@ -375,195 +324,302 @@ export default function POS() {
           />
         </Space>
       }
+      style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}
     >
-      <Row gutter={16} className='h-full'>
-        {/* Left Panel - Products */}
-        <Col span={16}>
-          <Card title='Products' className='h-full' size='small'>
-            <Space direction='vertical' className='w-full' size='middle'>
-              {/* Warehouse Selection */}
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Select
-                    placeholder='Select Warehouse'
-                    value={selectedWarehouse?.id}
-                    onChange={(value) => {
-                      const warehouse = warehouses.find((w) => w.id === value);
-                      setSelectedWarehouse(warehouse);
-                    }}
-                    className='w-full'
-                  >
-                    {warehouses.map((warehouse) => (
-                      <Select.Option key={warehouse.id} value={warehouse.id}>
-                        {warehouse.name} - {warehouse.location}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Col>
-                <Col span={12}>
-                  <Search
-                    placeholder='Search products...'
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    allowClear
-                  />
-                </Col>
-              </Row>
-
-              {/* Products Grid */}
-              <div className='grid grid-cols-4 gap-4 max-h-96 overflow-y-auto'>
-                {filteredProducts.map((product) => (
-                  <Card
-                    key={product.id}
-                    size='small'
-                    hoverable
-                    className='cursor-pointer'
-                    onClick={() => addToCart(product)}
-                    cover={
-                      product.photos?.[0] && (
-                        <Image
-                          alt={product.name}
-                          src={getMediaUrl(product.photos[0])}
-                          height={120}
-                          className='object-cover'
-                        />
-                      )
-                    }
-                  >
-                    <Card.Meta
-                      title={<Text className='text-sm'>{product.name}</Text>}
-                      description={
-                        <div>
-                          <Text type='secondary' className='text-xs'>
-                            SKU: {product.sku}
-                          </Text>
-                          <br />
-                          <Tag color='green' className='text-xs'>
-                            {product.variant_status}
-                          </Tag>
-                        </div>
-                      }
-                    />
-                  </Card>
-                ))}
-              </div>
-            </Space>
-          </Card>
-        </Col>
-
-        {/* Right Panel - Cart & Checkout */}
-        <Col span={8} className='mt-[-8px]'>
-          <Space direction='vertical' className='w-full' size='small'>
-            {/* Customer Selection */}
-            <Card title='Customer' size='small'>
-              <RelationChoose
-                module='accounts'
-                placeholder='Select Customer Account'
-                onChange={(value) => setCustomer({ ...value, type: 'account' })}
-              />
-              <Divider className='my-2'>OR</Divider>
-              <RelationChoose
-                module='contacts'
-                placeholder='Select Customer Contact'
-                onChange={(value) => setCustomer({ ...value, type: 'contact' })}
-              />
-              {customer && (
-                <div className='mt-2 p-2 bg-blue-50 rounded'>
-                  <Text strong>
-                    <UserOutlined />{' '}
-                    {customer.name ||
-                      `${customer.firstName} ${customer.lastName}`}
-                  </Text>
-                </div>
-              )}
-            </Card>
-
-            {/* Cart */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Row gutter={16} style={{ flex: 1, height: '100%' }}>
+          {/* Left Panel - Products */}
+          <Col span={16}>
             <Card
-              title={
-                <div className='flex justify-between items-center'>
-                  <span>
-                    <ShoppingCartOutlined /> Cart ({cart.length})
-                  </span>
-                  <Button
-                    size='small'
-                    icon={<ClearOutlined />}
-                    onClick={clearCart}
-                    disabled={cart.length === 0}
-                  >
-                    Clear
-                  </Button>
-                </div>
-              }
+              title='Products'
+              className='h-full flex flex-col'
               size='small'
+              styles={{
+                body: {
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                },
+              }}
             >
-              <Table
-                columns={cartColumns}
-                dataSource={cart}
-                rowKey='id'
-                pagination={false}
-                size='small'
-                scroll={{ y: 300 }}
-              />
-            </Card>
-
-            {/* Order Adjustments */}
-            <Card title='Order Adjustments' size='small'>
-              <ProForm form={form} submitter={false}>
-                <Row gutter={8}>
+              <div className='flex flex-col h-full'>
+                {/* Warehouse Selection */}
+                <Row gutter={16} className='mb-4'>
                   <Col span={12}>
-                    <ProForm.Item name='order_discount' label='Discount'>
-                      <DiscountInput amount={totals.subtotal} />
-                    </ProForm.Item>
+                    <Select
+                      placeholder='Select Warehouse'
+                      value={selectedWarehouse?.id}
+                      onChange={(value) => {
+                        const warehouse = warehouses.find(
+                          (w) => w.id === value
+                        );
+                        setSelectedWarehouse(warehouse);
+                      }}
+                      className='w-full'
+                    >
+                      {warehouses.map((warehouse) => (
+                        <Select.Option key={warehouse.id} value={warehouse.id}>
+                          {warehouse.name} - {warehouse.location}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   </Col>
                   <Col span={12}>
-                    <ProForm.Item name='order_tax' label='Tax'>
-                      <TaxInput amount={totals.subtotal} />
-                    </ProForm.Item>
+                    <Search
+                      placeholder='Search products...'
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      allowClear
+                    />
                   </Col>
                 </Row>
-              </ProForm>
-            </Card>
 
-            {/* Totals */}
-            <Card title='Order Summary' size='small'>
-              <div className='space-y-2'>
-                <div className='flex justify-between'>
-                  <Text>Subtotal:</Text>
-                  <Text>${totals.subtotal.toFixed(2)}</Text>
-                </div>
-                <div className='flex justify-between'>
-                  <Text>Discount:</Text>
-                  <Text>-${totals.discount.toFixed(2)}</Text>
-                </div>
-                <div className='flex justify-between'>
-                  <Text>Tax:</Text>
-                  <Text>+${totals.tax.toFixed(2)}</Text>
-                </div>
-                <Divider className='my-2' />
-                <div className='flex justify-between'>
-                  <Title level={4}>Total:</Title>
-                  <Title level={4} className='text-green-600'>
-                    ${totals.total_amount.toFixed(2)}
-                  </Title>
+                {/* Products Grid */}
+                <div className='grid grid-cols-4 gap-4 flex-1 overflow-y-auto auto-rows-max content-start'>
+                  {filteredProducts.map((product) => (
+                    <Card
+                      key={product.id}
+                      size='small'
+                      hoverable
+                      className='cursor-pointer h-fit'
+                      onClick={() => addToCart(product.product_variant)}
+                      cover={
+                        product.product_variant.photos?.[0] && (
+                          <Image
+                            preview={false}
+                            alt={product.product_variant.name}
+                            src={getMediaUrl(product.product_variant.photos[0])}
+                            height={120}
+                            className='object-cover'
+                          />
+                        )
+                      }
+                    >
+                      <Card.Meta
+                        title={false}
+                        description={
+                          <Space direction='vertical'>
+                            <div className='text-sm'>
+                              {product.product_variant.product.name}
+                            </div>
+                            <div className='text-xs'>
+                              SKU: {product.product_variant.sku}
+                            </div>
+                            <div className='text-xs'>
+                              Variant: {product.product_variant.name}
+                            </div>
+                            <Tag color='green' className='text-xs'>
+                              QTY: {product.stock_quantity}
+                            </Tag>
+                          </Space>
+                        }
+                      />
+                    </Card>
+                  ))}
                 </div>
               </div>
             </Card>
+          </Col>
 
-            {/* Checkout Button */}
-            <Button
-              type='primary'
-              size='large'
-              icon={<CheckOutlined />}
-              onClick={processOrder}
-              disabled={cart.length === 0 || !customer}
-              className='w-full'
-            >
-              Process Order
-            </Button>
-          </Space>
-        </Col>
-      </Row>
+          {/* Right Panel - Cart & Checkout */}
+          <Col span={8} className='mt-[-8px]'>
+            <Space direction='vertical' className='w-full' size='small'>
+              {/* Customer Selection */}
+              <Card title='Customer' size='small'>
+                <RelationChoose
+                  module='accounts'
+                  placeholder='Select Customer Account'
+                  onChange={(value) =>
+                    setCustomer({ ...value, type: 'account' })
+                  }
+                />
+                <Divider className='my-2'>OR</Divider>
+                <RelationChoose
+                  module='contacts'
+                  placeholder='Select Customer Contact'
+                  onChange={(value) =>
+                    setCustomer({ ...value, type: 'contact' })
+                  }
+                />
+                {customer && (
+                  <div className='mt-2 p-2 bg-blue-50 rounded'>
+                    <Text strong>
+                      <UserOutlined />{' '}
+                      {customer.name ||
+                        `${customer.firstName} ${customer.lastName}`}
+                    </Text>
+                  </div>
+                )}
+              </Card>
+
+              {/* Cart */}
+              <Card
+                title={
+                  <div className='flex justify-between items-center'>
+                    <span>
+                      <ShoppingCartOutlined /> Cart ({cart.length})
+                    </span>
+                    <Button
+                      size='small'
+                      icon={<ClearOutlined />}
+                      onClick={clearCart}
+                      disabled={cart.length === 0}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                }
+                size='small'
+              >
+                <ProList<CartItem>
+                  dataSource={cart}
+                  rowKey='id'
+                  pagination={false}
+                  size='small'
+                  split={false}
+                  itemLayout='horizontal'
+                  style={{ maxHeight: 300, overflowY: 'auto' }}
+                  metas={{
+                    subTitle: {
+                      render: (_, item) => (
+                        <div className='flex justify-between items-center w-full'>
+                          <div className='flex-1'>
+                            <strong className='text-black'>
+                              {item.product_variant.product.name}
+                            </strong>
+                            <div>
+                              <Text type='secondary' className='text-xs'>
+                                SKU: {item.product_variant.sku}
+                              </Text>
+                            </div>
+                            <div>
+                              <Text type='secondary' className='text-xs'>
+                                Variant: {item.product_variant.name}
+                              </Text>
+                            </div>
+                          </div>
+                        </div>
+                      ),
+                    },
+                    description: {
+                      render: (_, item, index) => (
+                        <div className='flex justify-between items-center mt-4 mb-2'>
+                          <div className='flex items-center gap-2'>
+                            <Button
+                              size='small'
+                              icon={<MinusOutlined />}
+                              onClick={() => {
+                                if (item.quantity > 1) {
+                                  updateCartItem(
+                                    index,
+                                    'quantity',
+                                    item.quantity - 1
+                                  );
+                                }
+                              }}
+                              disabled={item.quantity <= 1}
+                            />
+                            <span className='mx-2 min-w-[30px] text-center'>
+                              {item.quantity}
+                            </span>
+                            <Button
+                              size='small'
+                              icon={<PlusOutlined />}
+                              onClick={() =>
+                                updateCartItem(
+                                  index,
+                                  'quantity',
+                                  item.quantity + 1
+                                )
+                              }
+                            />
+                            <Text className='ml-2'>
+                              × ${item.unit_price.toFixed(2)}
+                            </Text>
+                          </div>
+                          <Text strong className='text-green-600'>
+                            ${item.subtotal.toFixed(2)}
+                          </Text>
+                        </div>
+                      ),
+                    },
+                    actions: {
+                      render: (_, _item, index) => (
+                        <Button
+                          variant='dashed'
+                          color='danger'
+                          size='small'
+                          icon={<DeleteOutlined />}
+                          onClick={() => removeFromCart(index)}
+                        />
+                      ),
+                    },
+                  }}
+                />
+              </Card>
+
+              {/* Order Adjustments */}
+              <Card title='Order Adjustments' size='small'>
+                <ProForm
+                  form={form}
+                  submitter={false}
+                  onValuesChange={handleFormChange}
+                >
+                  <Row gutter={8}>
+                    <Col span={12}>
+                      <ProForm.Item name='order_discount' label='Discount'>
+                        <DiscountInput amount={totals.subtotal} />
+                      </ProForm.Item>
+                    </Col>
+                    <Col span={12}>
+                      <ProForm.Item name='order_tax' label='Tax'>
+                        <TaxInput amount={totals.subtotal} />
+                      </ProForm.Item>
+                    </Col>
+                  </Row>
+                </ProForm>
+              </Card>
+
+              {/* Totals */}
+              <Card title='Order Summary' size='small'>
+                <div className='space-y-2'>
+                  <div className='flex justify-between'>
+                    <Text>Subtotal:</Text>
+                    <Text>${totals.subtotal.toFixed(2)}</Text>
+                  </div>
+                  <div className='flex justify-between'>
+                    <Text>Discount:</Text>
+                    <Text>-${totals.discount.toFixed(2)}</Text>
+                  </div>
+                  <div className='flex justify-between'>
+                    <Text>Tax:</Text>
+                    <Text>+${totals.tax.toFixed(2)}</Text>
+                  </div>
+                  <Divider className='my-2' />
+                  <div className='flex justify-between'>
+                    <Title level={4}>Total:</Title>
+                    <Title level={4} className='text-green-600'>
+                      ${totals.total_amount.toFixed(2)}
+                    </Title>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Checkout Button */}
+              <Button
+                type='primary'
+                size='large'
+                icon={<CheckOutlined />}
+                onClick={processOrder}
+                disabled={cart.length === 0 || !customer}
+                className='w-full'
+              >
+                Process Order
+              </Button>
+            </Space>
+          </Col>
+        </Row>
+      </div>
     </PageContainer>
   );
 }
