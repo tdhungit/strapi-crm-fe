@@ -73,8 +73,8 @@ export default function POS() {
     if (!selectedWarehouse) {
       return;
     }
-    loadProducts();
-  }, [selectedWarehouse]);
+    loadProducts(searchTerm);
+  }, [selectedWarehouse, searchTerm]);
 
   // Calculate totals when cart changes
   useEffect(() => {
@@ -100,7 +100,7 @@ export default function POS() {
     }
   };
 
-  const loadProducts = async () => {
+  const loadProducts = async (searchTerm: string = '') => {
     if (!selectedWarehouse) {
       message.error('Please select a warehouse first');
       return;
@@ -109,7 +109,10 @@ export default function POS() {
     try {
       const res = await ApiService.request(
         'get',
-        `/inventories/warehouse/${selectedWarehouse?.id}/available-products`
+        `/inventories/warehouse/${selectedWarehouse?.id}/available-products`,
+        {
+          search: searchTerm,
+        }
       );
       setProducts(res.data);
     } catch (error) {
@@ -302,16 +305,6 @@ export default function POS() {
     }
   };
 
-  const filteredProducts = products.filter(
-    (product) =>
-      product.product_variant.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      product.product_variant.sku
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-  );
-
   return (
     <PageContainer
       header={{
@@ -378,7 +371,7 @@ export default function POS() {
 
                 {/* Products Grid */}
                 <div className='grid grid-cols-4 gap-4 flex-1 overflow-y-auto auto-rows-max content-start'>
-                  {filteredProducts.map((product) => (
+                  {products.map((product) => (
                     <Card
                       key={product.id}
                       size='small'
