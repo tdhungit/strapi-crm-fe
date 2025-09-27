@@ -63,11 +63,18 @@ export default function POS() {
     total_amount: 0,
   });
 
-  // Load initial data
+  // Load Warehouses
   useEffect(() => {
     loadWarehouses();
-    loadProducts();
   }, []);
+
+  // Load Products when warehouse changes
+  useEffect(() => {
+    if (!selectedWarehouse) {
+      return;
+    }
+    loadProducts();
+  }, [selectedWarehouse]);
 
   // Calculate totals when cart changes
   useEffect(() => {
@@ -94,21 +101,16 @@ export default function POS() {
   };
 
   const loadProducts = async () => {
+    if (!selectedWarehouse) {
+      message.error('Please select a warehouse first');
+      return;
+    }
+
     try {
-      const res = await ApiService.getClient()
-        .collection('inventories')
-        .find({
-          filters: {
-            product_variant: {
-              variant_status: 'Active',
-            },
-            stock_quantity: {
-              $gt: 0,
-            },
-            warehouse: selectedWarehouse?.id || undefined,
-          },
-          populate: ['product_variant.product', 'warehouse'],
-        });
+      const res = await ApiService.request(
+        'get',
+        `/inventories/warehouse/${selectedWarehouse?.id}/available-products`
+      );
       setProducts(res.data);
     } catch (error) {
       console.error('Failed to load products:', error);
