@@ -403,13 +403,16 @@ export default function SaleOrderForm() {
                             disabled={!hasWarehouse}
                             placeholder={hasWarehouse ? 'Select product' : ''}
                             onChange={(value) => {
+                              const dateValue =
+                                form.getFieldValue('order_date');
                               ApiService.request(
                                 'get',
                                 `/product-variants/${value.id}/price`,
                                 {
-                                  date: form
-                                    .getFieldValue('order_date')
-                                    .format('YYYY-MM-DD'),
+                                  date:
+                                    typeof dateValue === 'string'
+                                      ? dateValue
+                                      : dateValue.format('YYYY-MM-DD'),
                                 }
                               ).then((res) => {
                                 if (res?.price?.price) {
