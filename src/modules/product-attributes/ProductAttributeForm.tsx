@@ -1,6 +1,7 @@
 import {
   PageContainer,
   ProForm,
+  ProFormDigit,
   ProFormList,
   ProFormText,
 } from '@ant-design/pro-components';
@@ -83,10 +84,10 @@ export default function ProductAttributeForm() {
       <div className='w-full bg-white p-4 rounded-md'>
         <ProForm form={form} onFinish={onFinish}>
           <Row gutter={[16, 16]}>
-            <Col span={12}>
+            <Col span={10}>
               <ProFormText name='name' label='Name' />
             </Col>
-            <Col span={12}>
+            <Col span={10}>
               <ProForm.Item
                 name='product_category'
                 label='Product Category'
@@ -101,6 +102,9 @@ export default function ProductAttributeForm() {
                   }}
                 />
               </ProForm.Item>
+            </Col>
+            <Col span={4}>
+              <ProFormDigit name='weight' label='Weight' />
             </Col>
           </Row>
           <ProFormList

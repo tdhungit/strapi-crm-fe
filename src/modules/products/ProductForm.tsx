@@ -4,6 +4,7 @@ import {
   ProFormList,
   ProFormSelect,
   ProFormText,
+  ProFormTextArea,
 } from '@ant-design/pro-components';
 import { App, Col, Row } from 'antd';
 import { useEffect } from 'react';
@@ -162,6 +163,8 @@ export default function ProductForm() {
           <ProForm.Item name='photos' label='Photos'>
             <MediaChoose />
           </ProForm.Item>
+
+          <ProFormTextArea name='summary' label='Summary' />
 
           <ProForm.Item name='description' label='Description'>
             <RichtextInput />

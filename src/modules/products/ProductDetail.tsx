@@ -109,6 +109,11 @@ export default function ProductDetail() {
                   span: 2,
                 },
                 {
+                  title: 'Summary',
+                  dataIndex: 'summary',
+                  span: 2,
+                },
+                {
                   title: 'Description',
                   dataIndex: 'description',
                   render: (dom: any) => (
