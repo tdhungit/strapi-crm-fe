@@ -200,10 +200,6 @@ export default function SaleOrderDetail() {
                 title: 'Sale Orders',
               },
               {
-                path: `/collections/sale-orders/edit/${id}`,
-                title: 'Edit',
-              },
-              {
                 title: 'Detail',
               },
             ],

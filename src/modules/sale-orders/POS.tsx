@@ -322,9 +322,9 @@ export default function POS() {
 
     try {
       message.loading('Processing order...', 0);
-      const res = await ApiService.getClient()
-        .collection('sale-orders')
-        .create(orderData);
+      const res = await ApiService.request('post', '/sale-orders/completed', {
+        data: orderData,
+      });
 
       notification.success({
         message: 'Order Created Successfully',

@@ -1,7 +1,12 @@
-import { FileExcelOutlined, PlusCircleFilled } from '@ant-design/icons';
+import {
+  EditOutlined,
+  EyeOutlined,
+  FileExcelOutlined,
+  PlusCircleFilled,
+} from '@ant-design/icons';
 import { App, Button } from 'antd';
 import type React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import CollectionListComponent from '../collections/components/CollectionListComponent';
 import PurchaseOrderDrawer from './components/PurchaseOrderDrawer';
 
@@ -73,6 +78,24 @@ export default function PurchaseOrderList() {
         });
       }}
       drawerComponent={PurchaseOrderDrawer}
+      recordActionRender={(_dom: any, record: any) => (
+        <>
+          <Link
+            to={`/collections/purchase-orders/detail/${record.documentId}`}
+            className='inline-block'
+          >
+            <EyeOutlined />
+          </Link>
+          {['Pending', 'New'].includes(record.order_status) && (
+            <Link
+              to={`/collections/purchase-orders/edit/${record.documentId}`}
+              className='inline-block ml-2'
+            >
+              <EditOutlined />
+            </Link>
+          )}
+        </>
+      )}
     />
   );
 }

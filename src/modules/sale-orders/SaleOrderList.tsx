@@ -1,6 +1,11 @@
-import { FileExcelOutlined, PlusCircleFilled } from '@ant-design/icons';
+import {
+  EditOutlined,
+  EyeOutlined,
+  FileExcelOutlined,
+  PlusCircleFilled,
+} from '@ant-design/icons';
 import { App, Button } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import CollectionListComponent from '../collections/components/CollectionListComponent';
 import SaleOrderDrawer from './components/SaleOrderDrawer';
 
@@ -72,6 +77,24 @@ export default function SaleOrderList() {
         });
       }}
       drawerComponent={SaleOrderDrawer}
+      recordActionRender={(_dom: any, record: any) => (
+        <>
+          <Link
+            to={`/collections/sale-orders/detail/${record.documentId}`}
+            className='inline-block'
+          >
+            <EyeOutlined />
+          </Link>
+          {['Pending', 'New'].includes(record.order_status) && (
+            <Link
+              to={`/collections/sale-orders/edit/${record.documentId}`}
+              className='inline-block ml-2'
+            >
+              <EditOutlined />
+            </Link>
+          )}
+        </>
+      )}
     />
   );
 }

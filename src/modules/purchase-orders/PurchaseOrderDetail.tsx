@@ -180,10 +180,6 @@ export default function PurchaseOrderDetail() {
                 title: 'Purchase Orders',
               },
               {
-                path: `/collections/purchase-orders/edit/${id}`,
-                title: 'Edit',
-              },
-              {
                 title: 'Detail',
               },
             ],

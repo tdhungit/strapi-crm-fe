@@ -64,6 +64,16 @@ export const defaultMenus: any = {
     icon: 'shop',
     label: 'Sale Orders',
   },
+  invoices: {
+    key: '/collections/invoices',
+    icon: 'filepdf',
+    label: 'Invoices',
+  },
+  payments: {
+    key: '/collections/payments',
+    icon: 'creditcard',
+    label: 'Payments',
+  },
   inventories: {
     key: '/collections/inventories',
     icon: 'folderopen',
