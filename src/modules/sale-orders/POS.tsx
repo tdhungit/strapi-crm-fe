@@ -31,6 +31,7 @@ import RelationChoose from '../../components/fields/relation/RelationChoose';
 import TaxInput from '../../components/fields/tax/TaxInput';
 import { getMediaUrl } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
+import InvoiceDetailModal from '../invoices/components/InvoiceDetailModal';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -63,6 +64,9 @@ export default function POS() {
     tax: 0,
     total_amount: 0,
   });
+
+  const [invoice, setInvoice] = useState<any>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   // Load Warehouses
   useEffect(() => {
@@ -332,7 +336,10 @@ export default function POS() {
       });
 
       clearCart();
-      navigate(`/collections/sale-orders/detail/${res.data.documentId}`);
+      if (res.data.invoices?.length > 0) {
+        setInvoice(res.data.invoices[0]);
+        setModalOpen(true);
+      }
     } catch (error) {
       console.error('Failed to create order:', error);
       notification.error({
@@ -654,6 +661,14 @@ export default function POS() {
           </Col>
         </Row>
       </div>
+
+      {invoice?.documentId && (
+        <InvoiceDetailModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          id={invoice.documentId}
+        />
+      )}
     </PageContainer>
   );
 }

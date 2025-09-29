@@ -69,6 +69,10 @@ class CollectionService {
       }
     }
 
+    if (!searchParams.sort) {
+      searchParams.sort = ['createdAt:desc'];
+    }
+
     if (options?.populate && options.populate.length > 0) {
       searchParams.populate = options.populate;
     }
