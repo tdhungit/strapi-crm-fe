@@ -22,6 +22,7 @@ export default function ProductDetail() {
         populate: [
           'product_variants.product_variant_attributes.product_attribute',
           'product_variants.product_prices',
+          'product_category',
         ],
       })
       .then((response) => {
@@ -89,15 +90,23 @@ export default function ProductDetail() {
                   dataIndex: 'unit',
                 },
                 {
+                  title: 'Product Status',
+                  dataIndex: 'product_status',
+                },
+                {
+                  title: 'Product Category',
+                  dataIndex: 'product_category',
+                  render: (_text: any, record: ProductType) => (
+                    <span>{record.product_category?.name}</span>
+                  ),
+                },
+                {
                   title: 'Photos',
                   dataIndex: 'photos',
                   render: (_text: any, record: ProductType) => (
                     <PhotosView photos={record.photos as any[]} />
                   ),
-                },
-                {
-                  title: 'Product Status',
-                  dataIndex: 'product_status',
+                  span: 2,
                 },
                 {
                   title: 'Description',
@@ -105,6 +114,7 @@ export default function ProductDetail() {
                   render: (dom: any) => (
                     <div dangerouslySetInnerHTML={{ __html: dom }} />
                   ),
+                  span: 2,
                 },
               ]}
             />

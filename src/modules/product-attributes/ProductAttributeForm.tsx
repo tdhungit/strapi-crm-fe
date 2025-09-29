@@ -20,7 +20,9 @@ export default function ProductAttributeForm() {
     if (id) {
       ApiService.getClient()
         .collection('product-attributes')
-        .findOne(id)
+        .findOne(id, {
+          populate: ['product_category'],
+        })
         .then((res) => {
           form.setFieldsValue(res?.data);
         });

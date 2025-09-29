@@ -1,9 +1,14 @@
+import { AppstoreOutlined, TagOutlined } from '@ant-design/icons';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
+import { Button } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 
 export default function ProductPriceList() {
+  const navigate = useNavigate();
+
   const { data: records } = useRequest(() => {
     return ApiService.getClient()
       .collection('products')
@@ -11,8 +16,6 @@ export default function ProductPriceList() {
         populate: ['product_variants.product_prices'],
       });
   });
-
-  console.log(records);
 
   const dataSource: any[] = [];
   if (records && records.data && records.data.length > 0) {
@@ -181,6 +184,32 @@ export default function ProductPriceList() {
             itemRender: breadcrumbItemRender,
           },
         }}
+        extra={[
+          <Button
+            variant='solid'
+            color='blue'
+            key='products'
+            onClick={() => navigate('/collections/products')}
+          >
+            <AppstoreOutlined /> Products
+          </Button>,
+          <Button
+            variant='solid'
+            color='blue'
+            key='product-categories'
+            onClick={() => navigate('/collections/product-categories')}
+          >
+            <AppstoreOutlined /> Categories
+          </Button>,
+          <Button
+            variant='solid'
+            color='blue'
+            key='product-attributes'
+            onClick={() => navigate('/collections/product-attributes')}
+          >
+            <TagOutlined /> Attributes
+          </Button>,
+        ]}
       >
         {records && (
           <ProTable

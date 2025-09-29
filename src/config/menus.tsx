@@ -39,20 +39,10 @@ export const defaultMenus: any = {
     icon: 'history',
     label: 'Mail Histories',
   },
-  'product-categories': {
-    key: '/collections/product-categories',
-    icon: 'folderopen',
-    label: 'Product Categories',
-  },
   products: {
     key: '/collections/products',
     icon: 'barcode',
     label: 'Products',
-  },
-  'product-attributes': {
-    key: '/collections/product-attributes',
-    icon: 'tags',
-    label: 'Product Attributes',
   },
   suppliers: {
     key: '/collections/suppliers',

@@ -21,6 +21,9 @@ export interface ProductFormType {
   product_status?: string;
   description?: string;
   variants?: ProductFormVariantType[];
+  product_category?: {
+    [key: string]: any;
+  };
 }
 
 interface ProductAttributeType {
@@ -60,12 +63,20 @@ export interface ProductType {
   description?: string;
   product_status?: string;
   product_variants?: ProductVariantType[];
+  product_category?: {
+    [key: string]: any;
+  };
 }
 
 class ProductService {
   normalizerFormValues(values: ProductFormType): ProductType {
     const data: any = { ...values };
     delete data.variants;
+
+    if (data.product_category) {
+      data.product_category =
+        data.product_category.value || data.product_category.id;
+    }
 
     if (values.variants && values.variants.length > 0) {
       const productVariants = values.variants.map(
@@ -106,6 +117,11 @@ class ProductService {
       photos: product.photos,
       product_status: product.product_status,
       description: product.description,
+      product_category: {
+        ...product.product_category,
+        value: product.product_category?.id,
+        label: product.product_category?.name,
+      },
       variants: [],
     };
 

@@ -5,22 +5,42 @@ import {
 } from '@ant-design/icons';
 import { Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { breadcrumbItemRender } from '../../helpers/views_helper';
 import CollectionListComponent from '../collections/components/CollectionListComponent';
 
-export default function ProductList() {
+export default function ProductCategoryList() {
   const navigate = useNavigate();
 
   return (
     <CollectionListComponent
-      module='products'
+      module='product-categories'
+      header={{
+        title: 'Product Categories',
+        breadcrumb: {
+          items: [
+            {
+              title: 'Home',
+              href: '/home',
+            },
+            {
+              title: 'Products',
+              href: '/collections/products',
+            },
+            {
+              title: 'Product Categories',
+            },
+          ],
+          itemRender: breadcrumbItemRender,
+        },
+      }}
       extra={[
         <Button
           variant='solid'
           color='blue'
-          key='product-categories'
-          onClick={() => navigate('/collections/product-categories')}
+          key='products'
+          onClick={() => navigate('/collections/products')}
         >
-          <AppstoreOutlined /> Categories
+          <AppstoreOutlined /> Products
         </Button>,
         <Button
           variant='solid'

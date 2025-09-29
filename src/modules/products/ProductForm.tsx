@@ -9,6 +9,7 @@ import { App, Col, Row } from 'antd';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import MediaChoose from '../../components/fields/media/MediaChoose';
+import RelationInput from '../../components/fields/relation/RelationInput';
 import RichtextInput from '../../components/fields/richtext/RichtextInput';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
@@ -26,6 +27,7 @@ export default function ProductForm() {
       .findOne(id, {
         populate: [
           'product_variants.product_variant_attributes.product_attribute',
+          'product_category',
         ],
       })
       .then((response) => {
@@ -116,11 +118,44 @@ export default function ProductForm() {
       <div className='w-full bg-white p-4 rounded-md custom-antd-pro-form'>
         <ProForm form={form} onFinish={handleSave}>
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={10}>
               <ProFormText name='name' label='Name' />
             </Col>
-            <Col span={12}>
-              <ProFormText name='unit' label='Unit' />
+            <Col span={10}>
+              <ProForm.Item name='product_category' label='Product Category'>
+                <RelationInput
+                  item={{
+                    options: {
+                      target: 'api::product-category.product-category',
+                      mainField: 'name',
+                    },
+                  }}
+                />
+              </ProForm.Item>
+            </Col>
+            <Col span={4}>
+              <ProFormSelect
+                name='unit'
+                label='Unit'
+                options={[
+                  {
+                    label: 'Unit',
+                    value: 'Unit',
+                  },
+                  {
+                    label: 'Pcs',
+                    value: 'Pcs',
+                  },
+                  {
+                    label: 'Box',
+                    value: 'Box',
+                  },
+                  {
+                    label: 'Carton',
+                    value: 'Carton',
+                  },
+                ]}
+              />
             </Col>
           </Row>
 

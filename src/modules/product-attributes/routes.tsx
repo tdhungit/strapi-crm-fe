@@ -1,6 +1,12 @@
 import ProductAttributeForm from './ProductAttributeForm';
+import ProductAttributeList from './ProductAttributeList';
 
 const routes = [
+  {
+    path: '/collections/product-attributes',
+    element: <ProductAttributeList />,
+    name: 'Product Attributes',
+  },
   {
     path: '/collections/product-attributes/create',
     element: <ProductAttributeForm />,

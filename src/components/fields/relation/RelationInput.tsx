@@ -18,7 +18,7 @@ export default function RelationInput(props: {
   disable?: boolean;
   onChange?: (value: any) => void;
 }) {
-  const { item, onChange, disable, initialValues } = props;
+  const { item, onChange, disable, initialValues, value: defaultValue } = props;
 
   const [contentType, setContentType] = useState<any>(null);
   const [keyLabel, setKeyLabel] = useState<string>('name');
@@ -36,13 +36,27 @@ export default function RelationInput(props: {
   }, [item]);
 
   useEffect(() => {
-    const id = initialValues?.id || initialValues?.initValue;
+    const id =
+      defaultValue?.id ||
+      defaultValue?.value ||
+      initialValues?.id ||
+      initialValues?.initValue;
+
     if (id && id !== value?.value) {
       let newValue;
       if (!value) {
         newValue = {
-          label: initialValues.initLabel || initialValues[keyLabel],
-          value: initialValues.initValue || initialValues.id,
+          label:
+            defaultValue?.label ||
+            defaultValue[keyLabel] ||
+            defaultValue?.name ||
+            initialValues.initLabel ||
+            initialValues[keyLabel],
+          value:
+            defaultValue?.value ||
+            defaultValue.id ||
+            initialValues.initValue ||
+            initialValues.id,
         };
       } else {
         newValue = value;
@@ -51,7 +65,7 @@ export default function RelationInput(props: {
       setValue(newValue);
       onChange?.(newValue);
     }
-  }, [initialValues]);
+  }, [initialValues, defaultValue]);
 
   const fetchOptions = async (search: string): Promise<any[]> => {
     // If no search term, fetch first 10 items

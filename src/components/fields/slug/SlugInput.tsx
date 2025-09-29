@@ -15,6 +15,10 @@ export default function SlugInput({
   const [value, setValue] = useState(defaultValue);
 
   useEffect(() => {
+    setValue(defaultValue);
+  }, [defaultValue]);
+
+  useEffect(() => {
     const triggerFieldValue: any = form.getFieldInstance(triggerField);
     triggerFieldValue?.nativeElement?.addEventListener('change', (e: any) => {
       const slug = e.target.value.replace(/[^a-z0-9]/gi, '-').toLowerCase();
