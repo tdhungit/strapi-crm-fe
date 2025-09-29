@@ -7,7 +7,7 @@ import {
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import { App, Col, Row } from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import MediaChoose from '../../components/fields/media/MediaChoose';
 import RelationInput from '../../components/fields/relation/RelationInput';
@@ -21,6 +21,8 @@ export default function ProductForm() {
   const [form] = ProForm.useForm();
   const { message, notification } = App.useApp();
   const navigate = useNavigate();
+
+  const [attributes, setAttributes] = useState<any>([]);
 
   const fetchData = (id: string) => {
     ApiService.getClient()
@@ -48,6 +50,56 @@ export default function ProductForm() {
 
   const generateDataSave = (values: any) => {
     return ProductService.normalizerFormValues(values);
+  };
+
+  const loadCategoryAttributes = (categoryId: string) => {
+    ApiService.getClient()
+      .collection('product-attributes')
+      .find({
+        filters: {
+          product_category: {
+            $eq: categoryId,
+          },
+        },
+      })
+      .then((response) => {
+        setAttributes(response.data);
+      });
+  };
+
+  const onValuesChange = (changedValues: any, values: any) => {
+    if (changedValues.product_category) {
+      loadCategoryAttributes(changedValues.product_category.value);
+    }
+
+    if (changedValues.variants) {
+      let addVariant = false;
+      const newVariants: any[] = [];
+      values.variants.forEach((variant: any) => {
+        if (!variant.attributes || variant.attributes.length === 0) {
+          addVariant = true;
+          variant.attributes = attributes.map((attribute: any) => {
+            return {
+              attribute: {
+                ...attribute,
+                label: attribute.name,
+                value: attribute.id,
+                key: attribute.id,
+              },
+            };
+          });
+        }
+        newVariants.push(variant);
+      });
+
+      if (addVariant) {
+        form.setFieldsValue({
+          variants: newVariants,
+        });
+      }
+
+      console.log({ changedValues, values });
+    }
   };
 
   const handleSave = async (values: any) => {
@@ -117,13 +169,25 @@ export default function ProductForm() {
       }}
     >
       <div className='w-full bg-white p-4 rounded-md custom-antd-pro-form'>
-        <ProForm form={form} onFinish={handleSave}>
+        <ProForm
+          form={form}
+          onFinish={handleSave}
+          onValuesChange={onValuesChange}
+        >
           <Row gutter={16}>
             <Col span={10}>
-              <ProFormText name='name' label='Name' />
+              <ProFormText
+                name='name'
+                label='Name'
+                rules={[{ required: true }]}
+              />
             </Col>
             <Col span={10}>
-              <ProForm.Item name='product_category' label='Product Category'>
+              <ProForm.Item
+                name='product_category'
+                label='Product Category'
+                rules={[{ required: true }]}
+              >
                 <RelationInput
                   item={{
                     options: {
@@ -138,6 +202,8 @@ export default function ProductForm() {
               <ProFormSelect
                 name='unit'
                 label='Unit'
+                rules={[{ required: true }]}
+                initialValue='Unit'
                 options={[
                   {
                     label: 'Unit',
@@ -178,6 +244,10 @@ export default function ProductForm() {
               style: {
                 marginBottom: 16,
               },
+              disabled:
+                !form.getFieldValue('product_category') ||
+                !form.getFieldValue('unit') ||
+                !form.getFieldValue('name'),
             }}
             alwaysShowItemLabel
           >
@@ -195,6 +265,8 @@ export default function ProductForm() {
                       <ProFormSelect
                         name='variant_status'
                         label='Status'
+                        rules={[{ required: true }]}
+                        initialValue='Active'
                         options={[
                           {
                             label: 'Active',
@@ -216,36 +288,19 @@ export default function ProductForm() {
                   <ProFormList
                     name='attributes'
                     label='Attributes'
-                    creatorButtonProps={{
-                      creatorButtonText: '',
-                      style: {
-                        width: 60,
-                      },
-                      variant: 'outlined',
-                      color: 'geekblue',
-                    }}
-                    alwaysShowItemLabel
+                    creatorButtonProps={false}
+                    actionRender={() => []}
                   >
                     {() => {
                       return (
-                        <div className='w-full border border-gray-200 rounded-md mb-2 px-4 pt-4'>
+                        <div className='w-full border border-gray-200 rounded-md px-4 pt-4 mt-2'>
                           <Row gutter={16}>
                             <Col span={12}>
                               <ProFormSelect
                                 name='attribute'
-                                label='Attribute'
-                                request={async (params) => {
-                                  const response = await ApiService.getClient()
-                                    .collection('product-attributes')
-                                    .find({
-                                      filters: {
-                                        name: {
-                                          $contains: params?.keyWords,
-                                        },
-                                      },
-                                    });
-                                  const data = response.data || [];
-                                  return data.map((item: any) => ({
+                                label='Attribute Name'
+                                request={async () => {
+                                  return attributes.map((item: any) => ({
                                     label: item.name,
                                     value: item.id,
                                     metadata: item.metadata || {},
@@ -254,6 +309,7 @@ export default function ProductForm() {
                                 fieldProps={{
                                   labelInValue: true,
                                 }}
+                                readonly
                               />
                             </Col>
                             <Col span={12}>

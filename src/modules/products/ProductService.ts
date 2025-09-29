@@ -145,8 +145,11 @@ class ProductService {
                 const attributeData = attribute.product_attribute as any;
                 variantData.attributes.push({
                   attribute: {
+                    key: attributeData.id,
                     value: attributeData.id,
-                    ...attributeData,
+                    label: attributeData.name,
+                    id: attributeData.id,
+                    metadata: attributeData.metadata,
                   },
                   value: attribute.attribute_value,
                 });

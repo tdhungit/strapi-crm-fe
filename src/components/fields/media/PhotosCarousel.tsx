@@ -29,17 +29,18 @@ export default function PhotosCarousel({
         autoplay={{ dotDuration: true }}
         autoplaySpeed={5000}
       >
-        {photos.map((photo: any) => (
-          <div>
-            <img
-              src={getMediaUrl(photo)}
-              alt={photo.name}
-              style={itemStyle || contentStyle}
-              width={width || 80}
-              height={height || 80}
-            />
-          </div>
-        ))}
+        {photos?.length > 0 &&
+          photos.map((photo: any) => (
+            <div>
+              <img
+                src={getMediaUrl(photo)}
+                alt={photo.name}
+                style={itemStyle || contentStyle}
+                width={width || 80}
+                height={height || 80}
+              />
+            </div>
+          ))}
       </Carousel>
     </div>
   );
