@@ -11,6 +11,7 @@ import PasswordInput from './password/PasswordInput';
 import RankingInput from './ranking/RankingInput';
 import RelationInput from './relation/RelationInput';
 import RichtextInput from './richtext/RichtextInput';
+import SlugInput from './slug/SlugInput';
 
 export default function FormInput({
   item,
@@ -129,6 +130,10 @@ export default function FormInput({
       break;
 
     case 'string':
+      if (item.name === 'slug' && form.getFieldInstance('name')) {
+        input = <SlugInput form={form} triggerField='name' />;
+      }
+      break;
     default:
       break;
   }

@@ -6,7 +6,14 @@ import DebounceSelect from '../../DebounceSelect';
 export default function RelationInput(props: {
   initialValues?: any;
   value?: any;
-  item: any;
+  item: {
+    options: {
+      target: string;
+      mainField: string;
+      [key: string]: any;
+    };
+    [key: string]: any;
+  };
   data?: any;
   disable?: boolean;
   onChange?: (value: any) => void;

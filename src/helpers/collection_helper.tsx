@@ -19,8 +19,8 @@ export function normalizeRecord(
         break;
       case 'relation':
         if (typeof record[field] === 'object') {
-          normalize[field] = record[field];
-          delete normalize[field]['documentId'];
+          const fieldValue = record[field];
+          normalize[field] = fieldValue?.value || fieldValue?.id || fieldValue;
         } else {
           normalize[field] = record[field];
         }

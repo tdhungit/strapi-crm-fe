@@ -21,7 +21,7 @@ export default function AssignUserInput({
   onChange?: (value: any) => void;
 }) {
   let newData = initialValues ? { ...initialValues } : { ...data };
-  const user = useSelector((state: RootState) => state.auth.user);
+  const user = useSelector((state: RootState) => state?.auth?.user);
   if (user?.id) {
     newData = {
       initValue: user.id,

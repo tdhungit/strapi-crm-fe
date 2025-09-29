@@ -4,9 +4,10 @@ import {
   ProFormList,
   ProFormText,
 } from '@ant-design/pro-components';
-import { App } from 'antd';
+import { App, Col, Row } from 'antd';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import RelationInput from '../../components/fields/relation/RelationInput';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 
@@ -27,6 +28,10 @@ export default function ProductAttributeForm() {
   }, [id]);
 
   const onFinish = async (values: any) => {
+    if (values.product_category) {
+      values.product_category =
+        values.product_category.value || values.product_category.id;
+    }
     try {
       message.loading('Saving...', 0);
       if (id) {
@@ -75,7 +80,27 @@ export default function ProductAttributeForm() {
     >
       <div className='w-full bg-white p-4 rounded-md'>
         <ProForm form={form} onFinish={onFinish}>
-          <ProFormText name='name' label='Name' />
+          <Row gutter={[16, 16]}>
+            <Col span={12}>
+              <ProFormText name='name' label='Name' />
+            </Col>
+            <Col span={12}>
+              <ProForm.Item
+                name='product_category'
+                label='Product Category'
+                rules={[{ required: true }]}
+              >
+                <RelationInput
+                  item={{
+                    options: {
+                      target: 'api::product-category.product-category',
+                      mainField: 'name',
+                    },
+                  }}
+                />
+              </ProForm.Item>
+            </Col>
+          </Row>
           <ProFormList
             name={['metadata', 'options']}
             label='Options'

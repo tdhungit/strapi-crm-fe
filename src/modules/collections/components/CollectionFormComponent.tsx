@@ -15,9 +15,11 @@ import MetadataService from '../../../services/MetadataService';
 export default function CollectionFormComponent({
   module,
   id,
+  onValuesChange,
 }: {
   module: string;
   id?: string;
+  onValuesChange?: (changedValues: any, allValues: any) => void;
   [key: string]: any;
 }) {
   const { message, notification } = App.useApp();
@@ -91,8 +93,8 @@ export default function CollectionFormComponent({
     <PageContainer
       header={{
         title: id
-          ? `Edit ${module}`.toLocaleUpperCase()
-          : `Create ${module}`.toLocaleUpperCase(),
+          ? `Edit ${camelToTitle(module)}`
+          : `Create ${camelToTitle(module)}`,
         breadcrumb: {
           items: [
             {
@@ -125,6 +127,7 @@ export default function CollectionFormComponent({
           form={form}
           layout='vertical'
           onFinish={onFinish}
+          onValuesChange={onValuesChange}
         >
           {renderEditLayoutRows(config, data, form)}
           <div className='flex gap-2'>

@@ -84,7 +84,7 @@ export function updateListLayoutFilterRender(
       col.renderFormItem = (_item: any, _config: any, form: FormInstance) => {
         return (
           <RelationInput
-            item={fieldOptions}
+            item={fieldOptions as any}
             onChange={(value: any) => {
               form.setFieldValue(field, value.value);
             }}
