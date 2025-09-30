@@ -241,6 +241,8 @@ export default function ManyToManyPanel({
                 <SelectOutlined /> Select
               </Button>,
             ]}
+            tableLayout='auto'
+            scroll={{ x: 'max-content' }}
           />
         )}
       </div>

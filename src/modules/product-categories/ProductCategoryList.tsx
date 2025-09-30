@@ -7,6 +7,7 @@ import { Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
 import CollectionListComponent from '../collections/components/CollectionListComponent';
+import ProductCategoryDrawer from './components/ProductCategoryDrawer';
 
 export default function ProductCategoryList() {
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ export default function ProductCategoryList() {
           <FundViewOutlined /> Prices
         </Button>,
       ]}
+      drawerComponent={ProductCategoryDrawer}
     />
   );
 }

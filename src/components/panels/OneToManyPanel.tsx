@@ -239,6 +239,8 @@ export default function OneToManyPanel({
                   <SelectOutlined /> Select
                 </Button>,
               ]}
+              tableLayout='auto'
+              scroll={{ x: 'max-content' }}
             />
           )}
       </div>
