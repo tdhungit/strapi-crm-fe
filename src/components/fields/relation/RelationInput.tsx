@@ -48,15 +48,15 @@ export default function RelationInput(props: {
         newValue = {
           label:
             defaultValue?.label ||
-            defaultValue[keyLabel] ||
+            defaultValue?.[keyLabel] ||
             defaultValue?.name ||
-            initialValues.initLabel ||
-            initialValues[keyLabel],
+            initialValues?.initLabel ||
+            initialValues?.[keyLabel],
           value:
             defaultValue?.value ||
-            defaultValue.id ||
-            initialValues.initValue ||
-            initialValues.id,
+            defaultValue?.id ||
+            initialValues?.initValue ||
+            initialValues?.id,
         };
       } else {
         newValue = value;

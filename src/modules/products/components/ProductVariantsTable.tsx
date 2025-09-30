@@ -92,7 +92,13 @@ export default function ProductVariantsTable({
                             key={price.id}
                             className='bg-white border-b border-gray-200'
                           >
-                            <td className='px-6 py-1'>{price.price}</td>
+                            <td className='px-6 py-1'>
+                              ${price.price}
+                              <span className='text-gray-500 text-xs italic line-through'>
+                                {' '}
+                                (${price.before_price})
+                              </span>
+                            </td>
                             <td className='px-6 py-1'>{price.price_type}</td>
                             <td className='px-6 py-1'>{price.price_status}</td>
                             <td className='px-6 py-1'>{price.start_date}</td>

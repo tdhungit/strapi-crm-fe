@@ -153,6 +153,8 @@ export default function CollectionListModal({
         rowKey='id'
         pagination={CollectionService.getTablePagination(config)}
         options={false}
+        tableLayout='auto'
+        scroll={{ x: 'max-content' }}
         rowSelection={
           single
             ? false

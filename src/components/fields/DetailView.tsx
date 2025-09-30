@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AddressView from './address/AddressView';
 import BooleanView from './boolean/BooleanView';
+import DateTimeView from './datetime/DateTimeView';
 import EnumerationView from './enumeration/EnumerationView';
 import MediaView from './media/MediaView';
 import PasswordView from './password/PasswordView';
@@ -62,6 +63,10 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
           break;
 
         case 'json':
+          break;
+
+        case 'datetime':
+          setDisplayValue(<DateTimeView value={value} />);
           break;
 
         case 'string':

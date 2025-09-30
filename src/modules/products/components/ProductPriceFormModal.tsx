@@ -83,18 +83,14 @@ export default function ProductPriceFormModal({
     >
       <Row gutter={[16, 0]}>
         <Col span={8}>
-          <ProFormSelect
-            name='price_type'
-            label='Price Type'
-            options={[
-              { label: 'Cost Price', value: 'Cost' },
-              { label: 'Sale Price', value: 'Sale' },
-            ]}
-            initialValue='Cost'
-          />
+          <ProFormDigit name='before_price' label='Before Price' />
         </Col>
         <Col span={8}>
-          <ProFormDigit name='price' label='Price' />
+          <ProFormDigit
+            name='price'
+            label='Price'
+            rules={[{ required: true }]}
+          />
         </Col>
         <Col span={8}>
           <ProFormSelect
@@ -105,6 +101,17 @@ export default function ProductPriceFormModal({
               { label: 'Inactive', value: 'Inactive' },
             ]}
             initialValue='Active'
+          />
+        </Col>
+        <Col span={8}>
+          <ProFormSelect
+            name='price_type'
+            label='Price Type'
+            options={[
+              { label: 'Sale Price', value: 'Sale' },
+              { label: 'Cost Price', value: 'Cost' },
+            ]}
+            initialValue='Sale'
           />
         </Col>
         <Col span={8}>
