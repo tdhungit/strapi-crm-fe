@@ -26,6 +26,7 @@ import {
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import CustomerChoose from '../../components/fields/customer/CustomerChoose';
 import DiscountInput from '../../components/fields/discount/DiscountInput';
 import RelationChoose from '../../components/fields/relation/RelationChoose';
 import TaxInput from '../../components/fields/tax/TaxInput';
@@ -300,6 +301,7 @@ export default function POS() {
       sale_date: new Date().toISOString().split('T')[0],
       account: customer.type === 'account' ? customer.id : null,
       contact: customer.type === 'contact' ? customer.id : null,
+      lead: customer.type === 'lead' ? customer.id : null,
       warehouse: selectedWarehouse?.id,
       subtotal: totals.subtotal,
       discount_type: 'percentage',
@@ -475,12 +477,9 @@ export default function POS() {
                   }
                 />
                 <Divider className='my-2'>OR</Divider>
-                <RelationChoose
-                  module='contacts'
-                  placeholder='Select Customer Contact'
-                  onChange={(value) =>
-                    setCustomer({ ...value, type: 'contact' })
-                  }
+                <CustomerChoose
+                  placeholder='Select Customer Contact or Lead'
+                  onChange={(value) => setCustomer({ ...value })}
                 />
                 {customer && (
                   <div className='mt-2 p-2 bg-blue-50 rounded'>
