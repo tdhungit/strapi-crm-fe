@@ -405,19 +405,18 @@ export default function PurchaseOrderForm() {
                               `/product-variants/${value.id}/price`,
                               {
                                 date: form.getFieldValue('purchase_date'),
+                                priceType: 'Cost',
                               }
                             ).then((res) => {
-                              if (res?.price?.price) {
-                                const items = form.getFieldValue('items');
-                                items[index].unit_price = res.price.price;
-                                if (
-                                  !items[index].quantity ||
-                                  items[index].quantity <= 0
-                                ) {
-                                  items[index].quantity = 1;
-                                }
-                                form.setFieldValue('items', items);
+                              const items = form.getFieldValue('items');
+                              items[index].unit_price = res.price?.price || 0;
+                              if (
+                                !items[index].quantity ||
+                                items[index].quantity <= 0
+                              ) {
+                                items[index].quantity = 1;
                               }
+                              form.setFieldValue('items', items);
                             });
                           }}
                         />
