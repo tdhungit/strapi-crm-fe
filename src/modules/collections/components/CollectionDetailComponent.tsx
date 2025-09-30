@@ -28,6 +28,7 @@ export default function CollectionDetailComponent({
   hook,
   populate,
   refresh,
+  loaded,
 }: {
   module: string;
   id: string;
@@ -36,6 +37,7 @@ export default function CollectionDetailComponent({
   hook?: (record: any) => React.ReactNode;
   populate?: string[];
   refresh?: number;
+  loaded?: (record: any) => void;
   [key: string]: any;
 }) {
   const [config, setConfig] = useState<CollectionConfigType>();
@@ -54,7 +56,10 @@ export default function CollectionDetailComponent({
     ApiService.getClient()
       .collection(module)
       .findOne(id, queryParams)
-      .then((r) => setRecord(r))
+      .then((r) => {
+        setRecord(r);
+        loaded?.(r.data);
+      })
       .catch((err) => {
         console.error(err);
         setError(err.message);
