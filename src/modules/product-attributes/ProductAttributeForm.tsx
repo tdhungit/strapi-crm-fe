@@ -4,6 +4,7 @@ import {
   ProFormDigit,
   ProFormList,
   ProFormText,
+  ProFormTextArea,
 } from '@ant-design/pro-components';
 import { App, Col, Row } from 'antd';
 import { useEffect } from 'react';
@@ -107,6 +108,7 @@ export default function ProductAttributeForm() {
               <ProFormDigit name='weight' label='Weight' />
             </Col>
           </Row>
+          <ProFormTextArea name='description' label='Description' />
           <ProFormList
             name={['metadata', 'options']}
             label='Options'

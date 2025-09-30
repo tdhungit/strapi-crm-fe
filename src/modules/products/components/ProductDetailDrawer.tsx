@@ -18,7 +18,7 @@ import { getMediaUrl } from '../../../helpers/views_helper';
 import ApiService from '../../../services/ApiService';
 import type { CollectionDrawerProps } from '../../collections/components/CollectionDetailDrawer';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 export default function ProductDetailDrawer({
   open,
@@ -157,19 +157,7 @@ export default function ProductDetailDrawer({
       open={open}
       onClose={() => onOpenChange(false)}
       width={width || 800}
-      title={
-        <div className='flex items-center justify-between'>
-          <div>
-            <Title level={4} className='mb-0'>
-              {product.name}
-            </Title>
-            <Text type='secondary'>Product Details</Text>
-          </div>
-          <Tag color={getStatusColor(product.product_status)}>
-            {product.product_status}
-          </Tag>
-        </div>
-      }
+      title={product.name}
       extra={
         <Space>
           <Button
