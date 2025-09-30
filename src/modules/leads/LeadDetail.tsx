@@ -22,13 +22,15 @@ export default function LeadDetail() {
           refresh={refresh}
           extra={
             <Space>
-              <Button
-                variant='solid'
-                color='cyan'
-                onClick={() => setConvertModalOpen(true)}
-              >
-                <MergeOutlined /> Convert to Contact
-              </Button>
+              {!lead?.contact?.id && (
+                <Button
+                  variant='solid'
+                  color='cyan'
+                  onClick={() => setConvertModalOpen(true)}
+                >
+                  <MergeOutlined /> Convert to Contact
+                </Button>
+              )}
               <Link
                 key={`leads-edit-${id}`}
                 to={`/collections/leads/edit/${id}`}
