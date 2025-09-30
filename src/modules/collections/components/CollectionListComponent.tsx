@@ -326,6 +326,8 @@ export default function CollectionListComponent({
             }}
             pagination={CollectionService.getTablePagination(config)}
             toolBarRender={() => toolBars}
+            tableLayout='auto'
+            scroll={{ x: 'max-content' }}
           />
         </div>
 

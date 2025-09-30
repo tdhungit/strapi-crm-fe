@@ -138,8 +138,8 @@ export function getListLayoutColumns(
       title,
       dataIndex: field,
       key: field,
-      search: metadatas.searchable || false,
       ellipsis: true,
+      search: metadatas.searchable || false,
       sorter: metadatas.sortable || false,
     };
 
