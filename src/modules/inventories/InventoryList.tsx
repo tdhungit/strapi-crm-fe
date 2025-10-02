@@ -20,9 +20,9 @@ export default function InventoryList() {
               render: (_dom: any, record: any) => {
                 return (
                   <Link
-                    to={`/collections/products/detail/${record.product_variant.product.documentId}`}
+                    to={`/collections/products/detail/${record.product_variant?.product?.documentId}`}
                   >
-                    {record.product_variant.product.name}
+                    {record.product_variant?.product?.name}
                   </Link>
                 );
               },
@@ -36,9 +36,9 @@ export default function InventoryList() {
                     options?.onClickMainField?.(record);
                   }}
                 >
-                  {record.product_variant.name}
+                  {record.product_variant?.name}
                   <div className='text-xs italic text-gray-500'>
-                    {record.product_variant.sku}
+                    {record.product_variant?.sku}
                   </div>
                 </div>
               );

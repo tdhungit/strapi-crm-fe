@@ -98,14 +98,11 @@ export default function ProductForm() {
           variants: newVariants,
         });
       }
-
-      console.log({ changedValues, values });
     }
   };
 
   const handleSave = async (values: any) => {
     const dataSave = generateDataSave(values);
-
     try {
       message.loading('Saving...', 0);
       let product;
@@ -270,6 +267,7 @@ export default function ProductForm() {
             {() => {
               return (
                 <div className='w-full mb-2 border border-gray-200 rounded-md px-4 pt-4'>
+                  <ProForm.Item name='id' hidden />
                   <Row gutter={16}>
                     <Col span={8}>
                       <ProFormText name='name' label='Name' />

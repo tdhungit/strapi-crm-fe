@@ -7,6 +7,7 @@ interface ProductFormAttributeType {
 }
 
 interface ProductFormVariantType {
+  id?: number;
   name?: string;
   sku?: string;
   variant_status?: string;
@@ -16,6 +17,7 @@ interface ProductFormVariantType {
 
 export interface ProductFormType {
   name?: string;
+  slug?: string;
   unit?: string;
   photos?: string[];
   product_status?: string;
@@ -58,6 +60,7 @@ export interface ProductType {
   id?: number;
   documentId?: string;
   name?: string;
+  slug?: string;
   unit?: string;
   photos?: string[];
   description?: string;
@@ -82,6 +85,7 @@ class ProductService {
       const productVariants = values.variants.map(
         (variant: ProductFormVariantType) => {
           const variantData: any = {
+            id: variant.id || 0,
             name: variant.name,
             sku: variant.sku,
             variant_status: variant.variant_status,
@@ -113,6 +117,7 @@ class ProductService {
   denormalizerFormValues(product: ProductType): ProductFormType {
     const data: ProductFormType = {
       name: product.name,
+      slug: product.slug,
       unit: product.unit,
       photos: product.photos,
       product_status: product.product_status,
@@ -129,6 +134,7 @@ class ProductService {
       const productVariants = product.product_variants.map(
         (variant: ProductVariantType) => {
           const variantData: ProductFormVariantType = {
+            id: variant.id || 0,
             name: variant.name,
             sku: variant.sku,
             variant_status: variant.variant_status,
