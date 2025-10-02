@@ -3,7 +3,7 @@ import { PageContainer } from '@ant-design/pro-components';
 import { App, Button, Image, Typography } from 'antd';
 import { Card, Col, Descriptions, Divider, Row, Table, Tag } from 'antd/lib';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { breadcrumbItemRender, getMediaUrl } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 
@@ -12,6 +12,7 @@ const { Title, Text } = Typography;
 export default function PurchaseOrderDetail() {
   const { id } = useParams();
   const { notification, message } = App.useApp();
+  const navigate = useNavigate();
 
   const [po, setPo] = useState<any>(null);
   const [refresh, setRefresh] = useState(0);
@@ -206,7 +207,16 @@ export default function PurchaseOrderDetail() {
                 >
                   Reject
                 </Button>
-                <Button variant='solid' color='orange' icon={<EditOutlined />}>
+                <Button
+                  variant='solid'
+                  color='orange'
+                  icon={<EditOutlined />}
+                  onClick={() =>
+                    navigate(
+                      `/collections/purchase-orders/edit/${po.documentId}`
+                    )
+                  }
+                >
                   Edit
                 </Button>
               </>
