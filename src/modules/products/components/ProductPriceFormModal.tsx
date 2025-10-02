@@ -41,6 +41,8 @@ export default function ProductPriceFormModal({
         .update(price.documentId, {
           ...values,
           product_variant: variant.id,
+          start_date: values.start_date ? values.start_date : null,
+          end_date: values.end_date ? values.end_date : null,
         });
     } else {
       result = ApiService.getClient()

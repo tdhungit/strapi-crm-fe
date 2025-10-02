@@ -86,7 +86,9 @@ export default function ProductVariantsPricesModal({
             dataIndex: 'price',
             render: (_dom: any, record: any) => {
               return (
-                <span>${record.product_variant.product_prices[0].price}</span>
+                <span>
+                  ${record.product_variant?.product_prices?.[0]?.price}
+                </span>
               );
             },
           },
