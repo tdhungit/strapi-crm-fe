@@ -21,6 +21,7 @@ export interface ProductFormType {
   unit?: string;
   photos?: string[];
   product_status?: string;
+  summary?: string;
   description?: string;
   variants?: ProductFormVariantType[];
   product_category?: {
@@ -63,6 +64,7 @@ export interface ProductType {
   slug?: string;
   unit?: string;
   photos?: string[];
+  summary?: string;
   description?: string;
   product_status?: string;
   product_variants?: ProductVariantType[];
@@ -121,6 +123,7 @@ class ProductService {
       unit: product.unit,
       photos: product.photos,
       product_status: product.product_status,
+      summary: product.summary,
       description: product.description,
       product_category: {
         ...product.product_category,
