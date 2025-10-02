@@ -7,7 +7,7 @@ interface ProductFormAttributeType {
 }
 
 interface ProductFormVariantType {
-  id?: number;
+  id?: number | null;
   name?: string;
   sku?: string;
   variant_status?: string;
@@ -47,7 +47,7 @@ interface ProductVariantAttributeType {
 }
 
 interface ProductVariantType {
-  id?: number;
+  id?: number | null;
   documentId?: string;
   name?: string;
   sku?: string;
@@ -85,7 +85,7 @@ class ProductService {
       const productVariants = values.variants.map(
         (variant: ProductFormVariantType) => {
           const variantData: any = {
-            id: variant.id || 0,
+            id: variant.id || undefined,
             name: variant.name,
             sku: variant.sku,
             variant_status: variant.variant_status,
@@ -134,7 +134,7 @@ class ProductService {
       const productVariants = product.product_variants.map(
         (variant: ProductVariantType) => {
           const variantData: ProductFormVariantType = {
-            id: variant.id || 0,
+            id: variant.id || null,
             name: variant.name,
             sku: variant.sku,
             variant_status: variant.variant_status,

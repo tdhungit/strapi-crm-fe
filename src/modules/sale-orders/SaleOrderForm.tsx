@@ -202,7 +202,7 @@ export default function SaleOrderForm() {
       tax_amount: data.tax?.amount || 0,
       total_amount: data.total_amount,
       items: data.items.map((item: any) => ({
-        id: item.id || 0,
+        id: item.id || undefined,
         product_variant: item.product_variant?.id || null,
         warehouse: item.warehouse?.id || data.warehouse?.id || null,
         quantity: item.quantity,

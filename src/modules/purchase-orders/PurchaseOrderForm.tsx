@@ -204,7 +204,7 @@ export default function PurchaseOrderForm() {
 
     const items = data.items.map((item: any) => {
       return {
-        id: item.id || 0,
+        id: item.id || undefined,
         product_variant: item.product_variant?.id || null,
         warehouse: item.warehouse?.id || null,
         quantity: item.quantity,
