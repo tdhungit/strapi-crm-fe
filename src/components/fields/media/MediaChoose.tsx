@@ -1,4 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { CloseCircleFilled, PlusOutlined } from '@ant-design/icons';
 import { Button, Image } from 'antd';
 import { useEffect, useState } from 'react';
 import MediaManagerModal from '../../MediaManagerModal';
@@ -50,12 +50,23 @@ export default function MediaChoose({
 
         {value?.length > 0 &&
           value.map((item: any) => (
-            <Image
-              key={item.id}
-              src={getUrlMedia(item)}
-              width={80}
-              height={80}
-            />
+            <div className='relative' style={{ width: 80, height: 80 }}>
+              <Image
+                key={item.id}
+                src={getUrlMedia(item)}
+                width='100%'
+                height='100%'
+              />
+              <div
+                className='absolute top-[-10px] right-[-5px] cursor-pointer text-red-500'
+                onClick={() => {
+                  setValue(value.filter((v: any) => v.id !== item.id));
+                  onChange?.(value.filter((v: any) => v.id !== item.id));
+                }}
+              >
+                <CloseCircleFilled />
+              </div>
+            </div>
           ))}
       </div>
 
