@@ -1,5 +1,6 @@
 import { Input, type FormInstance } from 'antd';
 import { useEffect, useState } from 'react';
+import { toSlug } from '../../../helpers/utils';
 
 export default function SlugInput({
   value: defaultValue,
@@ -21,7 +22,7 @@ export default function SlugInput({
   useEffect(() => {
     const triggerFieldValue: any = form.getFieldInstance(triggerField);
     triggerFieldValue?.nativeElement?.addEventListener('change', (e: any) => {
-      const slug = e.target.value.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+      const slug = toSlug(e.target.value);
       setValue(slug);
       onChange?.(slug);
     });

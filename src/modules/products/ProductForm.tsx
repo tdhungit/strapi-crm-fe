@@ -12,6 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import MediaChoose from '../../components/fields/media/MediaChoose';
 import RelationInput from '../../components/fields/relation/RelationInput';
 import RichtextInput from '../../components/fields/richtext/RichtextInput';
+import { toSlug } from '../../helpers/utils';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import ProductService from './ProductService';
@@ -175,14 +176,29 @@ export default function ProductForm() {
           onValuesChange={onValuesChange}
         >
           <Row gutter={16}>
-            <Col span={10}>
+            <Col span={12}>
               <ProFormText
                 name='name'
                 label='Name'
                 rules={[{ required: true }]}
+                fieldProps={{
+                  onChange: (e) => {
+                    form.setFieldValue('slug', toSlug(e.target.value));
+                  },
+                }}
               />
             </Col>
-            <Col span={10}>
+            <Col span={12}>
+              <ProFormText
+                name='slug'
+                label='Slug'
+                rules={[{ required: true }]}
+              />
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
               <ProForm.Item
                 name='product_category'
                 label='Product Category'
@@ -198,7 +214,7 @@ export default function ProductForm() {
                 />
               </ProForm.Item>
             </Col>
-            <Col span={4}>
+            <Col span={12}>
               <ProFormSelect
                 name='unit'
                 label='Unit'
