@@ -9,7 +9,7 @@ import {
 import { Button, Radio } from 'antd';
 import * as React from 'react';
 import { cx } from './common';
-import TopBarButtons from './TopbarButtons';
+import TopBarButtons from './TopBarButtons';
 
 export default function TopBar({
   className,
