@@ -13,7 +13,7 @@ import {
   type PageHeaderProps,
   type ProColumnType,
 } from '@ant-design/pro-components';
-import { App, Button } from 'antd';
+import { App, Button, Space } from 'antd';
 import { Flex } from 'antd/lib';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -125,17 +125,17 @@ export default function CollectionListComponent({
           const actionRender =
             recordActionRender ||
             ((_dom: React.ReactNode, record: any) => (
-              <div>
+              <Space>
                 <Link
                   to={`/collections/${module}/detail/${record.documentId}`}
-                  className='inline-block'
+                  className='!text-blue-500'
                 >
                   <EyeOutlined />
                 </Link>
                 {hasProfile && (
                   <Link
                     to={`/collections/${module}/profile/${record.documentId}`}
-                    className='inline-block ml-2'
+                    className='!text-cyan-500'
                   >
                     <FundViewOutlined />
                   </Link>
@@ -143,12 +143,12 @@ export default function CollectionListComponent({
                 {!noEdit && (
                   <Link
                     to={`/collections/${module}/edit/${record.documentId}`}
-                    className='inline-block ml-2'
+                    className='!text-orange-500'
                   >
                     <EditOutlined />
                   </Link>
                 )}
-              </div>
+              </Space>
             ));
 
           cols.push({

@@ -17,6 +17,7 @@ import ApiService from '../../../services/ApiService';
 import MetadataService from '../../../services/MetadataService';
 import type {
   CollectionConfigType,
+  PanelConfigType,
   PanelItemType,
 } from '../../../types/layouts';
 
@@ -29,6 +30,7 @@ export default function CollectionDetailComponent({
   populate,
   refresh,
   loaded,
+  panelConfigs,
 }: {
   module: string;
   id: string;
@@ -38,6 +40,7 @@ export default function CollectionDetailComponent({
   populate?: string[];
   refresh?: number;
   loaded?: (record: any) => void;
+  panelConfigs?: PanelConfigType[];
   [key: string]: any;
 }) {
   const [config, setConfig] = useState<CollectionConfigType>();
@@ -161,7 +164,11 @@ export default function CollectionDetailComponent({
 
       {record?.data && panels.length > 0 && (
         <div className='mt-4'>
-          <RecordPanels panels={panels} record={record?.data} />
+          <RecordPanels
+            panels={panels}
+            record={record?.data}
+            panelConfigs={panelConfigs}
+          />
         </div>
       )}
     </PageContainer>

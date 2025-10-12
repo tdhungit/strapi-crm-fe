@@ -106,3 +106,10 @@ export interface PanelItemType {
   parentModuleApi: string;
   field: any;
 }
+
+export interface PanelConfigType {
+  name: string;
+  canView?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
+}

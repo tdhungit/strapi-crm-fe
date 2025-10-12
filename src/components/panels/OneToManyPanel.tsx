@@ -11,8 +11,9 @@ import {
   type ProColumns,
 } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
-import { App, Button } from 'antd';
+import { App, Button, Space } from 'antd';
 import { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   getCollectionPopulatedList,
   getListLayoutColumns,
@@ -21,6 +22,7 @@ import CollectionFormModal from '../../modules/collections/components/Collection
 import CollectionListModal from '../../modules/collections/components/CollectionListModal';
 import CollectionService from '../../services/CollectionService';
 import MetadataService from '../../services/MetadataService';
+import type { PanelConfigType } from '../../types/layouts';
 import PageLoading from '../PageLoading';
 
 export default function OneToManyPanel({
@@ -28,11 +30,13 @@ export default function OneToManyPanel({
   relateModule,
   field,
   record,
+  panelConfig: initPanelConfig,
 }: {
   module: string;
   relateModule: string;
   field: any;
   record: any;
+  panelConfig?: PanelConfigType;
 }) {
   const { message, notification, modal } = App.useApp();
   const ref = useRef<ActionType>(null);
@@ -46,6 +50,14 @@ export default function OneToManyPanel({
 
   const apiRelateModule = relateModule.replace(/_/g, '-');
 
+  const panelConfig: PanelConfigType = {
+    name: relateModule,
+    canView: true,
+    canEdit: true,
+    canDelete: true,
+    ...initPanelConfig,
+  };
+
   let columns: ProColumns<any>[] = [];
   if (config) {
     columns = getListLayoutColumns(config);
@@ -53,59 +65,66 @@ export default function OneToManyPanel({
       title: 'Actions',
       dataIndex: 'actions',
       valueType: 'option',
-      render: (_text: any, selectedRecord: any) => [
-        <a
-          key={`panel-${relateModule}-btn-view`}
-          href={`/collections/${apiRelateModule}/detail/${selectedRecord.documentId}`}
-        >
-          <EyeFilled />
-        </a>,
-        <a
-          key={`panel-${relateModule}-btn-edit`}
-          href={`/collections/${apiRelateModule}/edit/${selectedRecord.documentId}`}
-        >
-          <EditFilled />
-        </a>,
-        <a
-          href='javascript:void(0)'
-          key={`panel-${relateModule}-btn-delete`}
-          onClick={() => {
-            modal.confirm({
-              title: 'Confirm Delete',
-              content:
-                'Are you sure you want to delete this record? This action cannot be undone.',
-              okText: 'Delete',
-              okType: 'danger',
-              cancelText: 'Cancel',
-              onOk: async () => {
-                message.loading('Saving...', 0);
-                try {
-                  await CollectionService.removeRelationRecord(
-                    relateModule,
-                    field.mappedBy,
-                    selectedRecord,
-                    record
-                  );
-                  message.destroy();
-                  ref?.current?.reload();
-                  notification.success({
-                    message: 'Deleted successfully',
-                  });
-                } catch (error: any) {
-                  message.destroy();
-                  notification.error({
-                    message:
-                      error?.response?.data?.error?.message ||
-                      'Failed to delete',
-                  });
-                }
-              },
-            });
-          }}
-        >
-          <DeleteFilled />
-        </a>,
-      ],
+      render: (_text: any, selectedRecord: any) => (
+        <Space>
+          {panelConfig?.canView && (
+            <Link
+              to={`/collections/${apiRelateModule}/detail/${selectedRecord.documentId}`}
+              className='!text-blue-500'
+            >
+              <EyeFilled />
+            </Link>
+          )}
+          {panelConfig?.canEdit && (
+            <Link
+              to={`/collections/${apiRelateModule}/edit/${selectedRecord.documentId}`}
+              className='!text-orange-500'
+            >
+              <EditFilled />
+            </Link>
+          )}
+          {panelConfig?.canDelete && (
+            <span
+              className='cursor-pointer text-red-500'
+              onClick={() => {
+                modal.confirm({
+                  title: 'Confirm Delete',
+                  content:
+                    'Are you sure you want to delete this record? This action cannot be undone.',
+                  okText: 'Delete',
+                  okType: 'danger',
+                  cancelText: 'Cancel',
+                  onOk: async () => {
+                    message.loading('Saving...', 0);
+                    try {
+                      await CollectionService.removeRelationRecord(
+                        relateModule,
+                        field.mappedBy,
+                        selectedRecord,
+                        record
+                      );
+                      message.destroy();
+                      ref?.current?.reload();
+                      notification.success({
+                        message: 'Deleted successfully',
+                      });
+                    } catch (error: any) {
+                      message.destroy();
+                      notification.error({
+                        message:
+                          error?.response?.data?.error?.message ||
+                          'Failed to delete',
+                      });
+                    }
+                  },
+                });
+              }}
+            >
+              <DeleteFilled />
+            </span>
+          )}
+        </Space>
+      ),
     });
   }
 
