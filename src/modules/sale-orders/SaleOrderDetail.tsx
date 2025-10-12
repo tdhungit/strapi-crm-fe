@@ -15,7 +15,12 @@ import {
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { breadcrumbItemRender, getMediaUrl } from '../../helpers/views_helper';
+import {
+  breadcrumbItemRender,
+  dateDisplay,
+  datetimeDisplay,
+  getMediaUrl,
+} from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 
 const { Title, Text } = Typography;
@@ -41,6 +46,7 @@ export default function SaleOrderDetail() {
           'contact',
           'warehouse',
           'so_shipping.shipping_method',
+          'payments.method',
           'assigned_user',
         ],
       })
@@ -56,6 +62,18 @@ export default function SaleOrderDetail() {
       Confirmed: 'green',
       Shipped: 'purple',
       Delivered: 'success',
+      Cancelled: 'red',
+      Draft: 'default',
+    };
+    return colors[status] || 'default';
+  };
+
+  const getPaymentStatusColor = (status: string) => {
+    const colors: { [key: string]: string } = {
+      Completed: 'green',
+      Pending: 'orange',
+      Failed: 'red',
+      Refunded: 'purple',
       Cancelled: 'red',
     };
     return colors[status] || 'default';
@@ -450,6 +468,91 @@ export default function SaleOrderDetail() {
                   </Descriptions>
                 </Col>
               </Row>
+            </Card>
+          )}
+
+          {/* Payment Information */}
+          {so.payments && so.payments.length > 0 && (
+            <Card title='Payment Information' style={{ marginTop: 8 }}>
+              <div className='space-y-6'>
+                {so.payments.map((payment: any, index: number) => (
+                  <div key={payment.id}>
+                    {index > 0 && <Divider />}
+                    <Row gutter={24}>
+                      <Col span={8}>
+                        <Descriptions
+                          title={dateDisplay(payment.payment_date)}
+                          column={1}
+                        >
+                          <Descriptions.Item label='Payment Status'>
+                            <Tag
+                              color={getPaymentStatusColor(
+                                payment.payment_status
+                              )}
+                            >
+                              {payment.payment_status}
+                            </Tag>
+                          </Descriptions.Item>
+                          <Descriptions.Item label='Payment Method'>
+                            <Text strong>{payment.payment_method}</Text>
+                          </Descriptions.Item>
+                          <Descriptions.Item label='Transaction ID'>
+                            <Text copyable>{payment.transaction_id}</Text>
+                          </Descriptions.Item>
+                          <Descriptions.Item label='Payment Date'>
+                            {dateDisplay(payment.payment_date)}
+                          </Descriptions.Item>
+                        </Descriptions>
+                      </Col>
+                      <Col span={8}>
+                        <Descriptions title='Method Details' column={1}>
+                          <Descriptions.Item label='Method Name'>
+                            <Text strong>{payment.method?.name}</Text>
+                          </Descriptions.Item>
+                          <Descriptions.Item label='Description'>
+                            {payment.method?.description}
+                          </Descriptions.Item>
+                          <Descriptions.Item label='Enabled'>
+                            <Tag
+                              color={payment.method?.enabled ? 'green' : 'red'}
+                            >
+                              {payment.method?.enabled ? 'Yes' : 'No'}
+                            </Tag>
+                          </Descriptions.Item>
+                          <Descriptions.Item label='Sandbox Mode'>
+                            <Tag
+                              color={
+                                payment.method?.options?.sandbox
+                                  ? 'orange'
+                                  : 'blue'
+                              }
+                            >
+                              {payment.method?.options?.sandbox
+                                ? 'Sandbox'
+                                : 'Live'}
+                            </Tag>
+                          </Descriptions.Item>
+                        </Descriptions>
+                      </Col>
+                      <Col span={8}>
+                        <Descriptions title='Payment Amount' column={1}>
+                          <Descriptions.Item label='Amount'>
+                            <Text strong className='text-lg text-green-600'>
+                              {formatCurrency(payment.amount)}
+                            </Text>
+                          </Descriptions.Item>
+                          <Descriptions.Item label='Created At'>
+                            {datetimeDisplay(payment.createdAt)}
+                          </Descriptions.Item>
+                          <Descriptions.Item label='Updated At'>
+                            {datetimeDisplay(payment.updatedAt)}
+                          </Descriptions.Item>
+                        </Descriptions>
+                      </Col>
+                    </Row>
+                  </div>
+                ))}
+              </div>
             </Card>
           )}
 
