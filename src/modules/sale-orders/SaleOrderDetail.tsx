@@ -40,6 +40,7 @@ export default function SaleOrderDetail() {
           'account',
           'contact',
           'warehouse',
+          'so_shipping.shipping_method',
           'assigned_user',
         ],
       })
@@ -263,7 +264,7 @@ export default function SaleOrderDetail() {
           </>
         }
       >
-        <div className='space-y-6'>
+        <div className=''>
           {/* Header Information */}
           <Card>
             <Row gutter={24}>
@@ -362,7 +363,7 @@ export default function SaleOrderDetail() {
           </Card>
 
           {/* Items Table */}
-          <Card title='Sale Order Items'>
+          <Card title='Sale Order Items' style={{ marginTop: 8 }}>
             <Table
               columns={columns}
               dataSource={so.sale_order_details}
@@ -372,8 +373,88 @@ export default function SaleOrderDetail() {
             />
           </Card>
 
+          {/* Shipping Information */}
+          {so.so_shipping && (
+            <Card title='Shipping Information' style={{ marginTop: 8 }}>
+              <Row gutter={24}>
+                <Col span={8}>
+                  <Descriptions title='Shipping Details' column={1}>
+                    <Descriptions.Item label='Shipping Status'>
+                      <Tag
+                        color={getStatusColor(so.so_shipping.shipping_status)}
+                      >
+                        {so.so_shipping.shipping_status}
+                      </Tag>
+                    </Descriptions.Item>
+                    <Descriptions.Item label='Shipping Method'>
+                      <Text strong>{so.so_shipping.shipping_method?.name}</Text>
+                    </Descriptions.Item>
+                    <Descriptions.Item label='Method Description'>
+                      {so.so_shipping.shipping_method?.description}
+                    </Descriptions.Item>
+                    <Descriptions.Item label='Enabled'>
+                      <Tag
+                        color={
+                          so.so_shipping.shipping_method?.enabled
+                            ? 'green'
+                            : 'red'
+                        }
+                      >
+                        {so.so_shipping.shipping_method?.enabled ? 'Yes' : 'No'}
+                      </Tag>
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Col>
+                <Col span={8}>
+                  <Descriptions title='Shipping Timeline' column={1}>
+                    <Descriptions.Item label='Date From'>
+                      {so.so_shipping.date_from
+                        ? new Date(
+                            so.so_shipping.date_from
+                          ).toLocaleDateString()
+                        : 'Not set'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label='Date To'>
+                      {so.so_shipping.date_to
+                        ? new Date(so.so_shipping.date_to).toLocaleDateString()
+                        : 'Not set'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label='Created'>
+                      {new Date(so.so_shipping.createdAt).toLocaleDateString()}
+                    </Descriptions.Item>
+                    <Descriptions.Item label='Last Updated'>
+                      {new Date(so.so_shipping.updatedAt).toLocaleDateString()}
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Col>
+                <Col span={8}>
+                  <Descriptions title='Shipping Costs' column={1}>
+                    <Descriptions.Item label='Shipping Subtotal'>
+                      <Text>
+                        {formatCurrency(so.so_shipping.shipping_subtotal || 0)}
+                      </Text>
+                    </Descriptions.Item>
+                    <Descriptions.Item label='Shipping Discount'>
+                      <Text>
+                        -{formatCurrency(so.so_shipping.shipping_discount || 0)}
+                      </Text>
+                    </Descriptions.Item>
+                    <Descriptions.Item label='Shipping Amount'>
+                      <Text strong className='text-blue-600'>
+                        {formatCurrency(so.so_shipping.shipping_amount || 0)}
+                      </Text>
+                    </Descriptions.Item>
+                    <Descriptions.Item label='Transaction ID'>
+                      {so.so_shipping.transaction_id || 'N/A'}
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Col>
+              </Row>
+            </Card>
+          )}
+
           {/* Totals Summary */}
-          <Card>
+          <Card style={{ marginTop: 8 }}>
             <Row gutter={24}>
               <Col span={16}>
                 {/* Left side can be used for notes or additional info */}
@@ -394,6 +475,14 @@ export default function SaleOrderDetail() {
                       <Text>Tax:</Text>
                       <Text>+{formatCurrency(so.tax_amount || 0)}</Text>
                     </div>
+                    {so.so_shipping && (
+                      <div className='flex justify-between'>
+                        <Text>Shipping:</Text>
+                        <Text>
+                          +{formatCurrency(so.so_shipping.shipping_amount || 0)}
+                        </Text>
+                      </div>
+                    )}
                     <Divider style={{ margin: '8px 0' }} />
                     <div className='flex justify-between'>
                       <Text strong className='text-lg'>

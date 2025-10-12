@@ -284,7 +284,7 @@ export default function PurchaseOrderDetail() {
           </Card>
 
           {/* Items Table */}
-          <Card title='Purchase Order Items'>
+          <Card title='Purchase Order Items' style={{ marginTop: 8 }}>
             <Table
               columns={columns}
               dataSource={po.purchase_order_details}
@@ -295,7 +295,7 @@ export default function PurchaseOrderDetail() {
           </Card>
 
           {/* Totals Summary */}
-          <Card>
+          <Card style={{ marginTop: 8 }}>
             <Row gutter={24}>
               <Col span={16}>
                 {/* Left side can be used for notes or additional info */}
