@@ -1,4 +1,9 @@
-import { CheckOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
+import {
+  CheckOutlined,
+  CloseOutlined,
+  DollarOutlined,
+  EditOutlined,
+} from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import {
   App,
@@ -22,6 +27,7 @@ import {
   getMediaUrl,
 } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
+import PaymentFormModal from './components/PaymentFormModal';
 
 const { Title, Text } = Typography;
 
@@ -32,6 +38,7 @@ export default function SaleOrderDetail() {
 
   const [so, setSo] = useState<any>(null);
   const [refresh, setRefresh] = useState(0);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -229,14 +236,25 @@ export default function SaleOrderDetail() {
           <>
             {(so?.order_status === 'New' || so?.order_status === 'Pending') && (
               <>
-                <Button
-                  variant='solid'
-                  color='green'
-                  icon={<CheckOutlined />}
-                  onClick={() => changeStatus('Approved')}
-                >
-                  Approved
-                </Button>
+                {so?.payments?.length > 0 ? (
+                  <Button
+                    variant='solid'
+                    color='green'
+                    icon={<CheckOutlined />}
+                    onClick={() => changeStatus('Approved')}
+                  >
+                    Approved
+                  </Button>
+                ) : (
+                  <Button
+                    variant='solid'
+                    color='green'
+                    icon={<DollarOutlined />}
+                    onClick={() => setPaymentModalOpen(true)}
+                  >
+                    Add Payment
+                  </Button>
+                )}
                 <Button
                   variant='solid'
                   color='red'
@@ -602,6 +620,12 @@ export default function SaleOrderDetail() {
           </Card>
         </div>
       </PageContainer>
+      <PaymentFormModal
+        open={paymentModalOpen}
+        openChange={setPaymentModalOpen}
+        order={so}
+        onFinish={() => setRefresh((r) => r + 1)}
+      />
     </>
   );
 }
