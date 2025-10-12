@@ -2,6 +2,7 @@ import {
   EditOutlined,
   EyeOutlined,
   FileExcelOutlined,
+  GiftOutlined,
   PlusCircleFilled,
 } from '@ant-design/icons';
 import { App, Button } from 'antd';
@@ -16,6 +17,13 @@ export default function SaleOrderList() {
   return (
     <CollectionListComponent
       module='sale-orders'
+      extra={[
+        <Link to='/collections/coupons' className='inline-block' key='coupons'>
+          <Button variant='solid' color='primary'>
+            <GiftOutlined /> Coupons
+          </Button>
+        </Link>,
+      ]}
       toolBarRender={[
         <Button
           key='create'

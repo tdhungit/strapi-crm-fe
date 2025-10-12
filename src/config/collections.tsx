@@ -17,4 +17,5 @@ export const availableCollections = [
   'invoices',
   'payments',
   'product-categories',
+  'coupons',
 ];

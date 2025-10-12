@@ -185,7 +185,7 @@ export default function ManyToManyPanel({
               span: 12,
             }}
             request={async (params, sort) => {
-              const apiModule = relateModule.replace(/-/g, '_');
+              const apiModule = relateModule.replace(/_/g, '-');
               try {
                 const res = await CollectionService.getTableRequest(
                   apiModule,
