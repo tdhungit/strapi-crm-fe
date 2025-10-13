@@ -19,7 +19,7 @@ import {
   Typography,
 } from 'antd';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   breadcrumbItemRender,
   dateDisplay,
@@ -54,6 +54,7 @@ export default function SaleOrderDetail() {
           'warehouse',
           'so_shipping.shipping_method',
           'payments.method',
+          'invoices',
           'assigned_user',
         ],
       })
@@ -314,16 +315,21 @@ export default function SaleOrderDetail() {
                   <Descriptions.Item label='Sale Date'>
                     {new Date(so.sale_date).toLocaleDateString()}
                   </Descriptions.Item>
-                  <Descriptions.Item label='Status'>
-                    <Tag color={getStatusColor(so.order_status)}>
-                      {so.order_status}
-                    </Tag>
-                  </Descriptions.Item>
                   <Descriptions.Item label='Warehouse'>
                     {so.warehouse?.name}
                   </Descriptions.Item>
                   <Descriptions.Item label='Assigned User'>
                     {so.assigned_user?.username}
+                  </Descriptions.Item>
+                  <Descriptions.Item label='Invoices'>
+                    {so.invoices?.map((invoice: any) => (
+                      <Link
+                        key={'invoice-' + invoice.id}
+                        to={`/collections/invoices/detail/${invoice.documentId}`}
+                      >
+                        {invoice.invoice_number}
+                      </Link>
+                    ))}
                   </Descriptions.Item>
                 </Descriptions>
               </Col>
