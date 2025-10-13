@@ -491,3 +491,10 @@ export function timeDisplay(date: string) {
 export function datetimeDisplay(date: string) {
   return dayjs(date).format('YYYY-MM-DD HH:mm');
 }
+
+export function formatCurrency(value: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(value);
+}

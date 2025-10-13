@@ -6,6 +6,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   optimizeDeps: {
+    include: ['html2pdf.js'],
     exclude: ['grapesjs'],
   },
   define: {

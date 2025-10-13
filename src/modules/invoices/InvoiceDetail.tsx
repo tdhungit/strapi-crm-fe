@@ -14,9 +14,13 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import { useEffect, useState } from 'react';
+import html2pdf from 'html2pdf.js';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { breadcrumbItemRender } from '../../helpers/views_helper';
+import {
+  breadcrumbItemRender,
+  formatCurrency,
+} from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 
 const { Title, Text } = Typography;
@@ -24,8 +28,10 @@ const { Title, Text } = Typography;
 export default function InvoiceDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const contentHtmlRef = useRef<HTMLDivElement>(null);
 
   const [invoice, setInvoice] = useState<any>(null);
+  const [invoiceHtml, setInvoiceHtml] = useState<string>('');
 
   useEffect(() => {
     if (!id) return;
@@ -65,10 +71,37 @@ export default function InvoiceDetail() {
     return colors[status] || 'default';
   };
 
-  const formatCurrency = (amount: number) => {
-    return amount
-      ? `$${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
-      : '$0.00';
+  const generateInvoiceHtml = async () => {
+    return await ApiService.request('GET', `/invoices/${id}/html`);
+  };
+
+  const handlePrint = async () => {
+    const html = await generateInvoiceHtml();
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
+  const handleDownloadPDF = async () => {
+    const html = await generateInvoiceHtml();
+    setInvoiceHtml(html);
+
+    setTimeout(() => {
+      const element = contentHtmlRef.current;
+      if (!element) return;
+
+      const opt: any = {
+        margin: 10,
+        filename: invoice.invoice_number + '.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }, 1000);
   };
 
   if (!invoice) {
@@ -116,10 +149,15 @@ export default function InvoiceDetail() {
         >
           View Sale Order
         </Button>,
-        <Button key='print' icon={<PrinterOutlined />}>
+        <Button key='print' icon={<PrinterOutlined />} onClick={handlePrint}>
           Print
         </Button>,
-        <Button key='download' type='primary' icon={<DownloadOutlined />}>
+        <Button
+          key='download'
+          type='primary'
+          icon={<DownloadOutlined />}
+          onClick={handleDownloadPDF}
+        >
           Download PDF
         </Button>,
       ]}
@@ -276,7 +314,7 @@ export default function InvoiceDetail() {
         )}
 
         {/* Invoice Summary */}
-        <Card style={{ marginTop: 16 }}>
+        <Card style={{ marginTop: 8 }}>
           <Row gutter={24}>
             <Col span={16}>{/* Left side for additional info if needed */}</Col>
             <Col span={8}>
@@ -355,6 +393,13 @@ export default function InvoiceDetail() {
             </Col>
           </Row>
         </Card>
+      </div>
+
+      <div style={{ display: 'none' }}>
+        <div
+          ref={contentHtmlRef}
+          dangerouslySetInnerHTML={{ __html: invoiceHtml || '' }}
+        />
       </div>
     </PageContainer>
   );
