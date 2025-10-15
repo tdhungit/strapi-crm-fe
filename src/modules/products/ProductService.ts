@@ -13,6 +13,12 @@ interface ProductFormVariantType {
   variant_status?: string;
   photos?: string[];
   attributes: ProductFormAttributeType[];
+  sale_price_type?: string;
+  sale_before_price?: number;
+  sale_price?: number;
+  cost_price_type?: string;
+  cost_price?: number;
+  cost_before_price?: number;
 }
 
 export interface ProductFormType {
@@ -93,6 +99,12 @@ class ProductService {
             variant_status: variant.variant_status,
             photos: variant.photos,
             product_variant_attributes: [],
+            sale_price_type: variant.sale_price_type,
+            sale_before_price: variant.sale_before_price,
+            sale_price: variant.sale_price,
+            cost_price_type: variant.cost_price_type,
+            cost_before_price: variant.cost_before_price,
+            cost_price: variant.cost_price,
           };
 
           if (variant.attributes && variant.attributes.length > 0) {

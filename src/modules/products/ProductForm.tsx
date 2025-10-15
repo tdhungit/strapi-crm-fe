@@ -1,6 +1,7 @@
 import {
   PageContainer,
   ProForm,
+  ProFormDigit,
   ProFormList,
   ProFormSelect,
   ProFormText,
@@ -294,6 +295,62 @@ export default function ProductForm() {
                       />
                     </Col>
                   </Row>
+
+                  {/* Add price if create new product */}
+                  {!id && (
+                    <>
+                      <Row gutter={16}>
+                        <Col span={4}>
+                          <ProFormText
+                            name='sale_price_type'
+                            label={false}
+                            initialValue='Sale'
+                            readonly
+                          />
+                        </Col>
+                        <Col span={10}>
+                          <ProFormDigit
+                            name='sale_before_price'
+                            label={false}
+                            placeholder='Before Price'
+                          />
+                        </Col>
+                        <Col span={10}>
+                          <ProFormDigit
+                            name='sale_price'
+                            label={false}
+                            placeholder='Price'
+                            rules={[{ required: true }]}
+                          />
+                        </Col>
+                      </Row>
+                      <Row gutter={16}>
+                        <Col span={4}>
+                          <ProFormText
+                            name='cost_price_type'
+                            label={false}
+                            initialValue='Cost'
+                            readonly
+                          />
+                        </Col>
+                        <Col span={10}>
+                          <ProFormDigit
+                            name='cost_before_price'
+                            label={false}
+                            placeholder='Before Price'
+                          />
+                        </Col>
+                        <Col span={10}>
+                          <ProFormDigit
+                            name='cost_price'
+                            label={false}
+                            placeholder='Price'
+                            rules={[{ required: true }]}
+                          />
+                        </Col>
+                      </Row>
+                    </>
+                  )}
 
                   <ProForm.Item name='photos' label='Photos'>
                     <MediaChoose />
