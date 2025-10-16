@@ -1,9 +1,16 @@
-import { EditOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Alert, Tree } from 'antd';
+import {
+  EditOutlined,
+  PlusCircleOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-components';
+import { Alert, Space, Tree } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
+import CollectionFormModal from '../collections/components/CollectionFormModal';
 import './ProductCategoryTree.css';
 
 interface ProductCategoryType {
@@ -21,6 +28,10 @@ export default function ProductCategoryTree() {
   const [tree, setTree] = useState<ProductCategoryType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [openCreate, setOpenCreate] = useState(false);
+  const [selectedCategory, setSelectedCategory] =
+    useState<ProductCategoryType | null>(null);
+
   const navigate = useNavigate();
 
   const fetchTreeData = async () => {
@@ -58,13 +69,23 @@ export default function ProductCategoryTree() {
         <div className='category-node'>
           <div className='category-header'>
             <div className='category-name'>{category.name}</div>
-            <EditOutlined
-              className='edit-icon'
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEdit(category.documentId);
-              }}
-            />
+            <Space>
+              <PlusCircleOutlined
+                className='edit-icon'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedCategory(category);
+                  setOpenCreate(true);
+                }}
+              />
+              <EditOutlined
+                className='edit-icon'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEdit(category.documentId);
+                }}
+              />
+            </Space>
           </div>
           <div className='category-details'>
             <span className='category-slug'>Slug: {category.slug}</span>
@@ -91,17 +112,37 @@ export default function ProductCategoryTree() {
   const treeData = convertToTreeData(tree);
 
   return (
-    <div className='p-4'>
-      <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-xl font-bold'>Product Category Tree</h2>
-        <div className='flex items-center gap-4'>
-          <ReloadOutlined
-            className='cursor-pointer text-blue-500 hover:text-blue-700'
-            onClick={fetchTreeData}
-          />
-        </div>
-      </div>
-
+    <PageContainer
+      header={{
+        title: 'Product Categories',
+        breadcrumb: {
+          items: [
+            {
+              title: 'Home',
+              href: '/home',
+            },
+            {
+              title: 'Products',
+              href: '/collections/products',
+            },
+            {
+              title: 'Categories',
+              href: '/collections/product-categories',
+            },
+            {
+              title: 'Tree',
+            },
+          ],
+          itemRender: breadcrumbItemRender,
+        },
+      }}
+      extra={[
+        <ReloadOutlined
+          className='cursor-pointer text-blue-500 hover:text-blue-700'
+          onClick={fetchTreeData}
+        />,
+      ]}
+    >
       {error && (
         <Alert message={error} type='warning' showIcon className='mb-4' />
       )}
@@ -120,6 +161,23 @@ export default function ProductCategoryTree() {
       ) : (
         <p>No categories found.</p>
       )}
-    </div>
+
+      <CollectionFormModal
+        module='product-categories'
+        open={openCreate}
+        onOpenChange={setOpenCreate}
+        onFinish={() => {
+          fetchTreeData();
+          setSelectedCategory(null);
+          setOpenCreate(false);
+        }}
+        initData={{
+          parent: {
+            value: selectedCategory?.id,
+            label: selectedCategory?.name,
+          },
+        }}
+      />
+    </PageContainer>
   );
 }

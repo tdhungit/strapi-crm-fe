@@ -19,6 +19,7 @@ export default function CollectionFormModal({
   onOpenChange,
   onFinish,
   defaultConfig,
+  initData,
 }: {
   module?: string;
   collectionName?: string;
@@ -30,6 +31,7 @@ export default function CollectionFormModal({
   defaultConfig?: any;
   onOpenChange?: (open: boolean) => void;
   onFinish?: (values: any) => void;
+  initData?: any;
 }) {
   const { message, notification } = App.useApp();
   const [form] = Form.useForm();
@@ -73,6 +75,12 @@ export default function CollectionFormModal({
         });
     }
   }, [id, form, collectionName]);
+
+  useEffect(() => {
+    if (form && initData) {
+      form.setFieldsValue(initData);
+    }
+  }, [initData, form]);
 
   useEffect(() => {
     if (parentCollectionName && relateField?.mappedBy && parentRecord?.id) {
