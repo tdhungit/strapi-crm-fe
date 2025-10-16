@@ -1,5 +1,6 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { App, Button, Form } from 'antd';
+import { App, Button, Form, type BreadcrumbProps } from 'antd';
+import type { AnyObject } from 'antd/es/_util/type';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageLoading from '../../../components/PageLoading';
@@ -16,10 +17,12 @@ export default function CollectionFormComponent({
   module,
   id,
   onValuesChange,
+  breadcrumb,
 }: {
   module: string;
   id?: string;
   onValuesChange?: (changedValues: any, allValues: any) => void;
+  breadcrumb?: Partial<BreadcrumbProps<AnyObject>> | any;
   [key: string]: any;
 }) {
   const { message, notification } = App.useApp();
@@ -95,7 +98,7 @@ export default function CollectionFormComponent({
         title: id
           ? `Edit ${camelToTitle(module)}`
           : `Create ${camelToTitle(module)}`,
-        breadcrumb: {
+        breadcrumb: breadcrumb || {
           items: [
             {
               title: 'Home',

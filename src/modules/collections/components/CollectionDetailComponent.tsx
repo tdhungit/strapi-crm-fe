@@ -1,6 +1,7 @@
 import { EditFilled } from '@ant-design/icons';
 import { PageContainer, ProDescriptions } from '@ant-design/pro-components';
-import { Button } from 'antd';
+import { Button, type BreadcrumbProps } from 'antd';
+import type { AnyObject } from 'antd/lib/_util/type';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageError from '../../../components/PageError';
@@ -31,6 +32,7 @@ export default function CollectionDetailComponent({
   refresh,
   loaded,
   panelConfigs,
+  breadcrumb,
 }: {
   module: string;
   id: string;
@@ -41,6 +43,7 @@ export default function CollectionDetailComponent({
   refresh?: number;
   loaded?: (record: any) => void;
   panelConfigs?: PanelConfigType[];
+  breadcrumb?: Partial<BreadcrumbProps<AnyObject>> | any;
   [key: string]: any;
 }) {
   const [config, setConfig] = useState<CollectionConfigType>();
@@ -123,7 +126,7 @@ export default function CollectionDetailComponent({
         title: config?.settings?.mainField
           ? record?.data[config.settings.mainField]
           : `${module?.toUpperCase()}`,
-        breadcrumb: {
+        breadcrumb: breadcrumb || {
           items: [
             {
               title: 'Home',
