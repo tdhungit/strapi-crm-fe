@@ -1,0 +1,64 @@
+.custom-tree .ant-tree-treenode {
+  padding-bottom: 8px;
+}
+
+.category-node {
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.category-node:hover {
+  background-color: #f5f5f5;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.category-name {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.edit-icon {
+  color: #1890ff;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.edit-icon:hover {
+  background-color: #e6f7ff;
+  color: #40a9ff;
+}
+
+.category-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.category-slug,
+.category-description {
+  color: #666;
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.category-description {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ant-tree-switcher {
+  align-self: flex-start;
+  margin-top: 10px;
+}

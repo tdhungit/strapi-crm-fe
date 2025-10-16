@@ -37,6 +37,7 @@ export default function CollectionListComponent({
   header,
   extra,
   toolBarRender,
+  toolBarRenderExtra,
   recordActionRender,
   hasProfile,
   noEdit,
@@ -52,6 +53,7 @@ export default function CollectionListComponent({
       };
   extra?: React.ReactNode[];
   toolBarRender?: boolean | React.ReactNode[];
+  toolBarRenderExtra?: React.ReactNode[];
   recordActionRender?: (dom: React.ReactNode, record: any) => React.ReactNode;
   hasProfile?: boolean;
   noEdit?: boolean;
@@ -259,6 +261,15 @@ export default function CollectionListComponent({
         <FileExcelOutlined /> Export
       </Button>,
     ];
+  }
+
+  if (
+    toolBars &&
+    toolBars.length > 0 &&
+    toolBarRenderExtra &&
+    toolBarRenderExtra.length > 0
+  ) {
+    toolBars = [...toolBars, ...toolBarRenderExtra];
   }
 
   const DrawerComponent = drawerComponent || CollectionDetailDrawer;

@@ -1,5 +1,6 @@
 import {
   AppstoreOutlined,
+  ClusterOutlined,
   FundViewOutlined,
   TagOutlined,
 } from '@ant-design/icons';
@@ -61,6 +62,16 @@ export default function ProductCategoryList() {
         </Button>,
       ]}
       drawerComponent={ProductCategoryDrawer}
+      toolBarRenderExtra={[
+        <Button
+          variant='solid'
+          color='blue'
+          key='tree'
+          onClick={() => navigate('/collections/product-categories/tree')}
+        >
+          <ClusterOutlined />
+        </Button>,
+      ]}
     />
   );
 }
