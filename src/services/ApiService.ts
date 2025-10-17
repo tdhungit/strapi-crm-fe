@@ -8,7 +8,9 @@ class ApiService {
 
   private constructor() {
     // Initialize with environment variable or default
-    this.baseUrl = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+    this.baseUrl =
+      import.meta.env.VITE_STRAPI_URL ||
+      'https://github.com/tdhungit/strapi-crm-api';
     this.setToken();
   }
 
