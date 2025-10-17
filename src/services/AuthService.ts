@@ -10,7 +10,10 @@ class AuthService {
   }
 
   async login(values: { identifier: string; password: string }) {
-    const response = await axios.post('http://localhost:1337/api/auth/local', {
+    const apiUrl =
+      import.meta.env.VITE_STRAPI_URL ||
+      'https://github.com/tdhungit/strapi-crm-api';
+    const response = await axios.post(`${apiUrl}/api/auth/local`, {
       identifier: values.identifier,
       password: values.password,
     });
