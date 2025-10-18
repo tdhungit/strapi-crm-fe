@@ -1,12 +1,24 @@
-import { Link } from 'react-router-dom';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
 import CollectionListComponent from '../collections/components/CollectionListComponent';
 import InventoryDrawer from './components/InventoryDrawer';
 
 export default function InventoryList() {
+  const navigate = useNavigate();
+
   return (
     <CollectionListComponent
       module='inventories'
-      toolBarRender={[]}
+      toolBarRender={[
+        <Button
+          key='inventory-create'
+          type='primary'
+          onClick={() => navigate('/collections/inventories/create')}
+        >
+          <PlusCircleOutlined /> Create
+        </Button>,
+      ]}
       noEdit
       populate={['product_variant.product']}
       mainField='product_variant'

@@ -1,4 +1,5 @@
 import InventoryDetail from './InventoryDetail';
+import InventoryForm from './InventoryForm';
 import InventoryList from './InventoryList';
 
 const routes = [
@@ -8,11 +9,11 @@ const routes = [
   },
   {
     path: '/collections/inventories/create',
-    element: <InventoryList />,
+    element: <InventoryForm />,
   },
   {
     path: '/collections/inventories/edit/:id',
-    element: <InventoryDetail />,
+    element: <InventoryForm />,
   },
   {
     path: '/collections/inventories/detail/:id',

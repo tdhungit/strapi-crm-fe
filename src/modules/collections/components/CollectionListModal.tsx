@@ -38,6 +38,7 @@ export default function CollectionListModal({
   const [config, setConfig] = useState<any>({});
   const [columns, setColumns] = useState<any>([]);
   const [selectedIds, setSelectedIds] = useState<any>([]);
+  const [selectedRecords, setSelectedRecords] = useState<any[]>([]);
 
   const onSelectRecord = (record: any) => {
     onFinish?.(record, {
@@ -55,13 +56,14 @@ export default function CollectionListModal({
   };
 
   const handleFinish = () => {
-    onFinish?.(selectedIds, {
+    onFinish?.(selectedRecords, {
       parentCollectionName: parentCollectionName,
       parentRecord: parentRecord,
       relateField: relateField,
       multiple: true,
     });
     setSelectedIds([]);
+    setSelectedRecords([]);
     onOpenChange(false);
   };
 
@@ -162,8 +164,9 @@ export default function CollectionListModal({
                 // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
                 selectedRowKeys: selectedIds,
                 preserveSelectedRowKeys: true,
-                onChange: (selectedRowKeys: any) => {
+                onChange: (selectedRowKeys: any, selectedRows: any[]) => {
                   setSelectedIds(selectedRowKeys);
+                  setSelectedRecords(selectedRows);
                 },
               }
         }
