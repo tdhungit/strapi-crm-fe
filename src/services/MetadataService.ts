@@ -32,7 +32,10 @@ class MetadataService {
 
   getContentTypeByModule(module: string): ContentTypeType | undefined {
     const contentTypes = this.getSavedContentTypes();
-    return contentTypes.find((item: any) => item.collectionName === module);
+    return contentTypes.find(
+      (item: any) =>
+        item.collectionName.toLocaleLowerCase() === module.toLocaleLowerCase()
+    );
   }
 
   getContentTypeByUid(uid: string) {

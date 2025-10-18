@@ -78,3 +78,8 @@
 .ant-picker.ant-picker-outlined {
   width: 100%;
 }
+
+.gjs-rte-action {
+  width: auto !important;
+  min-width: 25px !important;
+}

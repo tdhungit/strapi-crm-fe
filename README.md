@@ -20,6 +20,8 @@
 
 ![Kanbans](./docs/screenshots/kanban.png)
 
+![POS](./docs/screenshots/pos.png)
+
 ### Installation Backend
 
 #### npm

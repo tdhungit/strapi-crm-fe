@@ -1,10 +1,17 @@
 import GjsEditor, { Canvas, TraitsProvider } from '@grapesjs/react';
+import { App } from 'antd';
 import type { Editor, EditorConfig } from 'grapesjs';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import MediaManagerModal from '../../components/MediaManagerModal';
+import { camelToTitle } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
-import { addEditorBlocks, addEditorTraits } from './components/builders/common';
+import MetadataService from '../../services/MetadataService';
+import {
+  addEditorBlocks,
+  addEditorTraits,
+  getEditorHtml,
+} from './components/builders/common';
 import CustomTraitManager from './components/builders/CustomTraitManager';
 import RightSidebar from './components/builders/RightSidebar';
 import './components/builders/style.css';
@@ -47,11 +54,13 @@ const gjsOptions: EditorConfig = {
 export default function EmailTemplateBuilder() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { message, notification } = App.useApp();
 
   const [gjsEditor, setGjsEditor] = useState<Editor | null>(null);
   const [openMediaManager, setOpenMediaManager] = useState(false);
   const [openSaveModal, setOpenSaveModal] = useState(false);
   const [data, setData] = useState<any>({});
+  const [values, setValues] = useState<any>({ for_module: 'Accounts' });
 
   const onEditor = (editor: Editor) => {
     (window as any).editor = editor;
@@ -80,8 +89,50 @@ export default function EmailTemplateBuilder() {
     }
   };
 
+  const getModuleFields = (module: string) => {
+    const contentType = MetadataService.getContentTypeByModule(module);
+    if (!contentType) {
+      return [];
+    }
+    return MetadataService.getContentTypeListFields(contentType);
+  };
+
+  useEffect(() => {
+    if (gjsEditor && values.for_module) {
+      let options: string = `<option value="">Select Field</option>`;
+
+      const fields = getModuleFields(values.for_module);
+      if (fields && fields.length > 0) {
+        fields.forEach((field: any) => {
+          options += `<option value="${field.name}">${
+            field.label || camelToTitle(field.name)
+          }</option>`;
+        });
+      }
+
+      // Update rich text editor plugins
+      gjsEditor.RichTextEditor.add('collection-fields', {
+        icon: `
+          <select class="gjs-rte-select" id="rte-collection-fields">
+            ${options}
+          </select>
+        `,
+        event: 'change',
+        result: (rte, action) => {
+          const selected = action.btn?.firstChild?.nextSibling;
+          if (!selected) {
+            return;
+          }
+          const value = (selected as any).value;
+          rte.insertHTML(`<%= record.${value} %>`);
+        },
+      });
+    }
+  }, [values.for_module, gjsEditor]);
+
   useEffect(() => {
     if (id && gjsEditor) {
+      // Load email template content
       ApiService.getClient()
         .collection('email-templates')
         .findOne(id)
@@ -93,6 +144,57 @@ export default function EmailTemplateBuilder() {
         });
     }
   }, [id, gjsEditor]);
+
+  const handleSave = async () => {
+    if (!gjsEditor) {
+      message.error('Please wait...');
+      return;
+    }
+
+    if (!values.title || !values.for_module) {
+      message.error('Please update email template configuration');
+      return;
+    }
+
+    const projectData = await gjsEditor.store();
+    const htmlContent = getEditorHtml(gjsEditor);
+
+    const saveValues: any = { ...values };
+    saveValues.content = htmlContent;
+    saveValues.rawContent = {
+      projectData,
+    };
+
+    message.loading('Saving...', 0);
+    let service: any;
+    if (id) {
+      service = ApiService.getClient()
+        .collection('email-templates')
+        .update(id, saveValues);
+    } else {
+      service = ApiService.getClient()
+        .collection('email-templates')
+        .create(saveValues);
+    }
+
+    service
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Email Template saved successfully',
+        });
+        navigate('/collections/email-templates');
+      })
+      .catch((err: any) => {
+        notification.error({
+          message: 'Error',
+          description: err.data?.message || 'Failed to save Email Template',
+        });
+      })
+      .finally(() => {
+        message.destroy();
+      });
+  };
 
   return (
     <>
@@ -110,8 +212,9 @@ export default function EmailTemplateBuilder() {
           <div className='gjs-column-m flex flex-col flex-grow'>
             <TopBar
               className='min-h-[48px]'
-              onSelectSave={() => setOpenSaveModal(true)}
+              onConfig={() => setOpenSaveModal(true)}
               onCancel={() => navigate('/collections/email-templates')}
+              onSelectSave={handleSave}
             />
             <Canvas className='flex-grow gjs-custom-editor-canvas' />
           </div>
@@ -133,16 +236,9 @@ export default function EmailTemplateBuilder() {
         <EmailTemplateFormModal
           open={openSaveModal}
           onOpenChange={setOpenSaveModal}
-          editor={gjsEditor}
           data={data}
           onFinish={(record) => {
-            if (record?.data?.documentId) {
-              navigate(
-                `/collections/email-templates/detail/${record.data.documentId}`
-              );
-            } else {
-              navigate(`/collections/email-templates`);
-            }
+            setValues(record);
           }}
         />
       )}

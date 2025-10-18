@@ -4,6 +4,7 @@ import {
   DesktopOutlined,
   MobileOutlined,
   SaveOutlined,
+  SettingOutlined,
   TabletOutlined,
 } from '@ant-design/icons';
 import { Button, Radio } from 'antd';
@@ -15,9 +16,11 @@ export default function TopBar({
   className,
   onSelectSave,
   onCancel,
+  onConfig,
 }: React.HTMLAttributes<HTMLDivElement> & {
   onSelectSave: () => void;
   onCancel: () => void;
+  onConfig: () => void;
 }) {
   return (
     <div className={cx('gjs-top-sidebar flex items-center p-1', className)}>
@@ -53,6 +56,12 @@ export default function TopBar({
         <Button type='primary' icon={<SaveOutlined />} onClick={onSelectSave}>
           Save
         </Button>
+        <Button
+          type='default'
+          className='ml-2'
+          icon={<SettingOutlined />}
+          onClick={onConfig}
+        />
         <Button onClick={onCancel} className='ml-2'>
           Cancel
         </Button>
