@@ -26,9 +26,9 @@ export default function InventoryForm() {
     if (id) {
       // Fetch existing inventory data
       ApiService.getClient()
-        .collection('inventories')
+        .collection('inventory-manuals')
         .findOne(id, {
-          populate: ['warehouse', 'details.product_variant'],
+          populate: ['details.product_variant', 'warehouse'],
         })
         .then((res) => {
           const data = {
@@ -124,6 +124,10 @@ export default function InventoryForm() {
             {
               title: 'Inventories',
               href: '/collections/inventories',
+            },
+            {
+              title: 'Manuals',
+              href: `/collections/inventories/manuals`,
             },
             ...(id
               ? [

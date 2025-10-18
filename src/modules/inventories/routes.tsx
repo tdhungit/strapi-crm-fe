@@ -1,6 +1,7 @@
 import InventoryDetail from './InventoryDetail';
 import InventoryForm from './InventoryForm';
 import InventoryList from './InventoryList';
+import InventoryManuals from './InventoryManuals';
 
 const routes = [
   {
@@ -18,6 +19,10 @@ const routes = [
   {
     path: '/collections/inventories/detail/:id',
     element: <InventoryDetail />,
+  },
+  {
+    path: '/collections/inventories/manuals',
+    element: <InventoryManuals />,
   },
 ];
 

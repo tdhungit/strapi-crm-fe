@@ -1,4 +1,4 @@
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { HddOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import CollectionListComponent from '../collections/components/CollectionListComponent';
@@ -15,8 +15,18 @@ export default function InventoryList() {
           key='inventory-create'
           type='primary'
           onClick={() => navigate('/collections/inventories/create')}
+          icon={<PlusCircleOutlined />}
         >
-          <PlusCircleOutlined /> Create
+          Create
+        </Button>,
+        <Button
+          key='inventory-manuals'
+          variant='solid'
+          color='cyan'
+          onClick={() => navigate('/collections/inventories/manuals')}
+          icon={<HddOutlined />}
+        >
+          Manuals
         </Button>,
       ]}
       noEdit
