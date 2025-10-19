@@ -19,7 +19,7 @@ export default function InventoryManuals() {
               href: '/',
             },
             {
-              title: 'Inventory',
+              title: 'Inventories',
               href: '/collections/inventories',
             },
             {
@@ -43,7 +43,7 @@ export default function InventoryManuals() {
         <Space>
           <Link
             key='view'
-            to={`/collections/inventories/detail/${record.documentId}`}
+            to={`/collections/inventories/manuals/detail/${record.documentId}`}
             className='!text-cyan-600'
           >
             <EyeOutlined />

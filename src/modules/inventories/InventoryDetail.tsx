@@ -46,7 +46,7 @@ export default function InventoryDetail() {
                 href: '/',
               },
               {
-                title: 'Inventory',
+                title: 'Inventories',
                 href: '/collections/inventories',
               },
               {

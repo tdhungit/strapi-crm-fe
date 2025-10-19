@@ -2,6 +2,7 @@ import InventoryDetail from './InventoryDetail';
 import InventoryForm from './InventoryForm';
 import InventoryList from './InventoryList';
 import InventoryManuals from './InventoryManuals';
+import InventoryManualDetail from './widgets/InventoryManualDetail';
 
 const routes = [
   {
@@ -23,6 +24,10 @@ const routes = [
   {
     path: '/collections/inventories/manuals',
     element: <InventoryManuals />,
+  },
+  {
+    path: '/collections/inventories/manuals/detail/:id',
+    element: <InventoryManualDetail />,
   },
 ];
 
