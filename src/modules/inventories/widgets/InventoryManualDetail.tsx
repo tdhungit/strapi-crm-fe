@@ -53,7 +53,7 @@ export default function InventoryManualDetail() {
 
     message.loading('Approving...', 0);
     ApiService.request('PUT', `/inventory-manuals/${id}/change-status`, {
-      inventory_status: 'Approved',
+      status: 'Approved',
     })
       .then(() => {
         setRecord((prev: any) => ({
@@ -95,7 +95,7 @@ export default function InventoryManualDetail() {
           )}
           <div>
             <div>
-              {text} (
+              {record.product_variant?.name || text} (
               <Link
                 to={`/collections/products/detail/${record.product_variant?.product.documentId}`}
                 className='text-green-600 italic'
