@@ -42,10 +42,11 @@ export default function MediaInput({
   // Normalize value to array for consistent handling
   const normalizedValue = Array.isArray(value) ? value : value ? [value] : [];
 
-  const handleSelectMedia = (media: MediaFile) => {
+  const handleSelectMedia = (media: MediaFile | MediaFile[]) => {
     if (multiple) {
-      setValue([...normalizedValue, media]);
-      onChange?.([...normalizedValue, media]);
+      const multiValue = Array.isArray(media) ? media : [media];
+      setValue([...normalizedValue, ...multiValue]);
+      onChange?.([...normalizedValue, ...multiValue]);
       return;
     }
 
