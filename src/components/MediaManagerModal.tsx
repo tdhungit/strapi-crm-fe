@@ -2,6 +2,7 @@ import {
   CheckCircleOutlined,
   FileOutlined,
   InfoCircleOutlined,
+  LinkOutlined,
   SelectOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
@@ -12,6 +13,7 @@ import {
   Descriptions,
   Empty,
   Image,
+  Input,
   Modal,
   Pagination,
   Row,
@@ -50,20 +52,24 @@ export default function MediaManagerModal({
   open,
   onOpenChange,
   onSelect,
+  multiple,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelect?: (media: MediaItem) => void;
+  onSelect?: (media: MediaItem | MediaItem[]) => void;
+  multiple?: boolean;
 }) {
   const [medias, setMedias] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
+  const [selectedMediaList, setSelectedMediaList] = useState<MediaItem[]>([]);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 12,
     total: 0,
   });
+  const [externalUrl, setExternalUrl] = useState('');
 
   const formatSize = (bytes: number) => {
     if (bytes === 0) return '0 B';
@@ -108,10 +114,11 @@ export default function MediaManagerModal({
     setDrawerVisible(true);
   };
 
-  const handleSelectMedia = (media: MediaItem) => {
+  const handleSelectMedia = (media: MediaItem | MediaItem[]) => {
     if (onSelect) {
       onSelect(media);
       setSelectedMedia(null);
+      setSelectedMediaList([]);
       onOpenChange(false);
     }
   };
@@ -139,6 +146,60 @@ export default function MediaManagerModal({
     }
   };
 
+  const toggleMediaSelection = (media: MediaItem) => {
+    if (multiple) {
+      // For multiple selection
+      const isSelected = selectedMediaList.some((item) => item.id === media.id);
+      if (isSelected) {
+        // Remove from selection
+        setSelectedMediaList(
+          selectedMediaList.filter((item) => item.id !== media.id)
+        );
+      } else {
+        // Add to selection
+        setSelectedMediaList([...selectedMediaList, media]);
+      }
+    } else {
+      // For single selection
+      setSelectedMedia(media);
+    }
+  };
+
+  const handleDoubleClickSelect = (media: MediaItem) => {
+    if (!multiple) {
+      // In single mode, double click selects the media directly
+      handleSelectMedia(media);
+    }
+  };
+
+  const handleAddExternalMedia = () => {
+    if (!externalUrl) {
+      message.error('Please enter a valid URL');
+      return;
+    }
+
+    try {
+      // Create a mock media item for the external URL
+      const externalMedia: MediaItem = {
+        id: Date.now(), // Use timestamp as unique ID
+        name: externalUrl.split('/').pop() || 'External Media',
+        url: externalUrl,
+        mime: 'image/jpeg', // Default to image, could be improved
+        size: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Select the external media
+      handleSelectMedia(externalMedia);
+      setExternalUrl('');
+    } catch (error) {
+      message.error(
+        'Failed to add external media: ' + (error as Error).message
+      );
+    }
+  };
+
   useEffect(() => {
     if (open) {
       fetchMedias();
@@ -149,16 +210,42 @@ export default function MediaManagerModal({
     const isImage = media.mime?.startsWith('image/');
     const mediaUrl = import.meta.env.VITE_MEDIA_URL + media.url;
 
+    // Check if media is selected (for both single and multiple modes)
+    const isSelected = multiple
+      ? selectedMediaList.some((item) => item.id === media.id)
+      : selectedMedia?.id === media.id;
+
     return (
       <Col xs={12} sm={8} md={6} lg={4} key={media.id}>
         <Card
           size='small'
           hoverable
-          style={{ marginBottom: 16, cursor: 'pointer' }}
+          style={{
+            marginBottom: 16,
+            cursor: 'pointer',
+            border: isSelected ? '2px solid #1890ff' : '1px solid #f0f0f0',
+          }}
+          onClick={() => {
+            if (multiple) {
+              toggleMediaSelection(media);
+            } else {
+              handleMediaInfo(media);
+            }
+          }}
+          onDoubleClick={() => handleDoubleClickSelect(media)}
           cover={
             <div
               style={{ height: 120, overflow: 'hidden', position: 'relative' }}
-              onClick={() => handleMediaInfo(media)}
+              onClick={(e) => {
+                if (!multiple) {
+                  e.stopPropagation();
+                  handleMediaInfo(media);
+                }
+              }}
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                handleDoubleClickSelect(media);
+              }}
             >
               {isImage ? (
                 <Image
@@ -203,8 +290,10 @@ export default function MediaManagerModal({
                   justifyContent: 'center',
                 }}
               >
-                {selectedMedia?.id === media.id ? (
-                  <CheckCircleOutlined style={{ color: 'green' }} />
+                {isSelected ? (
+                  <CheckCircleOutlined
+                    style={{ color: 'green', fontSize: '18px' }}
+                  />
                 ) : (
                   <InfoCircleOutlined style={{ color: 'blue' }} />
                 )}
@@ -237,14 +326,20 @@ export default function MediaManagerModal({
           key='select'
           type='primary'
           onClick={() => {
-            if (selectedMedia) {
-              handleSelectMedia(selectedMedia);
-              onOpenChange(false);
+            if (multiple) {
+              if (selectedMediaList.length > 0) {
+                handleSelectMedia(selectedMediaList);
+              }
+            } else {
+              if (selectedMedia) {
+                handleSelectMedia(selectedMedia);
+              }
             }
           }}
-          disabled={!selectedMedia}
+          disabled={multiple ? selectedMediaList.length === 0 : !selectedMedia}
         >
-          <SelectOutlined /> Select
+          <SelectOutlined />{' '}
+          {multiple ? `Select (${selectedMediaList.length})` : 'Select'}
         </Button>,
       ]}
       width={1400}
@@ -371,24 +466,29 @@ export default function MediaManagerModal({
                   </Text>
                 </Descriptions.Item>
               </Descriptions>
-
-              {onSelect && (
-                <div style={{ marginTop: 24, textAlign: 'center' }}>
-                  <Button
-                    type='primary'
-                    size='large'
-                    onClick={() => {
-                      handleSelectMedia(selectedMedia);
-                      setDrawerVisible(false);
-                    }}
-                  >
-                    Select This Media
-                  </Button>
-                </div>
-              )}
             </>
           ) : (
             <div>
+              <h3 style={{ margin: '0 0 16px 0' }}>Add External Media</h3>
+
+              <div style={{ marginBottom: 24 }}>
+                <Input
+                  placeholder='https://example.com/image.jpg'
+                  value={externalUrl}
+                  onChange={(e) => setExternalUrl(e.target.value)}
+                  addonBefore={<LinkOutlined />}
+                  style={{ marginBottom: 8 }}
+                />
+                <Button
+                  type='primary'
+                  onClick={handleAddExternalMedia}
+                  disabled={!externalUrl}
+                  block
+                >
+                  Add External Media
+                </Button>
+              </div>
+
               <h3 style={{ margin: '0 0 16px 0' }}>Upload Media</h3>
 
               <Upload.Dragger

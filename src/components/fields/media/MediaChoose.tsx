@@ -50,7 +50,11 @@ export default function MediaChoose({
 
         {value?.length > 0 &&
           value.map((item: any) => (
-            <div className='relative' style={{ width: 80, height: 80 }}>
+            <div
+              key={item.id}
+              className='relative'
+              style={{ width: 80, height: 80 }}
+            >
               <Image
                 key={item.id}
                 src={getUrlMedia(item)}
