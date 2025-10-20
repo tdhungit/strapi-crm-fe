@@ -1,4 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { ForkOutlined, PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Select, Space } from 'antd';
 import { useEffect, useState } from 'react';
@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [openAddDashboardModal, setOpenAddDashboardModal] = useState(false);
   const [dashboards, setDashboards] = useState<any[]>([]);
   const [selectedDashboard, setSelectedDashboard] = useState<any>();
+  const [openAddItem, setOpenAddItem] = useState(false);
 
   const loadDashboards = () => {
     ApiService.getClient()
@@ -68,6 +69,7 @@ export default function Dashboard() {
               value: dashboard.documentId,
               label: dashboard.name,
             }))}
+            onChange={(value) => loadDashboard(value)}
             className='w-32'
           />
           <Button
@@ -76,12 +78,23 @@ export default function Dashboard() {
             size='small'
             onClick={() => setOpenAddDashboardModal(true)}
           />
+          <Button
+            variant='solid'
+            color='green'
+            icon={<ForkOutlined />}
+            size='small'
+            onClick={() => setOpenAddItem(true)}
+          />
         </Space>
       }
     >
       {selectedDashboard && (
         <div className='mt-4'>
-          <DashboardViews dashboard={selectedDashboard} />
+          <DashboardViews
+            dashboard={selectedDashboard}
+            openAddItem={openAddItem}
+            setOpenAddItem={setOpenAddItem}
+          />
         </div>
       )}
 

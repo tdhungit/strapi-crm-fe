@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
+import AddDashboardItemModal from './AddDashboardItemModal';
 
 export default function DashboardViews({
   dashboard: initDashboard,
+  openAddItem,
+  setOpenAddItem,
 }: {
   dashboard: any;
+  openAddItem: boolean;
+  setOpenAddItem: (open: boolean) => void;
 }) {
   const [dashboard, setDashboard] = useState(initDashboard);
 
@@ -11,5 +16,13 @@ export default function DashboardViews({
     setDashboard(initDashboard);
   }, [initDashboard]);
 
-  return <div>{dashboard.name}</div>;
+  return (
+    <>
+      <div className='w-full'>
+        <h3>{dashboard?.name}</h3>
+      </div>
+
+      <AddDashboardItemModal open={openAddItem} openChange={setOpenAddItem} />
+    </>
+  );
 }

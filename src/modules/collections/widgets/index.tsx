@@ -51,3 +51,13 @@ export function getWidgets(moduleName: string): Record<string, React.FC> {
   }
   return moduleWidgets;
 }
+
+export function getAllWidgets(): Record<string, Record<string, React.FC>> {
+  const result: Record<string, Record<string, React.FC>> = {};
+
+  for (const moduleName in widgets) {
+    result[moduleName] = getWidgets(moduleName);
+  }
+
+  return result;
+}
