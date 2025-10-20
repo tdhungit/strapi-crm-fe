@@ -16,12 +16,14 @@ interface ApiResponse {
   data: ChartData[];
 }
 
-export default function ChartCreatedAt({
-  module,
-}: {
+interface Props {
   module: string;
   [key: string]: any;
-}) {
+}
+
+export default function ChartCreatedAt(props: Props) {
+  const { module } = props;
+
   const [chartType, setChartType] = useState<ChartType>('day');
 
   const { data, loading } = useRequest(
@@ -72,7 +74,7 @@ export default function ChartCreatedAt({
   };
 
   return (
-    <Card title='Records Created' size='small'>
+    <Card title={props.title || 'Records Created'} size='small'>
       <div className='mb-4 flex justify-end'>
         <Select
           value={chartType}
@@ -86,7 +88,7 @@ export default function ChartCreatedAt({
         />
       </div>
       <Spin spinning={loading}>
-        <div style={{ height: 250 }}>
+        <div style={{ height: props.height || 300 }}>
           {data?.data && data.data.length > 0 ? (
             <Column {...chartConfig} />
           ) : (

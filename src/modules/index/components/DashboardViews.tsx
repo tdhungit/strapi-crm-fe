@@ -1,28 +1,69 @@
+import { Flex } from 'antd';
 import { useEffect, useState } from 'react';
+import ApiService from '../../../services/ApiService';
+import { getWidget } from '../../collections/widgets';
 import AddDashboardItemModal from './AddDashboardItemModal';
 
 export default function DashboardViews({
-  dashboard: initDashboard,
+  dashboardId,
   openAddItem,
   setOpenAddItem,
 }: {
-  dashboard: any;
+  dashboardId: string;
   openAddItem: boolean;
   setOpenAddItem: (open: boolean) => void;
 }) {
-  const [dashboard, setDashboard] = useState(initDashboard);
+  const [dashboard, setDashboard] = useState<any>({});
+
+  const loadDashboard = () => {
+    ApiService.getClient()
+      .collection('dashboards')
+      .findOne(dashboardId, {
+        populate: ['dashboard_items'],
+      })
+      .then((res) => {
+        setDashboard(res.data);
+      });
+  };
+
+  const WidgetComponent = (props: any) => {
+    const { item } = props;
+    if (!item?.widget || !item?.metadata?.module) {
+      return null;
+    }
+
+    const Widget = getWidget(item.metadata.module, item.widget);
+    return <Widget module={item.metadata.module} {...props} />;
+  };
 
   useEffect(() => {
-    setDashboard(initDashboard);
-  }, [initDashboard]);
+    if (dashboardId) {
+      loadDashboard();
+    }
+  }, [dashboardId]);
 
   return (
     <>
-      <div className='w-full'>
-        <h3>{dashboard?.name}</h3>
-      </div>
+      <Flex vertical gap={24}>
+        {dashboard.dashboard_items?.map((item: any) => (
+          <div key={item.id}>
+            <WidgetComponent
+              item={item}
+              height={item.height || 300}
+              title={item.title}
+            />
+          </div>
+        ))}
+      </Flex>
 
-      <AddDashboardItemModal open={openAddItem} openChange={setOpenAddItem} />
+      <AddDashboardItemModal
+        open={openAddItem}
+        onOpenChange={setOpenAddItem}
+        dashboard={dashboard}
+        onFinish={() => {
+          loadDashboard();
+        }}
+      />
     </>
   );
 }

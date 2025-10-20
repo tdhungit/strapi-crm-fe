@@ -14,7 +14,7 @@ export default function Dashboard() {
 
   const [openAddDashboardModal, setOpenAddDashboardModal] = useState(false);
   const [dashboards, setDashboards] = useState<any[]>([]);
-  const [selectedDashboard, setSelectedDashboard] = useState<any>();
+  const [selectedDashboardId, setSelectedDashboardId] = useState<string>('');
   const [openAddItem, setOpenAddItem] = useState(false);
 
   const loadDashboards = () => {
@@ -24,19 +24,8 @@ export default function Dashboard() {
       .then((res) => {
         if (res.data.length > 0) {
           setDashboards(res.data);
-          loadDashboard(res.data[0].documentId);
+          setSelectedDashboardId(res.data[0].documentId);
         }
-      });
-  };
-
-  const loadDashboard = (dashboardId: string) => {
-    ApiService.getClient()
-      .collection('dashboards')
-      .findOne(dashboardId, {
-        populate: ['dashboard_items'],
-      })
-      .then((res) => {
-        setSelectedDashboard(res.data);
       });
   };
 
@@ -64,12 +53,12 @@ export default function Dashboard() {
       extra={
         <Space>
           <Select
-            value={selectedDashboard?.documentId || ''}
+            value={selectedDashboardId}
             options={dashboards.map((dashboard) => ({
               value: dashboard.documentId,
               label: dashboard.name,
             }))}
-            onChange={(value) => loadDashboard(value)}
+            onChange={(value) => setSelectedDashboardId(value)}
             className='w-32'
           />
           <Button
@@ -88,10 +77,10 @@ export default function Dashboard() {
         </Space>
       }
     >
-      {selectedDashboard && (
+      {selectedDashboardId && (
         <div className='mt-4'>
           <DashboardViews
-            dashboard={selectedDashboard}
+            dashboardId={selectedDashboardId}
             openAddItem={openAddItem}
             setOpenAddItem={setOpenAddItem}
           />
