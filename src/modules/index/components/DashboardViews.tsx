@@ -44,7 +44,7 @@ export default function DashboardViews({
 
   return (
     <>
-      <Flex vertical gap={24}>
+      <Flex vertical gap={8}>
         {dashboard.dashboard_items?.map((item: any) => (
           <div key={item.id}>
             <WidgetComponent

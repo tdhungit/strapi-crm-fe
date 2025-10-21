@@ -43,6 +43,7 @@ export default function ChartCreatedAt(props: Props) {
     data: data?.data || [],
     xField: 'group',
     yField: 'total',
+    animate: false,
     columnStyle: {
       radius: [4, 4, 0, 0],
     },
