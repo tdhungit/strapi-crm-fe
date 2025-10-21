@@ -78,7 +78,7 @@ export default function Dashboard() {
       }
     >
       {selectedDashboardId && (
-        <div className='mt-4'>
+        <div className='w-full'>
           <DashboardViews
             dashboardId={selectedDashboardId}
             openAddItem={openAddItem}

@@ -1,5 +1,5 @@
 import { App, Input, Modal, Select } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ApiService from '../../../services/ApiService';
 import { getAllWidgets } from '../../collections/widgets';
 
@@ -8,10 +8,12 @@ export default function AddDashboardItemModal({
   onOpenChange,
   dashboard,
   onFinish,
+  item,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   dashboard: any;
+  item?: any;
   onFinish?: () => void;
 }) {
   const { message, notification } = App.useApp();
@@ -43,32 +45,57 @@ export default function AddDashboardItemModal({
 
     message.loading('Saving...', 0);
     const [module, widget] = values.widget.split(':');
-    ApiService.getClient()
-      .collection('dashboard-items')
-      .create({
-        dashboard: dashboard.id,
-        title: values.title,
-        widget,
-        metadata: {
-          module,
-        },
-      })
+    const body: any = {
+      dashboard: dashboard.id,
+      title: values.title,
+      widget,
+      metadata: {
+        module,
+      },
+    };
+
+    let service;
+    if (item?.documentId) {
+      service = ApiService.getClient()
+        .collection('dashboard-items')
+        .update(item.documentId, body);
+    } else {
+      service = ApiService.getClient()
+        .collection('dashboard-items')
+        .create(body);
+    }
+
+    service
       .then(() => {
         notification.success({
-          message: 'Dashboard item added successfully',
+          message: item?.documentId
+            ? 'Dashboard item updated successfully'
+            : 'Dashboard item added successfully',
         });
         onFinish?.();
         onOpenChange(false);
       })
       .catch(() => {
         notification.error({
-          message: 'Failed to add dashboard item',
+          message: item?.documentId
+            ? 'Failed to update dashboard item'
+            : 'Failed to add dashboard item',
         });
       })
       .finally(() => {
         message.destroy();
       });
   };
+
+  useEffect(() => {
+    if (item) {
+      setValues({
+        title: item.title,
+        widget: `${item.metadata.module}:${item.widget}`,
+        height: item.height,
+      });
+    }
+  }, [item]);
 
   return (
     <Modal

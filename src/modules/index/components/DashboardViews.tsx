@@ -1,3 +1,4 @@
+import { EditOutlined } from '@ant-design/icons';
 import {
   DragDropContext,
   Draggable,
@@ -20,12 +21,18 @@ export default function DashboardViews({
 }) {
   const [dashboard, setDashboard] = useState<any>({});
   const [items, setItems] = useState<any[]>([]);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isChangeWeight, setIsChangeWeight] = useState(false);
 
   const loadDashboard = useCallback(() => {
     ApiService.getClient()
       .collection('dashboards')
       .findOne(dashboardId, {
-        populate: ['dashboard_items'],
+        populate: {
+          dashboard_items: {
+            sort: 'weight:asc',
+          },
+        },
       })
       .then((res) => {
         setDashboard(res.data);
@@ -44,6 +51,7 @@ export default function DashboardViews({
       newItems.splice(toIndex, 0, movedItem);
       return newItems;
     });
+    setIsChangeWeight(true);
   }, []);
 
   const saveItemOrder = useCallback(async () => {
@@ -52,7 +60,7 @@ export default function DashboardViews({
       const updatePromises = items.map((item, index) => {
         return ApiService.getClient()
           .collection('dashboard-items')
-          .update(item.id, { order: index });
+          .update(item.documentId, { weight: index });
       });
 
       await Promise.all(updatePromises);
@@ -74,10 +82,11 @@ export default function DashboardViews({
 
   // Save order when items change
   useEffect(() => {
-    if (items.length > 0 && dashboard.id) {
+    if (isChangeWeight === true && items.length > 0 && dashboard.id) {
+      setIsChangeWeight(false);
       saveItemOrder();
     }
-  }, [items, dashboard.id, saveItemOrder]);
+  }, [isChangeWeight]);
 
   useEffect(() => {
     if (dashboardId) {
@@ -109,8 +118,8 @@ export default function DashboardViews({
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-              gap: 24,
-              marginTop: 16,
+              gap: 16,
+              marginTop: 0,
             }}
           >
             {items.map((item, index) => (
@@ -126,7 +135,7 @@ export default function DashboardViews({
                     {...provided.dragHandleProps}
                     style={{
                       ...provided.draggableProps.style,
-                      marginBottom: 24,
+                      marginBottom: 0,
                       backgroundColor: '#fff',
                       borderRadius: 8,
                       boxShadow: snapshot.isDragging
@@ -147,16 +156,18 @@ export default function DashboardViews({
                     >
                       <h3 style={{ margin: 0, fontSize: 16 }}>{item.title}</h3>
                       <button
-                        onClick={() => setOpenAddItem(true)}
+                        onClick={() => {
+                          setSelectedItem(item);
+                          setOpenAddItem(true);
+                        }}
                         style={{
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
-                          fontSize: 18,
                           color: '#1890ff',
                         }}
                       >
-                        ✏️
+                        <EditOutlined />
                       </button>
                     </div>
                     <WidgetComponent
@@ -178,6 +189,7 @@ export default function DashboardViews({
         onOpenChange={setOpenAddItem}
         dashboard={dashboard}
         onFinish={handleItemFinish}
+        item={selectedItem}
       />
     </DragDropContext>
   );
