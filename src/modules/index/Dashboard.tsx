@@ -1,4 +1,4 @@
-import { ForkOutlined, PlusOutlined } from '@ant-design/icons';
+import { EditOutlined, ForkOutlined, PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Select, Space } from 'antd';
 import { useEffect, useState } from 'react';
@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [dashboards, setDashboards] = useState<any[]>([]);
   const [selectedDashboardId, setSelectedDashboardId] = useState<string>('');
   const [openAddItem, setOpenAddItem] = useState(false);
+  const [editDashboardId, setEditDashboardId] = useState<string>('');
 
   const loadDashboards = () => {
     ApiService.getClient()
@@ -24,7 +25,12 @@ export default function Dashboard() {
       .then((res) => {
         if (res.data.length > 0) {
           setDashboards(res.data);
-          setSelectedDashboardId(res.data[0].documentId);
+          if (!selectedDashboardId) {
+            const selected = res.data.find((d: any) => d.is_default === true);
+            setSelectedDashboardId(selected?.documentId || '');
+          }
+        } else {
+          setSelectedDashboardId('');
         }
       });
   };
@@ -52,26 +58,39 @@ export default function Dashboard() {
       }}
       extra={
         <Space>
-          <Select
-            value={selectedDashboardId}
-            options={dashboards.map((dashboard) => ({
-              value: dashboard.documentId,
-              label: dashboard.name,
-            }))}
-            onChange={(value) => setSelectedDashboardId(value)}
-            className='w-32'
-          />
-          <Button
-            type='primary'
-            icon={<PlusOutlined />}
-            size='small'
-            onClick={() => setOpenAddDashboardModal(true)}
-          />
+          <Space.Compact>
+            <Select
+              value={selectedDashboardId}
+              options={dashboards.map((dashboard) => ({
+                value: dashboard.documentId,
+                label: dashboard.name,
+              }))}
+              onChange={(value) => setSelectedDashboardId(value)}
+              className='w-64'
+            />
+            <Button
+              variant='solid'
+              color='orange'
+              icon={<EditOutlined />}
+              onClick={() => {
+                setEditDashboardId(selectedDashboardId);
+                setOpenAddDashboardModal(true);
+              }}
+            />
+            <Button
+              variant='solid'
+              color='green'
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setEditDashboardId('');
+                setOpenAddDashboardModal(true);
+              }}
+            />
+          </Space.Compact>
           <Button
             variant='solid'
-            color='green'
+            color='blue'
             icon={<ForkOutlined />}
-            size='small'
             onClick={() => setOpenAddItem(true)}
           />
         </Space>
@@ -90,7 +109,13 @@ export default function Dashboard() {
       <AddDashboardModal
         open={openAddDashboardModal}
         onOpenChange={setOpenAddDashboardModal}
-        onFinish={() => {}}
+        id={editDashboardId}
+        onFinish={(newDashboard) => {
+          if (newDashboard) {
+            setSelectedDashboardId(newDashboard.documentId);
+          }
+          loadDashboards();
+        }}
       />
     </PageContainer>
   );

@@ -1,4 +1,9 @@
-import { ModalForm, ProForm, ProFormText } from '@ant-design/pro-components';
+import {
+  ModalForm,
+  ProForm,
+  ProFormCheckbox,
+  ProFormText,
+} from '@ant-design/pro-components';
 import { App } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,7 +19,7 @@ export default function AddDashboardModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   id?: string;
-  onFinish: () => void;
+  onFinish: (dashboard: any) => void;
 }) {
   const { message } = App.useApp();
   const [form] = ProForm.useForm();
@@ -38,6 +43,7 @@ export default function AddDashboardModal({
     if (dashboard?.id) {
       form.setFieldsValue({
         name: dashboard.name,
+        is_default: dashboard.is_default || false,
       });
     }
   }, [dashboard]);
@@ -48,14 +54,13 @@ export default function AddDashboardModal({
       ApiService.getClient()
         .collection('dashboards')
         .update(id, values)
-        .then(() => {
+        .then((res) => {
           message.success('Dashboard updated successfully');
+          onFinish(res.data);
           onOpenChange(false);
         })
         .finally(() => {
-          form.resetFields();
           message.destroy();
-          onFinish();
         });
     } else {
       ApiService.getClient()
@@ -64,14 +69,14 @@ export default function AddDashboardModal({
           ...values,
           assigned_user: user.id,
         })
-        .then(() => {
+        .then((res) => {
           form.resetFields();
           message.success('Dashboard added successfully');
+          onFinish(res.data);
           onOpenChange(false);
         })
         .finally(() => {
           message.destroy();
-          onFinish();
         });
     }
   };
@@ -85,6 +90,7 @@ export default function AddDashboardModal({
       title={id ? 'Edit Dashboard' : 'Add Dashboard'}
     >
       <ProFormText name='name' label='Name' />
+      <ProFormCheckbox name='is_default'>Default</ProFormCheckbox>
     </ModalForm>
   );
 }
