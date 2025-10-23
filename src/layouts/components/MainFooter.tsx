@@ -1,4 +1,5 @@
 import { Layout } from 'antd';
+import ChatBox from './ChatBox';
 
 const { Footer } = Layout;
 
@@ -24,6 +25,7 @@ export default function MainFooter() {
           </div>
         </div>
       </Footer>
+      <ChatBox />
     </>
   );
 }
