@@ -4,8 +4,9 @@ import {
   PlusCircleFilled,
 } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Tag } from 'antd';
+import { App, Button, Modal, Tag } from 'antd';
 import { useState } from 'react';
+import ApiService from '../../../services/ApiService';
 import CampaignActionSettingsModal from './CampaignActionSettingsModal';
 
 export default function CampaignActions({
@@ -15,8 +16,47 @@ export default function CampaignActions({
   campaign: any;
   onChange?: () => void;
 }) {
+  const { message, notification } = App.useApp();
+
+  const { confirm } = Modal;
+
   const [openActionSettings, setOpenActionSettings] = useState(false);
   const [selectedActionId, setSelectedActionId] = useState<number | null>(null);
+
+  const runAction = (id: number) => {
+    message.loading('Running...', 0);
+    ApiService.request(
+      'POST',
+      `/campaigns/${campaign.id}/actions/${id}/run`,
+      {}
+    )
+      .then(() => {
+        notification.success({
+          message: 'Action started',
+        });
+        onChange?.();
+      })
+      .catch((error: any) => {
+        notification.error({
+          message: error?.response?.data?.error?.message || 'Failed to run',
+        });
+      })
+      .finally(() => {
+        message.destroy();
+      });
+  };
+
+  const confirmRunAction = (id: number) => {
+    confirm({
+      title: 'Are you sure?',
+      content: 'This action will run immediately',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk() {
+        runAction(id);
+      },
+    });
+  };
 
   return (
     <div>
@@ -126,7 +166,9 @@ export default function CampaignActions({
                   <Tag
                     color='red'
                     className='cursor-pointer'
-                    onClick={() => {}}
+                    onClick={() => {
+                      confirmRunAction(record.id);
+                    }}
                   >
                     <PlayCircleOutlined />
                   </Tag>
