@@ -47,6 +47,16 @@ export default function CampaignActions({
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
+            render: (text: any) => {
+              return (
+                <div
+                  className='inline-block px-5 py-1 rounded-sm border bg-green-200 border-green-300'
+                  onClick={() => {}}
+                >
+                  {text}
+                </div>
+              );
+            },
           },
           {
             title: 'Field',
@@ -65,6 +75,34 @@ export default function CampaignActions({
             render: (text: any) => {
               return (
                 <Tag color={text === 'Ready' ? 'green' : 'red'}>{text}</Tag>
+              );
+            },
+          },
+          {
+            title: 'Schedule',
+            dataIndex: 'schedule',
+            key: 'schedule',
+            render: (_text: any, record: any) => {
+              return (
+                <>
+                  {record.schedule?.type === 'elapsed_day' && (
+                    <>
+                      <Tag color='red'>Elapsed Day</Tag>
+                      <Tag color='orange'>
+                        {record.schedule.hours}h:{record.schedule.minutes}'
+                      </Tag>
+                    </>
+                  )}
+                  {record.schedule?.type === 'exact_date' && (
+                    <>
+                      <Tag color='red'>Exact Date</Tag>
+                      <Tag color='orange'>
+                        {record.schedule.date} {record.schedule.hours}h:
+                        {record.schedule.minutes}'
+                      </Tag>
+                    </>
+                  )}
+                </>
               );
             },
           },
