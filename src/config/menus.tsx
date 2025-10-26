@@ -79,6 +79,11 @@ export const defaultMenus: any = {
     icon: 'appstore',
     label: 'Warehouses',
   },
+  workflows: {
+    key: '/collections/workflows',
+    icon: 'file',
+    label: 'Workflows',
+  },
   users: {
     key: '/users',
     icon: 'users',
