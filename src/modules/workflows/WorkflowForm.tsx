@@ -31,7 +31,7 @@ import {
   Typography,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { breadcrumbItemRender, camelToTitle } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
@@ -42,6 +42,7 @@ const { Text } = Typography;
 
 export default function WorkflowForm() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const { message, notification } = App.useApp();
 
@@ -73,6 +74,7 @@ export default function WorkflowForm() {
       actions: res.data.workflow_actions || [],
       conditionGroups: res.data.metadata?.conditions || [],
       status: res.data.workflow_status,
+      run_at: res.data.run_at,
       id: res.data.id,
       documentId: res.data.documentId,
     };
@@ -141,6 +143,7 @@ export default function WorkflowForm() {
       module: values.module,
       trigger: values.trigger,
       workflow_status: values.status || 'Active',
+      run_at: values.run_at,
       metadata: {
         conditions: values.conditionGroups,
       },
@@ -160,10 +163,18 @@ export default function WorkflowForm() {
 
     message.loading('Saving...', 0);
     service
-      .then(() => {
+      .then((res: any) => {
         notification.success({
           message: 'Saved successfully',
         });
+
+        if (!id) {
+          if (res?.data?.documentId) {
+            navigate(`/collections/workflows/detail/${res.data.documentId}`);
+          } else {
+            navigate('/collections/workflows');
+          }
+        }
       })
       .catch((error: any) => {
         notification.error({
@@ -572,26 +583,33 @@ export default function WorkflowForm() {
         style={{ marginBottom: 10 }}
         extra={<Tag color='green'>{index + 1}</Tag>}
       >
-        <ProFormSelect
-          name='name'
-          label={
-            <span className='flex items-center'>
-              <SettingOutlined className='mr-1 text-blue-500' />
-              Action
-            </span>
-          }
-          placeholder='Select an action'
-          options={actions.map((action: string) => ({
-            label: camelToTitle(action),
-            value: action,
-          }))}
-          rules={[
-            {
-              required: true,
-              message: 'Please select an action',
-            },
-          ]}
-        />
+        <Row gutter={[16, 16]}>
+          <Col span={12}>
+            <ProFormSelect
+              name='name'
+              label={
+                <span className='flex items-center'>
+                  <SettingOutlined className='mr-1 text-blue-500' />
+                  Action
+                </span>
+              }
+              placeholder='Select an action'
+              options={actions.map((action: string) => ({
+                label: camelToTitle(action),
+                value: action,
+              }))}
+              rules={[
+                {
+                  required: true,
+                  message: 'Please select an action',
+                },
+              ]}
+            />
+          </Col>
+          <Col span={12}>
+            <ProFormSwitch name='is_repeat' label='Repeat' />
+          </Col>
+        </Row>
 
         {renderActionForm(index)}
       </Card>
@@ -683,12 +701,7 @@ export default function WorkflowForm() {
                 <Col span={8}>
                   <ProFormText
                     name='name'
-                    label={
-                      <span className='flex items-center font-medium'>
-                        <SettingOutlined className='mr-1 text-blue-500' />
-                        Workflow Name
-                      </span>
-                    }
+                    label='Workflow Name'
                     placeholder='Enter a descriptive name'
                     rules={[
                       { required: true, message: 'Please enter workflow name' },
@@ -698,12 +711,7 @@ export default function WorkflowForm() {
                 <Col span={8}>
                   <ProFormSelect
                     name='module'
-                    label={
-                      <span className='flex items-center font-medium'>
-                        <BranchesOutlined className='mr-1 text-green-500' />
-                        Target Module
-                      </span>
-                    }
+                    label='Target Module'
                     placeholder='Select target module'
                     options={[
                       {
@@ -727,12 +735,7 @@ export default function WorkflowForm() {
                 <Col span={8}>
                   <ProFormSelect
                     name='trigger'
-                    label={
-                      <span className='flex items-center font-medium'>
-                        <PlayCircleOutlined className='mr-1 text-purple-500' />
-                        Trigger Event
-                      </span>
-                    }
+                    label='Trigger'
                     placeholder='When should this run?'
                     options={[
                       {
@@ -759,6 +762,41 @@ export default function WorkflowForm() {
                     rules={[
                       { required: true, message: 'Please select a trigger' },
                     ]}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={[24, 16]}>
+                <Col span={8}>
+                  <ProFormSelect
+                    name='status'
+                    label='Status'
+                    placeholder='Select status'
+                    options={[
+                      {
+                        label: 'Active',
+                        value: 'Active',
+                      },
+                      {
+                        label: 'Inactive',
+                        value: 'Inactive',
+                      },
+                    ]}
+                    rules={[
+                      { required: true, message: 'Please select a status' },
+                    ]}
+                    initialValue={'Active'}
+                  />
+                </Col>
+                <Col span={8}>
+                  <ProFormDatePicker
+                    name='run_at'
+                    label='Run At'
+                    placeholder='Select date'
+                    fieldProps={{
+                      style: { width: '100%' },
+                      format: 'YYYY-MM-DD HH:mm:ss',
+                      showTime: true,
+                    }}
                   />
                 </Col>
               </Row>
