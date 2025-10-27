@@ -584,7 +584,7 @@ export default function WorkflowForm() {
         extra={<Tag color='green'>{index + 1}</Tag>}
       >
         <Row gutter={[16, 16]}>
-          <Col span={12}>
+          <Col span={8}>
             <ProFormSelect
               name='name'
               label={
@@ -606,7 +606,18 @@ export default function WorkflowForm() {
               ]}
             />
           </Col>
-          <Col span={12}>
+          <Col span={8}>
+            <ProFormSelect
+              name='action_status'
+              label='Status'
+              options={[
+                { label: 'Active', value: 'Active' },
+                { label: 'Inactive', value: 'Inactive' },
+              ]}
+              initialValue={'Active'}
+            />
+          </Col>
+          <Col span={8}>
             <ProFormSwitch name='is_repeat' label='Repeat' />
           </Col>
         </Row>
