@@ -30,8 +30,8 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { breadcrumbItemRender, camelToTitle } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
@@ -43,7 +43,6 @@ const { Text } = Typography;
 export default function WorkflowForm() {
   const { id } = useParams();
 
-  const navigate = useNavigate();
   const { message, notification } = App.useApp();
 
   const [form] = ProForm.useForm();
@@ -64,6 +63,21 @@ export default function WorkflowForm() {
     if (value.module) {
       setModule(value.module);
     }
+  };
+
+  const normalizeRes = (res: { data: any; meta: any }) => {
+    const data = {
+      module: res.data.module,
+      name: res.data.name,
+      trigger: res.data.trigger,
+      actions: res.data.workflow_actions || [],
+      conditionGroups: res.data.metadata?.conditions || [],
+      status: res.data.workflow_status,
+      id: res.data.id,
+      documentId: res.data.documentId,
+    };
+
+    return data;
   };
 
   useEffect(() => {
@@ -88,6 +102,18 @@ export default function WorkflowForm() {
     }
   }, [module]);
 
+  useEffect(() => {
+    if (id) {
+      ApiService.getClient()
+        .collection('crm-workflows')
+        .findOne(id, { populate: { workflow_actions: true } })
+        .then((res: any) => {
+          form.setFieldsValue(normalizeRes(res));
+          formValueChange(normalizeRes(res), normalizeRes(res));
+        });
+    }
+  }, [id]);
+
   const handleSave = async (values: any) => {
     if (!values.name) {
       notification.error({
@@ -110,24 +136,34 @@ export default function WorkflowForm() {
       return;
     }
 
+    const saveData: any = {
+      name: values.name,
+      module: values.module,
+      trigger: values.trigger,
+      workflow_status: values.status || 'Active',
+      metadata: {
+        conditions: values.conditionGroups,
+      },
+      actions: values.actions,
+    };
+
+    let service;
+    if (id) {
+      service = ApiService.getClient()
+        .collection('crm-workflows')
+        .update(id, saveData);
+    } else {
+      service = ApiService.getClient()
+        .collection('crm-workflows')
+        .create(saveData);
+    }
+
     message.loading('Saving...', 0);
-    ApiService.getClient()
-      .collection('crm-workflows')
-      .create({
-        name: values.name,
-        module: values.module,
-        trigger: values.trigger,
-        workflow_status: values.status || 'Active',
-        metadata: {
-          conditions: values.conditionGroups,
-        },
-        actions: values.actions,
-      })
+    service
       .then(() => {
         notification.success({
           message: 'Saved successfully',
         });
-        navigate('/collections/workflows');
       })
       .catch((error: any) => {
         notification.error({
@@ -504,14 +540,22 @@ export default function WorkflowForm() {
   // Render a Action Form
   const renderActionForm = (index: number) => {
     const actionName = formValues?.actions?.[index]?.name || '';
+    let component = null;
     switch (actionName) {
       case 'Send_Email':
-        return <SendMailAction module={module} fields={moduleFields} />;
+        component = SendMailAction;
+        break;
       case 'Send_Sms':
-        return <SendSMSAction module={module} fields={moduleFields} />;
+        component = SendSMSAction;
+        break;
       default:
         return <></>;
     }
+
+    return React.createElement(component, {
+      module,
+      fields: moduleFields,
+    });
   };
 
   // Render a action
@@ -601,7 +645,7 @@ export default function WorkflowForm() {
                   size='large'
                   icon={<SaveOutlined />}
                   onClick={() => props.form?.submit?.()}
-                  className='bg-blue-500 hover:bg-blue-600 border-blue-500 hover:border-blue-600 rounded-lg px-8'
+                  className='bg-blue-500 hover:bg-blue-600 border-blue-500 hover:border-blue-600 rounded-lg px-8 w-full'
                 >
                   Save Workflow
                 </Button>,
@@ -795,6 +839,7 @@ export default function WorkflowForm() {
                   variant: 'solid',
                   color: 'green',
                 }}
+                alwaysShowItemLabel={true}
               >
                 {(meta, index) => renderAction(meta, index)}
               </ProFormList>

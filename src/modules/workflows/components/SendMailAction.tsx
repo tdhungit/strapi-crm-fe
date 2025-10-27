@@ -27,7 +27,7 @@ export default function SendMailAction({
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <ProFormSelect
-            name='field'
+            name={['metadata', 'field']}
             label={`${camelToTitle(module)}: Email Field`}
             options={fields.map((f: any) => ({
               label: camelToTitle(f.label || f.fieldName),
@@ -37,7 +37,7 @@ export default function SendMailAction({
         </Col>
         <Col span={12}>
           <ProFormSelect
-            name='templateId'
+            name={['metadata', 'templateId']}
             label='Email Template'
             options={emailTemplates.map((template: any) => ({
               label: template.title,
@@ -51,18 +51,24 @@ export default function SendMailAction({
       </Row>
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <ProFormText name='fromEmail' label='From Email' />
+          <ProFormText name={['metadata', 'fromEmail']} label='From Email' />
         </Col>
         <Col span={12}>
-          <ProFormText name='fromName' label='From Name' />
+          <ProFormText name={['metadata', 'fromName']} label='From Name' />
         </Col>
       </Row>
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <ProFormText name='replyToEmail' label='Reply To Email' />
+          <ProFormText
+            name={['metadata', 'replyToEmail']}
+            label='Reply To Email'
+          />
         </Col>
         <Col span={12}>
-          <ProFormText name='replyToName' label='Reply To Name' />
+          <ProFormText
+            name={['metadata', 'replyToName']}
+            label='Reply To Name'
+          />
         </Col>
       </Row>
     </div>

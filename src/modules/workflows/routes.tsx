@@ -7,11 +7,15 @@ const routes = [
     element: <WorkflowList />,
   },
   {
-    path: '/collections/workflows/:id',
+    path: '/collections/workflows/edit/:id',
     element: <WorkflowForm />,
   },
   {
     path: '/collections/workflows/create',
+    element: <WorkflowForm />,
+  },
+  {
+    path: '/collections/workflows/detail/:id',
     element: <WorkflowForm />,
   },
 ];

@@ -27,7 +27,7 @@ export default function SendSMSAction({
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <ProFormSelect
-            name='field'
+            name={['metadata', 'field']}
             label={`${camelToTitle(module)}: Phone Number Field`}
             options={fields.map((f: any) => ({
               label: camelToTitle(f.label || f.fieldName),
@@ -37,7 +37,7 @@ export default function SendSMSAction({
         </Col>
         <Col span={12}>
           <ProFormSelect
-            name='template'
+            name={['metadata', 'templateId']}
             label='Template'
             options={smsTemplates.map((template: any) => ({
               label: template.title,

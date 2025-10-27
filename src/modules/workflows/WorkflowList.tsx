@@ -1,6 +1,6 @@
-import { PlusOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Space } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
 import CollectionListComponent from '../collections/components/CollectionListComponent';
 
 export default function WorkflowList() {
@@ -10,6 +10,20 @@ export default function WorkflowList() {
     <>
       <CollectionListComponent
         module='crm-workflows'
+        header={{
+          title: 'Workflows',
+          breadcrumb: {
+            items: [
+              {
+                title: 'Home',
+                href: '/',
+              },
+              {
+                title: 'Workflows',
+              },
+            ],
+          },
+        }}
         toolBarRender={[
           <Button
             key='add'
@@ -17,9 +31,19 @@ export default function WorkflowList() {
             icon={<PlusOutlined />}
             onClick={() => navigate('/collections/workflows/create')}
           >
-            Add
+            Create New Workflow
           </Button>,
         ]}
+        recordActionRender={(_dom, record) => (
+          <Space>
+            <Link
+              to={`/collections/workflows/edit/${record.documentId}`}
+              className='!text-blue-500'
+            >
+              <EditOutlined />
+            </Link>
+          </Space>
+        )}
       />
     </>
   );
