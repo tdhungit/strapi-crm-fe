@@ -1,14 +1,19 @@
 import { BellOutlined } from '@ant-design/icons';
 import { App, Button, Dropdown, List } from 'antd';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import FirebaseService from '../../services/FirebaseService';
+import SupabaseService from '../../services/SupabaseService';
+import type { RootState } from '../../stores';
 
 export default function UserNotification({ user }: { user: any }) {
   const { notification } = App.useApp();
 
+  const settings = useSelector((state: RootState) => state?.app).settings;
+
   const [messages, setMessages] = useState<any[]>([]);
 
-  const notificationListener = async () => {
+  const firebaseNotificationListener = async () => {
     const { ref, db, onChildAdded, update, query, orderByChild, equalTo } =
       await FirebaseService.getApp();
 
@@ -43,12 +48,83 @@ export default function UserNotification({ user }: { user: any }) {
     return unsubscribe;
   };
 
+  const supabaseNotificationListener = async () => {
+    const supabase = await SupabaseService.getApp();
+
+    await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('read', false)
+      .then((res: any) => {
+        setMessages(res.data);
+      });
+
+    const subscription = supabase
+      .channel('notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const notificationRes: any = payload.new;
+          const notificationId = notificationRes.id;
+
+          if (!notificationRes.read) {
+            const pos = messages.findIndex(
+              (item) => item.id === notificationId
+            );
+            if (pos < 0) {
+              setMessages((prev) => [
+                ...prev,
+                { key: notificationId, ...notificationRes },
+              ]);
+            }
+          }
+
+          notification.open({
+            message: notificationRes.title,
+            description: notificationRes.body,
+          });
+
+          // Mark as pushed
+          supabase
+            .from('notifications')
+            .update({ pushed: true })
+            .eq('id', notificationId)
+            .then();
+        }
+      )
+      .subscribe((status) => console.log('CHANNEL STATUS:', status));
+
+    return {
+      unsubscribe: () => {
+        supabase.removeChannel(subscription);
+      },
+    };
+  };
+
+  const notificationListener = async () => {
+    let unsubscribe: any;
+    if (settings?.notificationService === 'firebase') {
+      unsubscribe = await firebaseNotificationListener();
+    } else if (settings?.notificationService === 'supabase') {
+      unsubscribe = await supabaseNotificationListener();
+    }
+    return unsubscribe;
+  };
+
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || !settings?.notificationService) return;
 
     let unsubscribe: any;
     notificationListener()
       .then((listener) => {
+        console.log('listener', settings.notificationService, user.id);
         unsubscribe = listener;
       })
       .catch((err) => {
@@ -57,9 +133,13 @@ export default function UserNotification({ user }: { user: any }) {
 
     // cleanup listener khi component unmount
     if (unsubscribe) {
-      return () => unsubscribe();
+      if (settings?.notificationService === 'firebase') {
+        return () => unsubscribe();
+      } else if (settings?.notificationService === 'supabase') {
+        return () => unsubscribe.unsubscribe();
+      }
     }
-  }, [user?.id]);
+  }, [user?.id, settings?.notificationService]);
 
   return (
     <>

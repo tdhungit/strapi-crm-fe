@@ -11,6 +11,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import PageLoading from '../components/PageLoading';
 import ApiService from '../services/ApiService';
 import MenuService from '../services/MenuService';
+import { setSettings } from '../stores/appSlice';
 import { setUserStore } from '../stores/authSlice';
 import MainFooter from './components/MainFooter';
 import MainLogo from './components/MainLogo';
@@ -52,6 +53,14 @@ export default function DefaultLayout() {
         document.head.appendChild(link);
       }
       link.href = appSettings.uiConfig.favicon;
+    }
+
+    if (appSettings?.uiConfig?.thirdPartyService) {
+      dispatch(
+        setSettings({
+          notificationService: appSettings.uiConfig.thirdPartyService,
+        })
+      );
     }
   }, [appSettings, userRole]);
 
