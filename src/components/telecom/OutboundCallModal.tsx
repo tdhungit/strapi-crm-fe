@@ -1,4 +1,6 @@
-import { Modal } from 'antd';
+import { Alert, Modal } from 'antd';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../stores';
 import TwilioOutboundCall from './twilio/TwilioOutboundCall';
 
 export default function OutboundCallModal({
@@ -14,6 +16,10 @@ export default function OutboundCallModal({
   module: string;
   recordId: string;
 }) {
+  const { telecomService } = useSelector(
+    (state: RootState) => state.app.settings
+  );
+
   return (
     <Modal
       title={false}
@@ -21,7 +27,13 @@ export default function OutboundCallModal({
       onCancel={() => onOpenChange(false)}
       footer={false}
     >
-      <TwilioOutboundCall to={to} module={module} recordId={recordId} />
+      {!telecomService && (
+        <Alert message='Telecom service not configured' type='error' />
+      )}
+
+      {telecomService === 'twilio' && (
+        <TwilioOutboundCall to={to} module={module} recordId={recordId} />
+      )}
     </Modal>
   );
 }
