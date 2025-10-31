@@ -1,160 +1,32 @@
-import { Device } from '@twilio/voice-sdk';
 import { Button, Card, Space, Tag, Typography } from 'antd';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 
 const { Text } = Typography;
 
-type CallStatus =
-  | 'idle'
-  | 'device-ready'
-  | 'incoming'
-  | 'connecting'
-  | 'in-call'
-  | 'muted'
-  | 'ended'
-  | 'error';
-
-export default function InboundCallComponent({ token }: { token?: string }) {
-  const [status, setStatus] = useState<CallStatus>('idle');
-  const [muted, setMuted] = useState(false);
-  const deviceRef = useRef<Device | null>(null);
-  const connectionRef = useRef<any>(null);
-  const [fromNumber, setFromNumber] = useState<string | undefined>(undefined);
-
+export default function InboundCallComponent({
+  fromNumber,
+  status,
+  statusTagColor = 'default',
+  muted,
+  acceptCall,
+  hangup,
+  toggleMute,
+  sendDigit,
+}: {
+  fromNumber?: string;
+  status?: string;
+  statusTagColor?: string;
+  muted?: boolean;
+  acceptCall?: () => void;
+  hangup?: () => void;
+  toggleMute?: () => void;
+  sendDigit?: (digit: string) => void;
+}) {
   // Digits for numpad
   const digits = useMemo(
     () => ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'],
     []
   );
-
-  useEffect(() => {
-    if (!token) {
-      setStatus('idle');
-      return;
-    }
-
-    let mounted = true;
-
-    // Initialize Twilio Device
-    const setupDevice = async () => {
-      try {
-        const device = new Device(token);
-        deviceRef.current = device;
-
-        // Device event handlers
-        device.on('ready', () => mounted && setStatus('device-ready'));
-        device.on('error', () => mounted && setStatus('error'));
-        device.on('incoming', (conn) => {
-          if (!mounted) return;
-          connectionRef.current = conn;
-          setFromNumber(conn.parameters?.From);
-          setStatus('incoming');
-
-          // Auto set basic handlers for connection
-          conn.on('accept', () => mounted && setStatus('in-call'));
-          conn.on('disconnect', () => {
-            if (!mounted) return;
-            setStatus('ended');
-            setMuted(false);
-            connectionRef.current = null;
-            setFromNumber(undefined);
-          });
-          conn.on('error', () => mounted && setStatus('error'));
-        });
-
-        // Create and register device
-        await device.register();
-      } catch (e: any) {
-        console.error(e);
-        setStatus('error');
-      }
-    };
-
-    setupDevice();
-
-    return () => {
-      mounted = false;
-      try {
-        connectionRef.current?.disconnect();
-      } catch (e: any) {
-        console.error(e);
-      }
-      try {
-        deviceRef.current?.destroy();
-      } catch (e: any) {
-        console.error(e);
-      }
-      deviceRef.current = null;
-      connectionRef.current = null;
-    };
-  }, [token]);
-
-  const acceptCall = () => {
-    const conn = connectionRef.current;
-    if (!conn) return;
-    setStatus('connecting');
-    try {
-      conn.accept();
-    } catch {
-      setStatus('error');
-    }
-  };
-
-  const hangup = () => {
-    const conn = connectionRef.current;
-    try {
-      conn?.disconnect();
-      deviceRef.current?.disconnectAll?.();
-      setStatus('ended');
-      setMuted(false);
-    } catch {
-      setStatus('error');
-    }
-  };
-
-  const toggleMute = () => {
-    const conn = connectionRef.current;
-    if (!conn) return;
-    try {
-      const next = !muted;
-      conn.mute?.(next);
-      setMuted(next);
-      setStatus(next ? 'muted' : 'in-call');
-    } catch {
-      setStatus('error');
-    }
-  };
-
-  const sendDigit = (d: string) => {
-    const conn = connectionRef.current;
-    if (!conn) return;
-    try {
-      conn.sendDigits(d);
-    } catch {
-      setStatus('error');
-    }
-  };
-
-  const statusTagColor = (() => {
-    switch (status) {
-      case 'device-ready':
-        return 'blue';
-      case 'incoming':
-        return 'orange';
-      case 'connecting':
-        return 'processing';
-      case 'in-call':
-        return 'green';
-      case 'muted':
-        return 'gold';
-      case 'ended':
-        return 'default';
-      case 'error':
-        return 'red';
-      default:
-        return 'default';
-    }
-  })();
 
   return (
     <Card>
@@ -196,7 +68,7 @@ export default function InboundCallComponent({ token }: { token?: string }) {
             <Button
               key={d}
               size='large'
-              onClick={() => sendDigit(d)}
+              onClick={() => sendDigit?.(d)}
               disabled={!(status === 'in-call' || status === 'muted')}
             >
               {d}
