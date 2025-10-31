@@ -3,12 +3,17 @@ interface AppState {
   settings: {
     notificationService: 'firebase' | 'supabase' | null;
     telecomService: 'twilio' | null;
+    telecomOptions: any;
     [key: string]: any;
   };
 }
 
 const initState: AppState = {
-  settings: { notificationService: null, telecomService: null },
+  settings: {
+    notificationService: null,
+    telecomService: null,
+    telecomOptions: {},
+  },
 };
 
 const appSlice = createSlice({

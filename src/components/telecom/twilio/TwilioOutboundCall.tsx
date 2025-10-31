@@ -1,7 +1,8 @@
 import { Device } from '@twilio/voice-sdk';
 import { Spin } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import ApiService from '../../../services/ApiService';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../stores';
 import OutboundCallComponent from '../OutboundCallComponent';
 
 export default function TwilioOutboundCall({
@@ -13,35 +14,28 @@ export default function TwilioOutboundCall({
   module: string;
   recordId: string;
 }) {
+  const settings = useSelector((state: RootState) => state?.app?.settings);
   const deviceRef = useRef<Device | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('init');
 
   useEffect(() => {
-    if (!to) {
+    if (!to || !settings?.telecomOptions?.token) {
       return;
     }
 
-    console.log({ to });
-    ApiService.request('post', '/telecoms/twilio/token', { identity: to })
-      .then((res) => {
-        const device = new Device(res.token);
-
-        device
-          .register()
-          .then(() => {
-            console.log('Device registered');
-            setStatus('ready');
-            deviceRef.current = device;
-          })
-          .catch((error) => {
-            console.error('Registration error:', error);
-            setStatus(`Error: ${error.message}`);
-          });
+    const device = new Device(settings?.telecomOptions?.token);
+    device
+      .register()
+      .then(() => {
+        console.log('Device registered');
+        setStatus('ready');
+        deviceRef.current = device;
       })
-      .catch((err) => {
-        console.error(err);
+      .catch((error) => {
+        console.error('Registration error:', error);
+        setStatus(`Error: ${error.message}`);
       })
       .finally(() => {
         setLoading(false);
@@ -54,7 +48,7 @@ export default function TwilioOutboundCall({
         console.log('Device destroyed');
       }
     };
-  }, [to, module, recordId]);
+  }, [to, module, recordId, settings]);
 
   if (loading) return <Spin />;
 

@@ -6,9 +6,15 @@ import InboundCallComponent from '../InboundCallComponent';
 export default function TwilioInboundCallModal({
   open,
   onOpenChange,
+  acceptCall,
+  hangup,
+  status,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  acceptCall?: () => void;
+  hangup?: () => void;
+  status?: string;
 }) {
   const [isMinimized, setIsMinimized] = useState(true);
 
@@ -63,7 +69,11 @@ export default function TwilioInboundCallModal({
     >
       {!isMinimized && (
         <div className='mt-2'>
-          <InboundCallComponent />
+          <InboundCallComponent
+            acceptCall={acceptCall}
+            hangup={hangup}
+            status={status}
+          />
         </div>
       )}
     </Modal>
