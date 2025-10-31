@@ -41,7 +41,6 @@ export default function PhoneView({ value }: { value: string }) {
         to={value}
         module=''
         recordId=''
-        onSuccess={() => {}}
       />
     </>
   );

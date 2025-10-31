@@ -2,12 +2,13 @@ import { createSlice } from '@reduxjs/toolkit';
 interface AppState {
   settings: {
     notificationService: 'firebase' | 'supabase' | null;
+    telecomService: 'twilio' | null;
     [key: string]: any;
   };
 }
 
 const initState: AppState = {
-  settings: { notificationService: null },
+  settings: { notificationService: null, telecomService: null },
 };
 
 const appSlice = createSlice({

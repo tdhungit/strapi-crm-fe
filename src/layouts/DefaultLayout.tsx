@@ -59,6 +59,7 @@ export default function DefaultLayout() {
       dispatch(
         setSettings({
           notificationService: appSettings.uiConfig.thirdPartyService,
+          telecomService: appSettings.uiConfig.telecomProvider,
         })
       );
     }

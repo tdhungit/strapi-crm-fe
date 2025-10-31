@@ -1,5 +1,5 @@
 import { Modal } from 'antd';
-import OutboundCallComponent from './OutboundCallComponent';
+import TwilioOutboundCall from './twilio/TwilioOutboundCall';
 
 export default function OutboundCallModal({
   open,
@@ -7,28 +7,21 @@ export default function OutboundCallModal({
   to,
   module,
   recordId,
-  onSuccess,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   to: string;
   module: string;
   recordId: string;
-  onSuccess: () => void;
 }) {
   return (
     <Modal
-      title='Phone Call'
+      title={false}
       open={open}
       onCancel={() => onOpenChange(false)}
       footer={false}
     >
-      <OutboundCallComponent
-        to={to}
-        module={module}
-        recordId={recordId}
-        onSuccess={onSuccess}
-      />
+      <TwilioOutboundCall to={to} module={module} recordId={recordId} />
     </Modal>
   );
 }

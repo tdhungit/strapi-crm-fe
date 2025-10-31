@@ -14,12 +14,12 @@ export default function OutboundCallComponent({
   to,
   module,
   recordId,
-  onSuccess,
+  status,
 }: {
   to: string;
   module: string;
   recordId: string;
-  onSuccess: () => void;
+  status: string;
 }) {
   const [number, setNumber] = useState<string>(to || '');
   const [digits, setDigits] = useState<string>('');
@@ -82,7 +82,6 @@ export default function OutboundCallComponent({
       // End call
       setIsCalling(false);
       stopTimer();
-      onSuccess?.();
     }
   };
 
@@ -92,6 +91,10 @@ export default function OutboundCallComponent({
 
   return (
     <>
+      <div className='pb-4 text-lg font-bold'>
+        Phone Call (<span className='text-sm text-red-500'>{status}</span>)
+      </div>
+
       <Space direction='vertical' style={{ width: '100%' }} size='middle'>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Input
