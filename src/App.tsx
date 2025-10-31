@@ -1,5 +1,6 @@
 import { App as AntdApp } from 'antd';
 import AppRoutes from './Route';
+import InboundCallListener from './components/telecom/InboundCallListener';
 
 function App() {
   return (
@@ -7,6 +8,7 @@ function App() {
       <div className='StrapiCrmContainer'>
         <AppRoutes />
       </div>
+      <InboundCallListener />
     </AntdApp>
   );
 }
