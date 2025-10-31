@@ -5,6 +5,7 @@ import DateTimeView from './datetime/DateTimeView';
 import EnumerationView from './enumeration/EnumerationView';
 import MediaView from './media/MediaView';
 import PasswordView from './password/PasswordView';
+import PhoneView from './phone/PhoneView';
 import RankingView from './ranking/RankingView';
 import RelationView from './relation/RelationView';
 import RichTextView from './richtext/RichtextView';
@@ -67,6 +68,10 @@ export default function DetailView({ item, data }: { item: any; data: any }) {
 
         case 'datetime':
           setDisplayValue(<DateTimeView value={value} />);
+          break;
+
+        case 'phone':
+          setDisplayValue(<PhoneView value={value} />);
           break;
 
         case 'string':

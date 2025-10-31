@@ -33,6 +33,7 @@ export default function CollectionDetailComponent({
   loaded,
   panelConfigs,
   breadcrumb,
+  onLoadedColumns,
 }: {
   module: string;
   id: string;
@@ -44,6 +45,7 @@ export default function CollectionDetailComponent({
   loaded?: (record: any) => void;
   panelConfigs?: PanelConfigType[];
   breadcrumb?: Partial<BreadcrumbProps<AnyObject>> | any;
+  onLoadedColumns?: (columns: any) => any[];
   [key: string]: any;
 }) {
   const [config, setConfig] = useState<CollectionConfigType>();
@@ -93,7 +95,8 @@ export default function CollectionDetailComponent({
 
         // Edit Layout
         const cols: any = getEditLayoutColumns(res);
-        setColumns(cols);
+        const colsFiltered = onLoadedColumns?.(cols) || cols;
+        setColumns(colsFiltered);
       });
     }
   }, [module]);
@@ -156,6 +159,7 @@ export default function CollectionDetailComponent({
             title={null}
             column={2}
             bordered
+            size='middle'
             dataSource={record?.data}
             emptyText='No Data'
             columns={columns}
