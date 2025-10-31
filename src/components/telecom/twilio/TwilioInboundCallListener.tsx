@@ -5,6 +5,7 @@ import ApiService from '../../../services/ApiService';
 import type { RootState } from '../../../stores';
 import { setSettings } from '../../../stores/appSlice';
 import TwilioInboundCallModal from './TwilioInboundCallModal';
+import TwilioInboundTaskRouter from './TwilioInboundTaskRouter';
 
 export default function TwilioInboundCallListener() {
   const dispatch = useDispatch();
@@ -13,8 +14,9 @@ export default function TwilioInboundCallListener() {
   const deviceRef = useRef<Device | null>(null);
 
   const [open, setOpen] = useState(false);
-  const [call, setCall] = useState<any>(null);
   const [status, setStatus] = useState('init');
+  const [call, setCall] = useState<any>(null);
+  const [callType, setCallType] = useState('direct');
 
   useEffect(() => {
     if (!user?.username) {
@@ -37,6 +39,10 @@ export default function TwilioInboundCallListener() {
             },
           })
         );
+
+        if (res.workspaceId && res.workerId) {
+          setCallType('taskrouter');
+        }
 
         const device = new Device(res.token);
 
@@ -87,13 +93,17 @@ export default function TwilioInboundCallListener() {
 
   return (
     <>
-      <TwilioInboundCallModal
-        open={open}
-        onOpenChange={setOpen}
-        acceptCall={acceptCall}
-        hangup={hangup}
-        status={status}
-      />
+      {callType === 'direct' && (
+        <TwilioInboundCallModal
+          open={open}
+          onOpenChange={setOpen}
+          acceptCall={acceptCall}
+          hangup={hangup}
+          status={status}
+        />
+      )}
+
+      {callType === 'taskrouter' && <TwilioInboundTaskRouter />}
     </>
   );
 }
