@@ -19,6 +19,7 @@ export default function TwilioOutboundCall({
 
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('init');
+  const [call, setCall] = useState<any>(null);
 
   useEffect(() => {
     if (!to || !settings?.telecomOptions?.token) {
@@ -50,6 +51,49 @@ export default function TwilioOutboundCall({
     };
   }, [to, module, recordId, settings]);
 
+  const onCall = async () => {
+    if (!to || !deviceRef.current) {
+      return;
+    }
+
+    const call = await deviceRef.current.connect({
+      params: {
+        To: to,
+      },
+    });
+
+    call.on('disconnect', () => {
+      console.log('Twilio device disconnect');
+      setStatus('ready');
+    });
+
+    call.on('connect', () => {
+      console.log('Twilio device connect');
+      setStatus('connected');
+    });
+
+    call.on('ringing', function () {
+      console.log('Twilio device ringing');
+      setStatus('preparing');
+    });
+
+    call.on('accept', () => {
+      console.log('Twilio device accept');
+      setStatus('ringing');
+    });
+
+    call.on('mute', (isMuted: boolean) => {
+      console.log('Twilio device mute', isMuted);
+    });
+
+    call.on('cancel', () => {
+      console.log('Twilio device cancel');
+      setStatus('ready');
+    });
+
+    setCall(call);
+  };
+
   if (loading) return <Spin />;
 
   return (
@@ -58,6 +102,24 @@ export default function TwilioOutboundCall({
       module={module}
       recordId={recordId}
       status={status}
+      onCall={onCall}
+      endCall={() => {
+        if (deviceRef.current) {
+          deviceRef.current.disconnectAll();
+          deviceRef.current.destroy();
+          console.log('Device destroyed');
+        }
+      }}
+      onPause={(isPaused: boolean) => {
+        if (call) {
+          call.muted(isPaused);
+        }
+      }}
+      onDigit={(digit: string) => {
+        if (call && digit) {
+          call.sendDigits(digit);
+        }
+      }}
     />
   );
 }

@@ -15,11 +15,19 @@ export default function OutboundCallComponent({
   module,
   recordId,
   status,
+  onCall,
+  endCall,
+  onPause,
+  onDigit,
 }: {
   to: string;
   module: string;
   recordId: string;
   status: string;
+  onCall?: () => void;
+  endCall?: () => void;
+  onPause?: (isPaused: boolean) => void;
+  onDigit?: (digit: string) => void;
 }) {
   const [number, setNumber] = useState<string>(to || '');
   const [digits, setDigits] = useState<string>('');
@@ -62,12 +70,17 @@ export default function OutboundCallComponent({
   };
 
   const appendDigit = (d: string) => {
-    if (isCalling) setDigits((prev) => prev + d);
-    // If in-call, this could send DTMF; left as a placeholder
+    if (isCalling) {
+      setDigits((prev) => prev + d);
+      onDigit?.(digits);
+    }
   };
 
   const backspace = () => {
     setDigits((prev) => prev.slice(0, -1));
+    if (isCalling) {
+      onDigit?.(digits);
+    }
   };
 
   const handleCall = async () => {
@@ -75,18 +88,18 @@ export default function OutboundCallComponent({
       if (!number) return;
       setIsCalling(true);
       startTimer();
-      // TODO: integrate with backend/twilio
-      // Example payload you might send:
-      // await fetch('/api/telecom/twilio/call', { method: 'POST', body: JSON.stringify({ to: number, module, recordId }) })
+      onCall?.();
     } else {
       // End call
       setIsCalling(false);
       stopTimer();
+      endCall?.();
     }
   };
 
   const togglePause = () => {
     setIsPaused(!isPaused);
+    onPause?.(!isPaused);
   };
 
   return (
