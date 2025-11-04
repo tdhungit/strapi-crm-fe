@@ -4,6 +4,7 @@ import { Button } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PhotosView from '../../components/fields/media/PhotosView';
+import TagInput from '../../components/fields/tag/TagInput';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import { type ProductType } from './ProductService';
@@ -119,6 +120,14 @@ export default function ProductDetail() {
                   render: (dom: any) => (
                     <div dangerouslySetInnerHTML={{ __html: dom }} />
                   ),
+                  span: 2,
+                },
+                {
+                  dataIndex: 'tags',
+                  title: 'Tags',
+                  render: (_text: any, record: any) => {
+                    return <TagInput module='products' recordId={record.id} />;
+                  },
                   span: 2,
                 },
               ]}
