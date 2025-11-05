@@ -34,7 +34,6 @@ export default function TagFindRecordsModal({
           }
           data[item.module].push(item);
         });
-        console.log(data);
         setRecords(data);
       })
       .catch((error) => {

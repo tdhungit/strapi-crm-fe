@@ -1,5 +1,6 @@
 import { ProTable } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getListLayoutColumns } from '../../../helpers/views_helper';
 import MetadataService from '../../../services/MetadataService';
 
@@ -22,6 +23,19 @@ export default function CollectionListDataComponent({
     MetadataService.getCollectionConfigurations(collectionName).then((res) => {
       // get columns
       const cols = getListLayoutColumns(res);
+      const idx = cols.findIndex((item) => item.key === res.settings.mainField);
+      if (idx >= 0) {
+        cols[idx] = {
+          ...cols[idx],
+          render: (text: any, record: any) => (
+            <Link
+              to={`/collections/${collectionName}/detail/${record.documentId}`}
+            >
+              {text}
+            </Link>
+          ),
+        };
+      }
       setColumns(cols);
     });
   }, [collectionName, dataSource]);
