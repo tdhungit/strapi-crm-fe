@@ -2,6 +2,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Flex, Input, Tag, type InputRef } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import ApiService from '../../../services/ApiService';
+import TagFindRecordsModal from './TagFindRecordsModal';
 
 interface ValueType {
   id: number;
@@ -22,13 +23,20 @@ export default function TagInput({
   const [editInputId, setEditInputId] = useState(0);
   const [editInputValue, setEditInputValue] = useState('');
 
+  const [tagSelected, setTagSelected] = useState<ValueType | null>(null);
+  const [tagFindRecordsModalOpen, setTagFindRecordsModalOpen] = useState(false);
+
   const inputRef = useRef<InputRef>(null);
   const editInputRef = useRef<InputRef>(null);
 
-  useEffect(() => {
+  const loadTags = () => {
     ApiService.request('GET', `/tags/${module}/${recordId}`).then((res) => {
       setValue(res);
     });
+  };
+
+  useEffect(() => {
+    loadTags();
   }, [module, recordId]);
 
   useEffect(() => {
@@ -46,6 +54,8 @@ export default function TagInput({
       module,
       recordId,
       tagNames: tags.map((v) => v.name),
+    }).then(() => {
+      loadTags();
     });
   };
 
@@ -104,54 +114,72 @@ export default function TagInput({
   };
 
   return (
-    <Flex gap='4px 0' wrap>
-      {value.map((item: ValueType) => (
-        <>
-          {editInputId === item.id ? (
-            <Input
-              ref={editInputRef}
-              key={item.id}
-              size='small'
-              style={tagInputStyle}
-              value={editInputValue}
-              onChange={handleEditInputChange}
-              onBlur={handleEditInputConfirm}
-              onPressEnter={handleEditInputConfirm}
-            />
-          ) : (
-            <Tag key={item.id} closable onClose={() => handleClose(item.id)}>
-              <span
-                onDoubleClick={(e) => {
-                  if (item.id !== 0) {
-                    setEditInputId(item.id);
-                    setEditInputValue(item.name);
-                    e.preventDefault();
-                  }
+    <>
+      <Flex gap='4px 0' wrap>
+        {value.map((item: ValueType) => (
+          <>
+            {editInputId === item.id ? (
+              <Input
+                ref={editInputRef}
+                key={item.id}
+                size='small'
+                style={tagInputStyle}
+                value={editInputValue}
+                onChange={handleEditInputChange}
+                onBlur={handleEditInputConfirm}
+                onPressEnter={handleEditInputConfirm}
+              />
+            ) : (
+              <Tag
+                key={item.id}
+                closable
+                onClose={() => handleClose(item.id)}
+                onClick={() => {
+                  setTagSelected(item);
+                  setTagFindRecordsModalOpen(true);
                 }}
               >
-                {item.name}
-              </span>
-            </Tag>
-          )}
-        </>
-      ))}
+                <span
+                  onDoubleClick={(e) => {
+                    if (item.id !== 0) {
+                      setEditInputId(item.id);
+                      setEditInputValue(item.name);
+                      e.preventDefault();
+                    }
+                  }}
+                >
+                  {item.name}
+                </span>
+              </Tag>
+            )}
+          </>
+        ))}
 
-      {inputVisible ? (
-        <Input
-          ref={inputRef}
-          type='text'
-          size='small'
-          style={tagInputStyle}
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleInputConfirm}
-          onPressEnter={handleInputConfirm}
+        {inputVisible ? (
+          <Input
+            ref={inputRef}
+            type='text'
+            size='small'
+            style={tagInputStyle}
+            value={inputValue}
+            onChange={handleInputChange}
+            onBlur={handleInputConfirm}
+            onPressEnter={handleInputConfirm}
+          />
+        ) : (
+          <Tag style={tagPlusStyle} icon={<PlusOutlined />} onClick={showInput}>
+            New Tag
+          </Tag>
+        )}
+      </Flex>
+
+      {tagSelected && (
+        <TagFindRecordsModal
+          open={tagFindRecordsModalOpen}
+          onOpenChange={setTagFindRecordsModalOpen}
+          tagId={tagSelected?.id}
         />
-      ) : (
-        <Tag style={tagPlusStyle} icon={<PlusOutlined />} onClick={showInput}>
-          New Tag
-        </Tag>
       )}
-    </Flex>
+    </>
   );
 }
