@@ -24,6 +24,7 @@ export default function ProductDetail() {
           'product_variants.product_variant_attributes.product_attribute',
           'product_variants.product_prices',
           'product_category',
+          'brand',
         ],
       })
       .then((response) => {
@@ -95,10 +96,12 @@ export default function ProductDetail() {
                   dataIndex: 'product_status',
                 },
                 {
-                  title: 'Product Category',
+                  title: 'Category/Brand',
                   dataIndex: 'product_category',
                   render: (_text: any, record: ProductType) => (
-                    <span>{record.product_category?.name}</span>
+                    <span>
+                      {record.product_category?.name}/{record.brand?.name}
+                    </span>
                   ),
                 },
                 {

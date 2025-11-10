@@ -196,7 +196,7 @@ export default function ProductForm() {
           </Row>
 
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
               <ProForm.Item
                 name='product_category'
                 label='Product Category'
@@ -212,7 +212,7 @@ export default function ProductForm() {
                 />
               </ProForm.Item>
             </Col>
-            <Col span={12}>
+            <Col span={8}>
               <ProFormSelect
                 name='unit'
                 label='Unit'
@@ -237,6 +237,18 @@ export default function ProductForm() {
                   },
                 ]}
               />
+            </Col>
+            <Col span={8}>
+              <ProForm.Item name='brand' label='Brand'>
+                <RelationInput
+                  item={{
+                    options: {
+                      target: 'api::brand.brand',
+                      mainField: 'name',
+                    },
+                  }}
+                />
+              </ProForm.Item>
             </Col>
           </Row>
 

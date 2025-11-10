@@ -49,6 +49,11 @@ export const defaultMenus: any = {
     icon: 'contactsbook',
     label: 'Suppliers',
   },
+  brands: {
+    key: '/collections/brands',
+    icon: 'tag',
+    label: 'Brands',
+  },
   'purchase-orders': {
     key: '/collections/purchase-orders',
     icon: 'shoppingcart',

@@ -77,6 +77,9 @@ export interface ProductType {
   product_category?: {
     [key: string]: any;
   };
+  brand?: {
+    [key: string]: any;
+  };
 }
 
 class ProductService {
@@ -87,6 +90,10 @@ class ProductService {
     if (data.product_category) {
       data.product_category =
         data.product_category.value || data.product_category.id;
+    }
+
+    if (data.brand?.value) {
+      data.brand = data.brand.value;
     }
 
     if (values.variants && values.variants.length > 0) {

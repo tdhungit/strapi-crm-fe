@@ -51,7 +51,7 @@ export default function MediaChoose({
         {value?.length > 0 &&
           value.map((item: any) => (
             <div
-              key={item.id}
+              key={item.id || item.url}
               className='relative'
               style={{ width: 80, height: 80 }}
             >
