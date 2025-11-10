@@ -33,6 +33,7 @@ export default function ProductForm() {
         populate: [
           'product_variants.product_variant_attributes.product_attribute',
           'product_category',
+          'brand',
         ],
       })
       .then((response) => {

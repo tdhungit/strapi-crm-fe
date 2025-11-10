@@ -33,6 +33,9 @@ export interface ProductFormType {
   product_category?: {
     [key: string]: any;
   };
+  brand?: {
+    [key: string]: any;
+  };
 }
 
 interface ProductAttributeType {
@@ -148,6 +151,11 @@ class ProductService {
         ...product.product_category,
         value: product.product_category?.id,
         label: product.product_category?.name,
+      },
+      brand: {
+        ...product.brand,
+        value: product.brand?.id,
+        label: product.brand?.name,
       },
       variants: [],
     };
