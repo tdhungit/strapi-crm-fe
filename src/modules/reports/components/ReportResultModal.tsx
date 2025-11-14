@@ -10,11 +10,13 @@ export default function ReportResultModal({
   module,
   tree,
   config,
+  selectedFields,
   onFinish,
 }: {
   module: string;
   tree: ImmutableTree;
   config: Config;
+  selectedFields: string[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onFinish?: (query: any, filters: any) => void;
@@ -36,6 +38,7 @@ export default function ReportResultModal({
       tree: treeObj,
       query: exported.sql,
       filters: strapiFilters,
+      selectedFields,
     })
       .then((res) => {
         setQuery(exported);

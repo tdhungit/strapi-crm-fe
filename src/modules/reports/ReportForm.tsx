@@ -1,8 +1,18 @@
 import { SaveOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import type { Config, ImmutableTree } from '@react-awesome-query-builder/antd';
-import { App, Button, Card, Col, Form, Input, Row, Select } from 'antd';
-import { useState } from 'react';
+import {
+  App,
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  Row,
+  Select,
+  Transfer,
+} from 'antd';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import AssignUserInput from '../../components/fields/assign-user/AssignUserInput';
@@ -10,6 +20,7 @@ import { availableCollections } from '../../config/collections';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
+import type { ContentTypeAttributeType } from '../../types/content-types';
 import QueryBuilder from './components/QueryBuilder';
 import ReportResultModal from './components/ReportResultModal';
 
@@ -23,6 +34,8 @@ export default function ReportForm() {
   const [treeObj, setTreeObj] = useState<ImmutableTree>();
   const [treeConfig, setTreeConfig] = useState<Config>();
   const [openReportModal, setOpenReportModal] = useState<boolean>(false);
+  const [availableFields, setAvailableFields] = useState<any[]>([]);
+  const [selectedFields, setSelectedFields] = useState<string[]>([]);
 
   const contentTypes = MetadataService.getSavedContentTypes();
 
@@ -35,6 +48,77 @@ export default function ReportForm() {
     label: ct.displayName,
     value: ct.collectionName,
   }));
+
+  useEffect(() => {
+    if (!selectedModule) {
+      setAvailableFields([]);
+      setSelectedFields([]);
+      return;
+    }
+
+    const collection = MetadataService.getContentTypeByModule(selectedModule);
+    if (!collection) return;
+
+    const fields: any[] = [];
+
+    Object.entries(collection.attributes).forEach(
+      ([fieldName, fieldAttr]: [string, ContentTypeAttributeType]) => {
+        // Skip localizations and complex types
+        if (fieldName === 'localizations' || fieldAttr.type === 'component') {
+          return;
+        }
+
+        const formatFieldLabel = (name: string): string => {
+          return (
+            name.charAt(0).toUpperCase() + name.slice(1).replace(/_/g, ' ')
+          );
+        };
+
+        // Handle relation fields
+        if (fieldAttr.type === 'relation' && fieldAttr.target) {
+          const relatedContentType = MetadataService.getContentTypeByUid(
+            fieldAttr.target
+          );
+          if (relatedContentType) {
+            Object.entries(relatedContentType.attributes).forEach(
+              ([relatedFieldName, relatedFieldAttr]: [
+                string,
+                ContentTypeAttributeType
+              ]) => {
+                if (
+                  relatedFieldName === 'localizations' ||
+                  relatedFieldAttr.type === 'relation' ||
+                  relatedFieldAttr.type === 'component'
+                ) {
+                  return;
+                }
+                fields.push({
+                  key: `${fieldName}.${relatedFieldName}`,
+                  title: `${formatFieldLabel(fieldName)} > ${formatFieldLabel(
+                    relatedFieldName
+                  )}`,
+                });
+              }
+            );
+          }
+        } else {
+          fields.push({
+            key: fieldName,
+            title: formatFieldLabel(fieldName),
+          });
+        }
+      }
+    );
+
+    setAvailableFields(fields);
+    // Auto-select common fields
+    const autoSelect = fields
+      .filter((f) =>
+        ['id', 'name', 'title', 'createdAt', 'updatedAt'].includes(f.key)
+      )
+      .map((f) => f.key);
+    setSelectedFields(autoSelect);
+  }, [selectedModule]);
 
   const handleQueryChange = (tree: ImmutableTree, config: Config) => {
     setTreeObj(tree);
@@ -59,6 +143,7 @@ export default function ReportForm() {
         tree: treeObj,
         query,
         filters,
+        selectedFields,
       },
     };
 
@@ -153,6 +238,28 @@ export default function ReportForm() {
           </Form>
         </Card>
 
+        {selectedModule && availableFields.length > 0 && (
+          <Card title='Select Fields to Display' size='small'>
+            <Transfer
+              dataSource={availableFields}
+              titles={['Available Fields', 'Selected Fields']}
+              targetKeys={selectedFields}
+              onChange={(targetKeys) =>
+                setSelectedFields(targetKeys as string[])
+              }
+              render={(item: any) => item.title}
+              listStyle={{
+                width: '100%',
+                height: 400,
+              }}
+              showSearch
+              filterOption={(inputValue: string, item: any) =>
+                item.title.toLowerCase().includes(inputValue.toLowerCase())
+              }
+            />
+          </Card>
+        )}
+
         {selectedModule && (
           <Card title='Query Builder' size='small'>
             <QueryBuilder
@@ -167,6 +274,7 @@ export default function ReportForm() {
             type='primary'
             icon={<SaveOutlined />}
             onClick={generateReport}
+            disabled={!selectedModule || selectedFields.length === 0}
           >
             Generate Report
           </Button>
@@ -180,6 +288,7 @@ export default function ReportForm() {
           module={selectedModule}
           tree={treeObj}
           config={treeConfig}
+          selectedFields={selectedFields}
           onFinish={(query, filters) => handleSave(query, filters)}
         />
       )}
