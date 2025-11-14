@@ -20,6 +20,7 @@
     "@grapesjs/react": "^2.0.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@n8n/chat": "^0.62.0",
+    "@react-awesome-query-builder/antd": "^6.7.0-alpha.0",
     "@reduxjs/toolkit": "^2.8.2",
     "@strapi/client": "^1.4.0",
     "@supabase/supabase-js": "^2.76.1",

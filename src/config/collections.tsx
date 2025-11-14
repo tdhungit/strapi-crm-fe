@@ -19,4 +19,5 @@ export const availableCollections = [
   'product-categories',
   'coupons',
   'brands',
+  'reports',
 ];

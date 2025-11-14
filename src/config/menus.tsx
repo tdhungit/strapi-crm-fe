@@ -89,6 +89,11 @@ export const defaultMenus: any = {
     icon: 'file',
     label: 'Workflows',
   },
+  reports: {
+    key: '/collections/reports',
+    icon: 'file',
+    label: 'Reports',
+  },
   users: {
     key: '/users',
     icon: 'users',
