@@ -4,14 +4,14 @@ import type { Config, ImmutableTree } from '@react-awesome-query-builder/antd';
 import { App, Button, Card, Col, Form, Input, Row, Select } from 'antd';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import AssignUserInput from '../../components/fields/assign-user/AssignUserInput';
 import { availableCollections } from '../../config/collections';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
+import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
 import QueryBuilder from './components/QueryBuilder';
-// import { exportQuery, toStrapiFilters } from './utils/queryExport';
-import { useNavigate } from 'react-router-dom';
-import ApiService from '../../services/ApiService';
+import ReportResultModal from './components/ReportResultModal';
 
 export default function ReportForm() {
   const user = useSelector((state: any) => state.user);
@@ -22,6 +22,7 @@ export default function ReportForm() {
   const [selectedModule, setSelectedModule] = useState<string>('');
   const [treeObj, setTreeObj] = useState<ImmutableTree>();
   const [treeConfig, setTreeConfig] = useState<Config>();
+  const [openReportModal, setOpenReportModal] = useState<boolean>(false);
 
   const contentTypes = MetadataService.getSavedContentTypes();
 
@@ -38,17 +39,17 @@ export default function ReportForm() {
   const handleQueryChange = (tree: ImmutableTree, config: Config) => {
     setTreeObj(tree);
     setTreeConfig(config);
-
-    // Export query in different formats
-    // const exported = exportQuery(tree, config);
-    // const strapiFilters = toStrapiFilters(tree, config);
-
-    // console.log('Query Tree:', tree);
-    // console.log('Query Exports:', exported);
-    // console.log('Strapi Filters:', strapiFilters);
   };
 
-  const handleSave = () => {
+  const generateReport = () => {
+    if (!treeObj || !treeConfig) {
+      return;
+    }
+
+    setOpenReportModal(true);
+  };
+
+  const handleSave = (query: any, filters: any) => {
     const formData = form.getFieldsValue();
     const data = {
       name: formData.name,
@@ -56,7 +57,8 @@ export default function ReportForm() {
       metadata: {
         module: selectedModule,
         tree: treeObj,
-        config: treeConfig,
+        query,
+        filters,
       },
     };
 
@@ -161,11 +163,26 @@ export default function ReportForm() {
         )}
 
         <div className='flex justify-start mt-2'>
-          <Button type='primary' icon={<SaveOutlined />} onClick={handleSave}>
+          <Button
+            type='primary'
+            icon={<SaveOutlined />}
+            onClick={generateReport}
+          >
             Generate Report
           </Button>
         </div>
       </div>
+
+      {selectedModule && treeObj && treeConfig && (
+        <ReportResultModal
+          open={openReportModal}
+          onOpenChange={setOpenReportModal}
+          module={selectedModule}
+          tree={treeObj}
+          config={treeConfig}
+          onFinish={(query, filters) => handleSave(query, filters)}
+        />
+      )}
     </PageContainer>
   );
 }

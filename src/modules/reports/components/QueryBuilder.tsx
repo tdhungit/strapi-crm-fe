@@ -71,7 +71,7 @@ export default function QueryBuilder({
     } else {
       // Create an empty tree with proper structure
       const emptyTree = QbUtils.loadTree({ id: QbUtils.uuid(), type: 'group' });
-      console.log('Initialized empty tree:', emptyTree);
+      // console.log('Initialized empty tree:', emptyTree);
       setTree(emptyTree);
     }
   }, [module]);
@@ -184,7 +184,7 @@ export default function QueryBuilder({
       }
     );
 
-    console.log('Built config with fields:', Object.keys(fields));
+    // console.log('Built config with fields:', Object.keys(fields));
 
     return {
       ...AntdConfig,
