@@ -1,13 +1,14 @@
 import type { Config, ImmutableTree } from '@react-awesome-query-builder/antd';
 import { Utils as QbUtils } from '@react-awesome-query-builder/antd';
 
-const { jsonLogicFormat, queryString, sqlFormat } = QbUtils;
+const { jsonLogicFormat, queryString, sqlFormat, getTree, loadTree } = QbUtils;
 
 export interface QueryExport {
   jsonLogic?: any;
   queryString?: string;
   mongodb?: string;
   sql?: string;
+  jsonTree?: any;
 }
 
 /**
@@ -22,6 +23,7 @@ export const exportQuery = (
     queryString: queryString(tree, config) || '',
     // mongodb: mongodbFormat(tree, config),
     sql: sqlFormat(tree, config),
+    jsonTree: getTree(tree),
   };
 };
 
@@ -145,4 +147,8 @@ const convertJsonLogicToStrapi = (logic: any): any => {
   }
 
   return logic;
+};
+
+export const loadTreeFromJson = (jsonTree: any) => {
+  return loadTree(jsonTree);
 };

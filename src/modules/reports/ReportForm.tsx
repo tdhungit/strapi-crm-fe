@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AssignUserInput from '../../components/fields/assign-user/AssignUserInput';
 import { availableCollections } from '../../config/collections';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
@@ -23,8 +23,11 @@ import MetadataService from '../../services/MetadataService';
 import type { ContentTypeAttributeType } from '../../types/content-types';
 import QueryBuilder from './components/QueryBuilder';
 import ReportResultModal from './components/ReportResultModal';
+import { loadTreeFromJson } from './utils/queryExport';
 
 export default function ReportForm() {
+  const { id } = useParams();
+
   const user = useSelector((state: any) => state.user);
   const navigate = useNavigate();
   const { message, notification } = App.useApp();
@@ -120,6 +123,24 @@ export default function ReportForm() {
     setSelectedFields(autoSelect);
   }, [selectedModule]);
 
+  useEffect(() => {
+    if (!id) return;
+
+    ApiService.getClient()
+      .collection('reports')
+      .findOne(id)
+      .then((res) => {
+        const data = res.data;
+        form.setFieldsValue(data);
+        setSelectedModule(data.metadata.module);
+        setTreeObj(loadTreeFromJson(data.metadata.tree));
+        setSelectedFields(data.metadata.selectedFields);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [id]);
+
   const handleQueryChange = (tree: ImmutableTree, config: Config) => {
     setTreeObj(tree);
     setTreeConfig(config);
@@ -140,24 +161,29 @@ export default function ReportForm() {
       });
   };
 
-  const handleSave = (query: any, filters: any) => {
+  const handleSave = (query: any, filters: any, jsonTree: any) => {
     const formData = form.getFieldsValue();
     const data = {
       name: formData.name,
       assigned_user: formData.assigned_user?.value || user.id,
       metadata: {
         module: selectedModule,
-        tree: treeObj,
+        tree: jsonTree,
         query,
         filters,
         selectedFields,
       },
     };
 
+    let service;
+    if (id) {
+      service = ApiService.getClient().collection('reports').update(id, data);
+    } else {
+      service = ApiService.getClient().collection('reports').create(data);
+    }
+
     message.loading('Saving report...', 0);
-    ApiService.getClient()
-      .collection('reports')
-      .create(data)
+    service
       .then(() => {
         notification.success({
           message: 'Success',
@@ -271,7 +297,11 @@ export default function ReportForm() {
           <Card title='Query Builder' size='small'>
             <QueryBuilder
               module={selectedModule}
+              value={treeObj || undefined}
               onChange={handleQueryChange}
+              onInit={(_tree, config) => {
+                setTreeConfig(config);
+              }}
             />
           </Card>
         )}
@@ -300,7 +330,9 @@ export default function ReportForm() {
             tree={treeObj}
             config={treeConfig}
             selectedFields={selectedFields}
-            onFinish={(query, filters) => handleSave(query, filters)}
+            onFinish={(query, filters, jsonTree) =>
+              handleSave(query, filters, jsonTree)
+            }
           />
         )}
     </PageContainer>

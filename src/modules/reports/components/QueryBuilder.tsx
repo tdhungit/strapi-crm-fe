@@ -21,6 +21,7 @@ interface QueryBuilderProps {
   module: string;
   value?: ImmutableTree;
   onChange?: (tree: ImmutableTree, config: Config) => void;
+  onInit?: (tree: ImmutableTree, config: Config) => void;
 }
 
 // Map Strapi field types to query builder types
@@ -51,6 +52,7 @@ export default function QueryBuilder({
   module,
   value,
   onChange,
+  onInit,
 }: QueryBuilderProps) {
   const [config, setConfig] = useState<Config | null>(null);
   const [tree, setTree] = useState<ImmutableTree | null>(null);
@@ -74,6 +76,8 @@ export default function QueryBuilder({
       // console.log('Initialized empty tree:', emptyTree);
       setTree(emptyTree);
     }
+
+    onInit?.(tree!, queryConfig);
   }, [module]);
 
   const formatFieldLabel = (fieldName: string): string => {

@@ -20,10 +20,11 @@ export default function ReportResultModal({
   selectedFields: string[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onFinish?: (query: any, filters: any) => void;
+  onFinish?: (query: any, filters: any, jsonTree: any) => void;
 }) {
-  const [query, setQuery] = useState<any>(null);
+  const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<any>(null);
+  const [jsonTree, setJsonTree] = useState<any>(null);
   const [generating, setGenerating] = useState<boolean>(false);
   const [result, setResult] = useState<any>(null);
 
@@ -36,14 +37,15 @@ export default function ReportResultModal({
     setGenerating(true);
     ApiService.request('post', '/reports/extra/generate', {
       module,
-      tree: treeObj,
+      tree: exported.jsonTree,
       query: exported.sql,
       filters: strapiFilters,
       selectedFields,
     })
       .then((res) => {
-        setQuery(exported);
+        setQuery(exported.sql || '');
         setFilters(strapiFilters);
+        setJsonTree(exported.jsonTree);
         setResult(res);
       })
       .catch((err) => {
@@ -68,7 +70,7 @@ export default function ReportResultModal({
       onCancel={() => onOpenChange(false)}
       onOk={() => {
         onOpenChange(false);
-        onFinish?.(query, filters);
+        onFinish?.(query, filters, jsonTree);
       }}
       width={1100}
     >
