@@ -281,17 +281,21 @@ export default function ReportForm() {
         </div>
       </div>
 
-      {selectedModule && treeObj && treeConfig && (
-        <ReportResultModal
-          open={openReportModal}
-          onOpenChange={setOpenReportModal}
-          module={selectedModule}
-          tree={treeObj}
-          config={treeConfig}
-          selectedFields={selectedFields}
-          onFinish={(query, filters) => handleSave(query, filters)}
-        />
-      )}
+      {selectedModule &&
+        treeObj &&
+        treeConfig &&
+        selectedFields &&
+        selectedFields.length > 0 && (
+          <ReportResultModal
+            open={openReportModal}
+            onOpenChange={setOpenReportModal}
+            module={selectedModule}
+            tree={treeObj}
+            config={treeConfig}
+            selectedFields={selectedFields}
+            onFinish={(query, filters) => handleSave(query, filters)}
+          />
+        )}
     </PageContainer>
   );
 }

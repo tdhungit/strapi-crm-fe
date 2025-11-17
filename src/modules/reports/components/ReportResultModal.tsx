@@ -1,6 +1,7 @@
 import type { Config, ImmutableTree } from '@react-awesome-query-builder/antd';
-import { Modal } from 'antd';
+import { Modal, Table } from 'antd';
 import { useEffect, useState } from 'react';
+import { convertFieldsToTableColumns } from '../../../helpers/views_helper';
 import ApiService from '../../../services/ApiService';
 import { exportQuery, toStrapiFilters } from './../utils/queryExport';
 
@@ -59,6 +60,8 @@ export default function ReportResultModal({
     generateReport(tree, config);
   }, [open, tree, config]);
 
+  const columns = convertFieldsToTableColumns(module, selectedFields);
+
   return (
     <Modal
       open={open}
@@ -67,12 +70,21 @@ export default function ReportResultModal({
         onOpenChange(false);
         onFinish?.(query, filters);
       }}
+      width={1100}
     >
       {generating ? (
         <div>Generating report...</div>
       ) : result ? (
-        <div>
-          <pre>{JSON.stringify(result, null, 2)}</pre>
+        <div className='w-full'>
+          <Table
+            columns={columns}
+            dataSource={result.data}
+            pagination={{
+              pageSize: result.meta.pagination.pageSize,
+              total: result.meta.pagination.total,
+              current: result.meta.pagination.page,
+            }}
+          />
         </div>
       ) : (
         <div>No result</div>

@@ -498,3 +498,35 @@ export function formatCurrency(value: number) {
     currency: 'USD',
   }).format(value);
 }
+
+export function convertFieldsToTableColumns(module: string, fields: any[]) {
+  const columns: any[] = [];
+
+  const contentType = MetadataService.getContentTypeByModule(module);
+  const attributes = contentType?.attributes;
+
+  fields.forEach((field: string) => {
+    const fieldOptions = attributes?.[field] || null;
+    if (!fieldOptions) return;
+
+    const column: any = {
+      title: camelToTitle(field),
+      dataIndex: field,
+      key: field,
+    };
+
+    switch (fieldOptions.type) {
+      case 'date':
+      case 'datetime':
+        column.render = (text: string) => datetimeDisplay(text);
+        break;
+      case 'number':
+        column.render = (text: number) => formatCurrency(text || 0);
+        break;
+    }
+
+    columns.push(column);
+  });
+
+  return columns;
+}
