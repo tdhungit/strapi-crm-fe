@@ -85,6 +85,7 @@ export default function ReportResultModal({
               pageSize: result.meta.pagination.pageSize,
               total: result.meta.pagination.total,
               current: result.meta.pagination.page,
+              disabled: true,
             }}
           />
         </div>

@@ -1,3 +1,4 @@
+import ReportDetail from './ReportDetail';
 import ReportForm from './ReportForm';
 
 const routes = [
@@ -8,6 +9,10 @@ const routes = [
   {
     path: '/collections/reports/edit/:id',
     element: <ReportForm />,
+  },
+  {
+    path: '/collections/reports/detail/:id',
+    element: <ReportDetail />,
   },
 ];
 
