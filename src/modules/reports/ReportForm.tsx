@@ -130,7 +130,14 @@ export default function ReportForm() {
       return;
     }
 
-    setOpenReportModal(true);
+    form
+      .validateFields()
+      .then(() => {
+        setOpenReportModal(true);
+      })
+      .catch(() => {
+        message.error('Please fill in all required fields');
+      });
   };
 
   const handleSave = (query: any, filters: any) => {
