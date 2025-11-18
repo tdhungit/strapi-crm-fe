@@ -530,3 +530,21 @@ export function convertFieldsToTableColumns(module: string, fields: any[]) {
 
   return columns;
 }
+
+export function convertRawFieldsToTableColumns(fields: string[]) {
+  const columns: any[] = [];
+
+  let count = 0;
+  fields.forEach((field: any) => {
+    if (count >= 10) return;
+
+    columns.push({
+      title: field.label || field.name,
+      dataIndex: field.name,
+    });
+
+    count += 1;
+  });
+
+  return columns;
+}

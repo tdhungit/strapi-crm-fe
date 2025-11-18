@@ -1,7 +1,10 @@
 import type { Config, ImmutableTree } from '@react-awesome-query-builder/antd';
 import { Modal, Table } from 'antd';
 import { useEffect, useState } from 'react';
-import { convertFieldsToTableColumns } from '../../../helpers/views_helper';
+import {
+  convertFieldsToTableColumns,
+  convertRawFieldsToTableColumns,
+} from '../../../helpers/views_helper';
 import ApiService from '../../../services/ApiService';
 import { exportQuery, toStrapiFilters } from './../utils/queryExport';
 
@@ -9,24 +12,28 @@ export default function ReportResultModal({
   open,
   onOpenChange,
   module,
+  query: rawQuery,
   tree,
   config,
   selectedFields,
   onFinish,
 }: {
   module: string;
-  tree: ImmutableTree;
-  config: Config;
-  selectedFields: string[];
+  query?: string;
+  tree?: ImmutableTree;
+  config?: Config;
+  selectedFields?: string[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onFinish?: (query: any, filters: any, jsonTree: any) => void;
+  onFinish?: (query: any, filters: any, jsonTree: any, fields?: any[]) => void;
 }) {
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<any>(null);
   const [jsonTree, setJsonTree] = useState<any>(null);
   const [generating, setGenerating] = useState<boolean>(false);
   const [result, setResult] = useState<any>(null);
+  const [columns, setColumns] = useState<any>([]);
+  const [fields, setFields] = useState<any>([]);
 
   const generateReport = (treeObj: ImmutableTree, configObj: Config) => {
     const exported = exportQuery(treeObj, configObj);
@@ -56,13 +63,42 @@ export default function ReportResultModal({
       });
   };
 
+  const generateRawQueryReport = (query: string) => {
+    setGenerating(true);
+    ApiService.request('post', '/reports/extra/generate', {
+      module,
+      query,
+    })
+      .then((res) => {
+        setQuery(query);
+        setResult(res);
+        setColumns(convertRawFieldsToTableColumns(res.meta.fields));
+        setFields(res.meta.fields);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setGenerating(false);
+      });
+  };
+
   useEffect(() => {
     if (!open || !tree || !config) return;
 
     generateReport(tree, config);
   }, [open, tree, config]);
 
-  const columns = convertFieldsToTableColumns(module, selectedFields);
+  useEffect(() => {
+    if (!open || !selectedFields || selectedFields.length === 0 || !filters)
+      return;
+    setColumns(convertFieldsToTableColumns(module, selectedFields));
+  }, [open, selectedFields]);
+
+  useEffect(() => {
+    if (!open || !rawQuery) return;
+    generateRawQueryReport(rawQuery);
+  }, [open, rawQuery]);
 
   return (
     <Modal
@@ -70,14 +106,14 @@ export default function ReportResultModal({
       onCancel={() => onOpenChange(false)}
       onOk={() => {
         onOpenChange(false);
-        onFinish?.(query, filters, jsonTree);
+        onFinish?.(query, filters, jsonTree, fields);
       }}
       width={1100}
     >
       {generating ? (
         <div>Generating report...</div>
       ) : result ? (
-        <div className='w-full'>
+        <div className='w-full overflow-y-auto'>
           <Table
             columns={columns}
             dataSource={result.data}

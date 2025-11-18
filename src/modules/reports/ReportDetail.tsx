@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import {
   breadcrumbItemRender,
   convertFieldsToTableColumns,
+  convertRawFieldsToTableColumns,
 } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 
@@ -19,12 +20,20 @@ export default function ReportDetail() {
       .findOne(id as string)
       .then((res) => {
         setReport(res.data);
-        setColumns(
-          convertFieldsToTableColumns(
-            res.data.metadata.module,
-            res.data.metadata.selectedFields
-          )
-        );
+        if (res.data.metadata?.queryType !== 'query') {
+          setColumns(
+            convertFieldsToTableColumns(
+              res.data.metadata.module,
+              res.data.metadata.selectedFields
+            )
+          );
+        } else {
+          if (res.data.metadata?.fields) {
+            setColumns(
+              convertRawFieldsToTableColumns(res.data.metadata.fields)
+            );
+          }
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -64,6 +73,7 @@ export default function ReportDetail() {
                 ...params,
               }
             );
+
             return {
               data: res.data,
               success: true,
