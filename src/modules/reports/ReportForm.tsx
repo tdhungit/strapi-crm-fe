@@ -167,6 +167,12 @@ export default function ReportForm() {
     setTreeConfig(config);
   };
 
+  const checkValidQuery = (query: string) => {
+    return ApiService.request('post', '/reports/extra/is-valid-query', {
+      query,
+    });
+  };
+
   const generateReport = () => {
     if (queryType === 'filters' && (!treeObj || !treeConfig)) {
       return;
@@ -179,7 +185,32 @@ export default function ReportForm() {
     form
       .validateFields()
       .then(() => {
-        setOpenReportModal(true);
+        if (queryType === 'query') {
+          if (!rawQuery) {
+            notification.error({
+              message: 'Error',
+              description: 'Query is required',
+            });
+            return;
+          }
+
+          message.loading('Checking query validity...', 0);
+          checkValidQuery(rawQuery)
+            .then(() => {
+              setOpenReportModal(true);
+            })
+            .catch(() => {
+              notification.error({
+                message: 'Error',
+                description: 'Query is not valid',
+              });
+            })
+            .finally(() => {
+              message.destroy();
+            });
+        } else {
+          setOpenReportModal(true);
+        }
       })
       .catch(() => {
         message.error('Please fill in all required fields');
