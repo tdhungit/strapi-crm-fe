@@ -2,6 +2,7 @@ import { App, Input, Modal, Select } from 'antd';
 import { useEffect, useState } from 'react';
 import ApiService from '../../../services/ApiService';
 import { getAllWidgets } from '../../collections/widgets';
+import ChartBuilder from '../../reports/components/ChartBuilder';
 
 export default function AddDashboardItemModal({
   open,
@@ -17,6 +18,8 @@ export default function AddDashboardItemModal({
   onFinish?: () => void;
 }) {
   const { message, notification } = App.useApp();
+
+  const [chartBuilder, setChartBuilder] = useState<any>({});
 
   const widgets = [];
   for (const module in getAllWidgets()) {
@@ -103,6 +106,8 @@ export default function AddDashboardItemModal({
       onCancel={() => onOpenChange(false)}
       onOk={() => handleSave()}
       title='Add Dashboard Item'
+      maskClosable={false}
+      width={800}
     >
       <div className='mt-4 mb-6 flex flex-col space-y-4'>
         <div className='w-full'>
@@ -119,20 +124,47 @@ export default function AddDashboardItemModal({
         </div>
         <div className='w-full'>
           <label className='block text-sm font-medium text-gray-700 mb-2'>
-            Select Widget
+            Type
           </label>
           <Select
-            value={values.widget}
+            value={values.type || 'Widget'}
+            onChange={(e) => setValues((prev: any) => ({ ...prev, type: e }))}
             className='w-full'
-            onChange={handleSelectWidget}
           >
-            {widgets.map((widget) => (
-              <Select.Option key={widget.id} value={widget.id}>
-                {widget.module}:{widget.name}
-              </Select.Option>
-            ))}
+            <Select.Option value='Widget'>Widget</Select.Option>
+            <Select.Option value='Builder'>Builder</Select.Option>
+            <Select.Option value='Query'>Query</Select.Option>
           </Select>
         </div>
+
+        {(!values.type || values.type === 'Widget') && (
+          <div className='w-full'>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Select Widget
+            </label>
+            <Select
+              value={values.widget}
+              className='w-full'
+              onChange={handleSelectWidget}
+            >
+              {widgets.map((widget) => (
+                <Select.Option key={widget.id} value={widget.id}>
+                  {widget.module}:{widget.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+        )}
+
+        {(values.type === 'Query' || values.type === 'Builder') && (
+          <div className='w-full'>
+            <ChartBuilder
+              values={{ ...chartBuilder, queryType: values.type }}
+              onChange={setChartBuilder}
+            />
+          </div>
+        )}
+
         <div className='w-full'>
           <label className='block text-sm font-medium text-gray-700 mb-2'>
             Height

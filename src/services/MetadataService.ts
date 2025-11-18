@@ -1,3 +1,4 @@
+import { availableCollections } from '../config/collections';
 import type { ComponentType } from '../types/components';
 import type { ContentTypeType } from '../types/content-types';
 import type {
@@ -95,6 +96,21 @@ class MetadataService {
       });
     }
     return fields;
+  }
+
+  getAvailableContentTypes() {
+    const contentTypes = this.getSavedContentTypes();
+
+    return contentTypes.filter((ct) =>
+      availableCollections.includes(ct.collectionName)
+    );
+  }
+
+  getAvailableContentTypeOptions() {
+    return this.getAvailableContentTypes().map((ct) => ({
+      label: ct.displayName,
+      value: ct.collectionName,
+    }));
   }
 }
 

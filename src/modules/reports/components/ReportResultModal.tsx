@@ -109,6 +109,7 @@ export default function ReportResultModal({
         onFinish?.(query, filters, jsonTree, fields);
       }}
       width={1100}
+      maskClosable={false}
     >
       {generating ? (
         <div>Generating report...</div>

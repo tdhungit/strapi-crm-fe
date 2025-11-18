@@ -18,7 +18,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import AssignUserInput from '../../components/fields/assign-user/AssignUserInput';
 import SqlInput from '../../components/fields/sql/SqlInput';
-import { availableCollections } from '../../config/collections';
 import { breadcrumbItemRender } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
@@ -45,17 +44,7 @@ export default function ReportForm() {
   const [queryType, setQueryType] = useState<string>('');
   const [rawQuery, setRawQuery] = useState<string>('');
 
-  const contentTypes = MetadataService.getSavedContentTypes();
-
-  // const reportCT = contentTypes.find((ct) => ct.collectionName === 'reports');
-
-  const availableContentTypes = contentTypes.filter((ct) =>
-    availableCollections.includes(ct.collectionName)
-  );
-  const moduleOptions = availableContentTypes.map((ct) => ({
-    label: ct.displayName,
-    value: ct.collectionName,
-  }));
+  const moduleOptions = MetadataService.getAvailableContentTypeOptions();
 
   useEffect(() => {
     if (!selectedModule || queryType === 'query') {
