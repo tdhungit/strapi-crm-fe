@@ -118,9 +118,9 @@ export default function ReportResultModal({
             columns={columns}
             dataSource={result.data}
             pagination={{
-              pageSize: result.meta.pagination.pageSize,
-              total: result.meta.pagination.total,
-              current: result.meta.pagination.page,
+              pageSize: result.meta.pagination?.pageSize || 10,
+              total: result.meta.pagination?.total || 0,
+              current: result.meta.pagination?.page || 1,
               disabled: true,
             }}
           />

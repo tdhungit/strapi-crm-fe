@@ -2,6 +2,7 @@ import { SaveOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import type { Config, ImmutableTree } from '@react-awesome-query-builder/antd';
 import {
+  Alert,
   App,
   Button,
   Card,
@@ -316,7 +317,13 @@ export default function ReportForm() {
 
         {queryType === 'query' && selectedModule && (
           <Card title='Query' size='small'>
-            <SqlInput value={rawQuery} onChange={setRawQuery} />
+            <Alert
+              message='Enter your query here and ensure it is valid and limited to 1000 results'
+              type='info'
+            />
+            <div className='mt-2'>
+              <SqlInput value={rawQuery} onChange={setRawQuery} />
+            </div>
           </Card>
         )}
 
