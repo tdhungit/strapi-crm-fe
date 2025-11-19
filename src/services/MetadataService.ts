@@ -112,6 +112,19 @@ class MetadataService {
       value: ct.collectionName,
     }));
   }
+
+  getContentTypeFieldOptions(module: string) {
+    const contentType = this.getContentTypeByModule(module);
+    if (!contentType) {
+      return [];
+    }
+
+    const fields = this.getContentTypeListFields(contentType);
+    return fields.map((field) => ({
+      label: field.name,
+      value: field.name,
+    }));
+  }
 }
 
 export default MetadataService.getInstance();

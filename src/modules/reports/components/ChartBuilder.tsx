@@ -7,7 +7,11 @@ interface ValuesType {
   chartType?: string;
   module?: string;
   queryType?: string;
-  query?: string;
+  metadata?: {
+    query?: string;
+    xAxis?: string;
+    yAxis?: string;
+  };
 }
 
 export default function ChartBuilder({
@@ -36,7 +40,7 @@ export default function ChartBuilder({
   return (
     <div className='w-full space-y-4'>
       <div className='w-full'>
-        <label className='block text-sm font-medium text-gray-700'>
+        <label className='block text-sm font-medium text-gray-700 mb-1'>
           Chart Type
         </label>
         <Select
@@ -47,7 +51,7 @@ export default function ChartBuilder({
         />
       </div>
       <div className='w-full'>
-        <label className='block text-sm font-medium text-gray-700'>
+        <label className='block text-sm font-medium text-gray-700 mb-1'>
           Module
         </label>
         <Select
@@ -61,8 +65,13 @@ export default function ChartBuilder({
       {values.module && values.queryType === 'Query' && values.chartType && (
         <ChartQueryBuilder
           chartType={values.chartType}
-          value={values.query || ''}
-          onChange={(query) => onChange({ ...values, query })}
+          value={values.metadata || {}}
+          onChange={(newValue) =>
+            onChange({
+              ...values,
+              metadata: { ...values.metadata, ...newValue },
+            })
+          }
         />
       )}
 

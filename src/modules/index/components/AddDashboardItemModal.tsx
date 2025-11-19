@@ -19,8 +19,6 @@ export default function AddDashboardItemModal({
 }) {
   const { message, notification } = App.useApp();
 
-  const [chartBuilder, setChartBuilder] = useState<any>({});
-
   const widgets = [];
   for (const module in getAllWidgets()) {
     for (const widget in getAllWidgets()[module]) {
@@ -39,23 +37,36 @@ export default function AddDashboardItemModal({
   };
 
   const handleSave = () => {
-    if (!values.title || !values.widget) {
+    if (!values.title) {
       notification.error({
         message: 'Please fill all the fields',
       });
       return;
     }
 
-    message.loading('Saving...', 0);
-    const [module, widget] = values.widget.split(':');
-    const body: any = {
+    let body: any = {
       dashboard: dashboard.id,
       title: values.title,
-      widget,
-      metadata: {
-        module,
-      },
+      type: values.type,
     };
+
+    if (values.type === 'Widget') {
+      const [module, widget] = values.widget.split(':');
+      body = {
+        ...body,
+        widget,
+        metadata: {
+          module,
+        },
+      };
+    } else {
+      body = {
+        ...body,
+        metadata: values.metadata,
+      };
+    }
+
+    message.loading('Saving...', 0);
 
     let service;
     if (item?.documentId) {
@@ -111,7 +122,7 @@ export default function AddDashboardItemModal({
     >
       <div className='mt-4 mb-6 flex flex-col space-y-4'>
         <div className='w-full'>
-          <label className='block text-sm font-medium text-gray-700 mb-2'>
+          <label className='block text-sm font-medium text-gray-700 mb-1'>
             Title
           </label>
           <Input
@@ -123,7 +134,7 @@ export default function AddDashboardItemModal({
           />
         </div>
         <div className='w-full'>
-          <label className='block text-sm font-medium text-gray-700 mb-2'>
+          <label className='block text-sm font-medium text-gray-700 mb-1'>
             Type
           </label>
           <Select
@@ -139,7 +150,7 @@ export default function AddDashboardItemModal({
 
         {(!values.type || values.type === 'Widget') && (
           <div className='w-full'>
-            <label className='block text-sm font-medium text-gray-700 mb-2'>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
               Select Widget
             </label>
             <Select
@@ -159,14 +170,19 @@ export default function AddDashboardItemModal({
         {(values.type === 'Query' || values.type === 'Builder') && (
           <div className='w-full'>
             <ChartBuilder
-              values={{ ...chartBuilder, queryType: values.type }}
-              onChange={setChartBuilder}
+              values={{ ...values.metadata, queryType: values.type }}
+              onChange={(newValue) =>
+                setValues((prev: any) => ({
+                  ...prev,
+                  metadata: { ...prev.metadata, ...newValue },
+                }))
+              }
             />
           </div>
         )}
 
         <div className='w-full'>
-          <label className='block text-sm font-medium text-gray-700 mb-2'>
+          <label className='block text-sm font-medium text-gray-700 mb-1'>
             Height
           </label>
           <Input
