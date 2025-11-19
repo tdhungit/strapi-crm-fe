@@ -76,6 +76,7 @@ export default function ChartQueryBuilder({
               options={selectFields}
               placeholder='Select fields'
               className='w-full'
+              value={value?.xAxis}
               onChange={(value) => onValueChange('xAxis', value)}
             />
           </div>
@@ -87,6 +88,7 @@ export default function ChartQueryBuilder({
               options={selectFields}
               placeholder='Select fields'
               className='w-full'
+              value={value?.yAxis}
               onChange={(value) => onValueChange('yAxis', value)}
             />
           </div>

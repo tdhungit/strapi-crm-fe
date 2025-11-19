@@ -1,4 +1,5 @@
 import { availableCollections } from '../config/collections';
+import { camelToTitle } from '../helpers/views_helper';
 import type { ComponentType } from '../types/components';
 import type { ContentTypeType } from '../types/content-types';
 import type {
@@ -120,10 +121,15 @@ class MetadataService {
     }
 
     const fields = this.getContentTypeListFields(contentType);
-    return fields.map((field) => ({
-      label: field.name,
+    const options = fields.map((field) => ({
+      label: camelToTitle(field.name),
       value: field.name,
     }));
+    options.unshift({
+      label: 'ID',
+      value: 'id',
+    });
+    return options;
   }
 }
 

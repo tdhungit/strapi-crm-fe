@@ -79,6 +79,13 @@ export default function ChartBuilder({
         <ChartFilterBuilder
           module={values.module}
           chartType={values.chartType}
+          value={values.metadata || {}}
+          onChange={(newValue) =>
+            onChange({
+              ...values,
+              metadata: { ...values.metadata, ...newValue },
+            })
+          }
         />
       )}
     </div>

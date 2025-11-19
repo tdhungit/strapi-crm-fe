@@ -80,6 +80,11 @@ export default function QueryBuilder({
     onInit?.(tree!, queryConfig);
   }, [module]);
 
+  useEffect(() => {
+    if (!value) return;
+    setTree(value);
+  }, [value]);
+
   const formatFieldLabel = (fieldName: string): string => {
     return (
       fieldName.charAt(0).toUpperCase() + fieldName.slice(1).replace(/_/g, ' ')

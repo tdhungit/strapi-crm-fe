@@ -15,10 +15,14 @@ export default function DashboardViews({
   dashboardId,
   openAddItem,
   setOpenAddItem,
+  resetAddItemForm,
+  setResetAddItemForm,
 }: {
   dashboardId: string;
   openAddItem: boolean;
   setOpenAddItem: (open: boolean) => void;
+  resetAddItemForm?: boolean;
+  setResetAddItemForm?: (reset: boolean) => void;
 }) {
   const [dashboard, setDashboard] = useState<any>({});
   const [items, setItems] = useState<any[]>([]);
@@ -113,6 +117,13 @@ export default function DashboardViews({
     const Widget = getWidget(item.metadata.module, item.widget);
     return <Widget module={item.metadata.module} {...props} />;
   };
+
+  useEffect(() => {
+    if (resetAddItemForm) {
+      setSelectedItem(null);
+      setResetAddItemForm?.(false);
+    }
+  }, [resetAddItemForm]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>

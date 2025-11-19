@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [dashboards, setDashboards] = useState<any[]>([]);
   const [selectedDashboardId, setSelectedDashboardId] = useState<string>('');
   const [openAddItem, setOpenAddItem] = useState(false);
+  const [resetAddItemForm, setResetAddItemForm] = useState(false);
   const [editDashboardId, setEditDashboardId] = useState<string>('');
 
   const loadDashboards = () => {
@@ -91,7 +92,10 @@ export default function Dashboard() {
             variant='solid'
             color='blue'
             icon={<ForkOutlined />}
-            onClick={() => setOpenAddItem(true)}
+            onClick={() => {
+              setResetAddItemForm(true);
+              setOpenAddItem(true);
+            }}
           />
         </Space>
       }
@@ -102,6 +106,8 @@ export default function Dashboard() {
             dashboardId={selectedDashboardId}
             openAddItem={openAddItem}
             setOpenAddItem={setOpenAddItem}
+            resetAddItemForm={resetAddItemForm}
+            setResetAddItemForm={setResetAddItemForm}
           />
         </div>
       )}

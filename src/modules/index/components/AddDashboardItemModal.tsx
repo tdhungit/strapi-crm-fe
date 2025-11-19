@@ -105,8 +105,18 @@ export default function AddDashboardItemModal({
     if (item) {
       setValues({
         title: item.title,
+        type: item.type,
         widget: `${item.metadata.module}:${item.widget}`,
         height: item.height,
+        metadata: item.metadata,
+      });
+    } else {
+      setValues({
+        title: '',
+        type: 'Widget',
+        widget: '',
+        height: 300,
+        metadata: {},
       });
     }
   }, [item]);
@@ -119,6 +129,7 @@ export default function AddDashboardItemModal({
       title='Add Dashboard Item'
       maskClosable={false}
       width={800}
+      destroyOnHidden
     >
       <div className='mt-4 mb-6 flex flex-col space-y-4'>
         <div className='w-full'>
