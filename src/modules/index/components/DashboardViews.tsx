@@ -107,6 +107,7 @@ export default function DashboardViews({
     const { item } = props;
 
     if (item?.type === 'Query') {
+      console.log(item);
       return <DashboardItemQueryView item={item} />;
     }
 

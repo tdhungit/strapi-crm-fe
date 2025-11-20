@@ -10,7 +10,7 @@ export default function DashboardItemQueryView({ item }: { item: any }) {
   const [queryData, setQueryData] = useState<any>(null);
 
   useEffect(() => {
-    if (!item?.metadata?.query) {
+    if (!item?.metadata?.query && !item?.metadata?.metadata?.query) {
       return;
     }
 
