@@ -1,16 +1,15 @@
 import { Bar, Column, Line, Pie } from '@ant-design/charts';
 import { Table } from 'antd';
 import { useEffect, useState } from 'react';
-import { camelToTitle } from '../../../helpers/views_helper';
 import ApiService from '../../../services/ApiService';
 
-export default function DashboardItemQueryView({ item }: { item: any }) {
+export default function DashboardItemFilterBuilder({ item }: { item: any }) {
   const [loading, setLoading] = useState(false);
   const [chartType, setChartType] = useState('table');
   const [queryData, setQueryData] = useState<any>(null);
 
   useEffect(() => {
-    if (!item?.metadata?.query && !item?.metadata?.metadata?.query) {
+    if (!item.metadata?.filters && !item.metadata?.metadata?.filters) {
       return;
     }
 
@@ -23,17 +22,24 @@ export default function DashboardItemQueryView({ item }: { item: any }) {
         setLoading(false);
       }
     );
-  }, [item]);
+  }, []);
 
   const renderTable = () => {
+    if (queryData?.data && queryData?.data.length === 0) {
+      return <div className='px-7 py-4 text-center'>No data</div>;
+    }
+
     const columns: any[] = [];
-    queryData?.meta?.fields?.forEach((field: any) => {
+    const row: any = queryData?.data[0];
+
+    Object.keys(row || {}).forEach((key) => {
       columns.push({
-        title: camelToTitle(field.name),
-        dataIndex: field.name,
-        key: field.name,
+        title: key,
+        dataIndex: key,
+        key: key,
       });
     });
+
     return <Table columns={columns} dataSource={queryData?.data || []} />;
   };
 
@@ -43,14 +49,20 @@ export default function DashboardItemQueryView({ item }: { item: any }) {
     };
 
     chartConfig.xField =
-      item.metadata?.xField ||
-      item.metadata?.metadata?.xField ||
+      item.metadata?.xAxis ||
+      item.metadata?.metadata?.xAxis ||
       queryData?.meta?.fields?.[0]?.name;
+
+    const metricOperation =
+      item.metadata?.metricOperation ||
+      item.metadata?.metadata?.metricOperation ||
+      '';
     chartConfig.yField =
-      item.metadata?.yField ||
-      item.metadata?.metadata?.yField ||
-      queryData?.meta?.fields?.[1]?.name ||
-      queryData?.meta?.fields?.[0]?.name;
+      (metricOperation ? `${metricOperation}_` : '') +
+      (item.metadata?.yAxis ||
+        item.metadata?.metadata?.yAxis ||
+        queryData?.meta?.fields?.[1]?.name ||
+        queryData?.meta?.fields?.[0]?.name);
 
     switch (chartType) {
       case 'bar':
@@ -68,23 +80,13 @@ export default function DashboardItemQueryView({ item }: { item: any }) {
     }
   };
 
-  if (item?.type !== 'Query') {
-    return (
-      <div className='text-orange-500 px-7 py-4'>
-        Not support type {item?.type}
-      </div>
-    );
-  }
-
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className='px-7 py-4'>Loading...</div>;
   }
 
   return (
-    <>
-      <div className='px-7 py-4'>
-        {chartType === 'table' ? renderTable() : renderChart()}
-      </div>
-    </>
+    <div className='px-7 py-4'>
+      {chartType === 'table' ? renderTable() : renderChart()}
+    </div>
   );
 }

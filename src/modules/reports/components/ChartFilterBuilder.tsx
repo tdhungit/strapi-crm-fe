@@ -12,6 +12,7 @@ import QueryBuilder from './QueryBuilder';
 
 interface ValueType {
   jsonTree?: any;
+  jsonLogic?: any;
   filters?: any;
   xAxis?: string;
   yAxis?: string;
@@ -41,6 +42,7 @@ export default function ChartFilterBuilder({
     onChange?.({
       ...(value || {}),
       jsonTree: exported.jsonTree,
+      jsonLogic: exported.jsonLogic,
       filters,
       xAxis: value?.xAxis,
       yAxis: value?.yAxis,

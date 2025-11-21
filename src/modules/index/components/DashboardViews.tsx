@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 import ApiService from '../../../services/ApiService';
 import { getWidget } from '../../collections/widgets';
 import AddDashboardItemModal from './AddDashboardItemModal';
+import DashboardItemFilterBuilder from './DashboardItemFilterBuilder';
 import DashboardItemQueryView from './DashboardItemQueryView';
 
 export default function DashboardViews({
@@ -107,8 +108,11 @@ export default function DashboardViews({
     const { item } = props;
 
     if (item?.type === 'Query') {
-      console.log(item);
       return <DashboardItemQueryView item={item} />;
+    }
+
+    if (item?.type === 'Builder') {
+      return <DashboardItemFilterBuilder item={item} />;
     }
 
     if (!item?.widget || !item?.metadata?.module) {

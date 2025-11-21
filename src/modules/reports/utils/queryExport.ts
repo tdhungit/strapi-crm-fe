@@ -19,7 +19,7 @@ export const exportQuery = (
   config: Config
 ): QueryExport => {
   return {
-    // jsonLogic: jsonLogicFormat(tree, config),
+    jsonLogic: jsonLogicFormat(tree, config),
     queryString: queryString(tree, config) || '',
     // mongodb: mongodbFormat(tree, config),
     sql: sqlFormat(tree, config),
