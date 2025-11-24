@@ -54,6 +54,7 @@ export default function QueryBuilder({
   onChange,
   onInit,
 }: QueryBuilderProps) {
+  const [init, setInit] = useState(false);
   const [config, setConfig] = useState<Config | null>(null);
   const [tree, setTree] = useState<ImmutableTree | null>(null);
 
@@ -82,7 +83,9 @@ export default function QueryBuilder({
 
   useEffect(() => {
     if (!value) return;
+    if (init) return;
     setTree(value);
+    setInit(true);
   }, [value]);
 
   const formatFieldLabel = (fieldName: string): string => {

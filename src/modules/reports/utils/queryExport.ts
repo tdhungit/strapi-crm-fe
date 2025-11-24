@@ -32,7 +32,7 @@ export const exportQuery = (
  */
 export const toStrapiFilters = (tree: ImmutableTree, config: Config): any => {
   const jsonLogic = jsonLogicFormat(tree, config);
-  console.log('jsonLogic output:', JSON.stringify(jsonLogic, null, 2));
+  // console.log('jsonLogic output:', JSON.stringify(jsonLogic, null, 2));
 
   // Convert JSON Logic to Strapi filters
   // This is a basic implementation - you may need to extend it
