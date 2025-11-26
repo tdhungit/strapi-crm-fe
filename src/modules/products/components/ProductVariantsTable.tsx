@@ -46,7 +46,7 @@ export default function ProductVariantsTable({
                 </Tag>
                 {entity.product_variant_attributes.map((attribute: any) => (
                   <Tag key={attribute.id} color='green'>
-                    {attribute.product_attribute.name}:{' '}
+                    {attribute.product_attribute?.name || 'Unknown'}:{' '}
                     <span className='font-bold'>
                       {attribute.attribute_value}
                     </span>
