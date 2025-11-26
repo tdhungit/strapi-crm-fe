@@ -179,6 +179,7 @@ class ProductService {
             variant.product_variant_attributes.forEach(
               (attribute: ProductVariantAttributeType) => {
                 const attributeData = attribute.product_attribute as any;
+                if (!attributeData) return;
                 variantData.attributes.push({
                   attribute: {
                     key: attributeData.id,
