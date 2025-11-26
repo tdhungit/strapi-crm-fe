@@ -48,7 +48,7 @@ export default function ProductVariantsTable({
                   <Tag key={attribute.id} color='green'>
                     {attribute.product_attribute?.name || 'Unknown'}:{' '}
                     <span className='font-bold'>
-                      {attribute.attribute_value}
+                      {attribute.attribute_value || 'Unknown'}
                     </span>
                   </Tag>
                 ))}
