@@ -42,6 +42,7 @@ export default function CollectionListComponent({
   hasProfile,
   noEdit,
   updateColumns,
+  disableDrawer,
   drawerComponent,
   populate,
   mainField,
@@ -61,6 +62,7 @@ export default function CollectionListComponent({
     columns: ProColumnType<any>[],
     options?: ListLayoutOptions
   ) => ProColumnType<any>[];
+  disableDrawer?: boolean;
   drawerComponent?: React.ComponentType<any>;
   populate?: string[];
   mainField?: string;
@@ -80,6 +82,8 @@ export default function CollectionListComponent({
     const saved = localStorage.getItem(`collection-${module}-panel-collapsed`);
     return saved ? JSON.parse(saved) : false;
   });
+
+  const DrawerComponent = drawerComponent || CollectionDetailDrawer;
 
   const layoutOptions: ListLayoutOptions = {
     onClickMainField: (record: any) => {
@@ -110,10 +114,10 @@ export default function CollectionListComponent({
   }, [module]);
 
   useEffect(() => {
-    if (selectRecordId) {
+    if (selectRecordId && !disableDrawer) {
       setIsOpenDrawer(true);
     }
-  }, [selectRecordId]);
+  }, [selectRecordId, disableDrawer]);
 
   useEffect(() => {
     if (module) {
@@ -271,8 +275,6 @@ export default function CollectionListComponent({
   ) {
     toolBars = [...toolBars, ...toolBarRenderExtra];
   }
-
-  const DrawerComponent = drawerComponent || CollectionDetailDrawer;
 
   if (!config?.layouts) return <PageLoading />;
 

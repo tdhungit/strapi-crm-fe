@@ -44,6 +44,7 @@ export default function WorkflowList() {
             </Link>
           </Space>
         )}
+        disableDrawer={true}
       />
     </>
   );
