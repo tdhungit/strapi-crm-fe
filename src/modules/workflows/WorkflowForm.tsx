@@ -35,6 +35,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { breadcrumbItemRender, camelToTitle } from '../../helpers/views_helper';
 import ApiService from '../../services/ApiService';
 import MetadataService from '../../services/MetadataService';
+import AddToCampaign from './components/AddToCampaign';
 import SendMailAction from './components/SendMailAction';
 import SendSMSAction from './components/SendSMSAction';
 
@@ -558,6 +559,9 @@ export default function WorkflowForm() {
         break;
       case 'Send_Sms':
         component = SendSMSAction;
+        break;
+      case 'Add_To_Campaign':
+        component = AddToCampaign;
         break;
       default:
         return <></>;
