@@ -282,6 +282,10 @@ export function getEditLayoutPanels(
           fieldOptions.target
         );
 
+        const field = config.attributes?.[item.name] || {};
+        if (fieldOptions.relation === 'oneToMany' && !field.mappedBy) {
+          return;
+        }
         panels.push({
           name: item.name,
           label: fieldOptions.label || item.name,
@@ -290,7 +294,7 @@ export function getEditLayoutPanels(
           moduleApi: contentType?.pluralName || '',
           parentModule: config.collectionName || '',
           parentModuleApi: config.pluralName || '',
-          field: config.attributes?.[item.name] || {},
+          field,
         });
       }
     });
