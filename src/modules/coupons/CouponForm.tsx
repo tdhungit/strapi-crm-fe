@@ -138,12 +138,12 @@ export default function CouponForm() {
                 ? [
                     {
                       path: `/collections/coupons/detail/${id}`,
-                      breadcrumbName: 'Coupon Detail',
+                      breadcrumbName: 'Detail',
                     },
                   ]
                 : []),
               {
-                breadcrumbName: id ? 'Edit Coupon' : 'Create Coupon',
+                breadcrumbName: id ? 'Edit' : 'Create',
               },
             ],
           },
