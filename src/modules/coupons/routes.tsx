@@ -1,4 +1,5 @@
 import CouponDetail from './CouponDetail';
+import CouponForm from './CouponForm';
 import CouponList from './CouponList';
 
 const routes = [
@@ -9,6 +10,14 @@ const routes = [
   {
     path: '/collections/coupons/detail/:id',
     element: <CouponDetail />,
+  },
+  {
+    path: '/collections/coupons/create',
+    element: <CouponForm />,
+  },
+  {
+    path: '/collections/coupons/edit/:id',
+    element: <CouponForm />,
   },
 ];
 
